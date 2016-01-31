@@ -1,0 +1,57 @@
+html, body{
+    width:100%;
+    height:100%
+}
+#container-wrap {
+    display:block;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+.visual-dummy {
+    position:relative;
+    left:0px;
+    top:0px;
+    width:100px;
+    height:100px;
+    overflow:visible;
+    background-color: #343434;
+}
+
+.container
+{
+    display:block;
+    width:100%;
+    height:100%;
+    background-color:#cecece;
+}
+
+#centerx
+ {
+     position:absolute;
+     left:50%;
+     top:0px;
+     width:1px;
+     height:100%;
+     background-color:#000
+ }
+
+#centery
+{
+    position:absolute;
+    top:50%;
+    left:0px;
+    height:1px;
+    width:100%;
+    background-color:#000
+}
+
+.layer
+{
+    position:relative;
+    left:0px;
+    top:0px;
+    background-image: url("/assets/images/grid.png");
+    transform-origin: top left;
+}
