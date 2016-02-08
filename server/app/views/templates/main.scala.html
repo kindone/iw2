@@ -12,6 +12,100 @@
         @*<script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js" type="text/javascript"></script>*@
         @*<script src="@routes.Assets.versioned("lib/bootstrap/js/bootstrap.min.js")" type="text/javascript"></script>*@
 
+        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("codemirror.js"))"></script>
+        <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("codemirror.css"))">
+        <!--<script src="@routes.WebJarAssets.at(WebJarAssets.locate("mode/markdown/markdown.js"))"></script>-->
+        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("addon/mode/overlay.js"))"></script>
+        <script src="/assets/javascripts/markdown.js"></script>
+        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("mode/javascript/javascript.js"))"></script>
+        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("mode/gfm/gfm.js"))"></script>
+        <style type="text/css" media="screen">
+
+            #codemirror-wrapper {
+                border:1px solid black;
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+            }
+            #codemirror-editor {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+
+                border 1px solid black;
+            }
+
+            .cm-formatting {
+                opacity:0.4
+            }
+
+            .cm-formatting-header-1:first-child,
+            .cm-formatting-header-2,
+            .cm-formatting-header-3,
+            .cm-formatting-header-4,
+            .cm-formatting-header-5,
+            .cm-formatting-header-6{
+                position:relative;
+                font-size:0px;
+                /*bottom:0px;*/
+                display:inline-block;
+                width:0;
+
+            }
+
+            .cm-formatting-header-1::before,
+            .cm-formatting-header-2::before,
+            .cm-formatting-header-3::before,
+            .cm-formatting-header-4::before,
+            .cm-formatting-header-5::before,
+            .cm-formatting-header-6::before
+            {
+                font-size:13px !important;
+                position:absolute;
+                right: 0px;
+                top: -0.75em;
+                clear:both;
+            }
+
+            .cm-formatting-header-1::before {
+            content: "# "
+            }
+
+            .cm-formatting-header-2::before {
+            content: "## "
+            }
+
+            .cm-formatting-header-3::before {
+            content: "### "
+            }
+
+            .cm-formatting-header-4::before {
+            content: "#### "
+            }
+
+            .cm-formatting-header-5::before {
+            content: "##### "
+            }
+
+            .cm-formatting-header-6::before {
+            content: "###### "
+            }
+
+            .CodeMirror-code > pre {
+            margin-left:60px;
+            }
+            .CodeMirror-cursors {
+            margin-left:60px;
+            }
+
+            .CodeMirror-selected {
+            margin-left:60px;
+            }
+          </style>
     </head>
     <body>
         @content

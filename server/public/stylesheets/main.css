@@ -52,6 +52,85 @@ html, body{
     position:relative;
     left:0px;
     top:0px;
-    background-image: url("/assets/images/grid.png");
+    /*background-image: url("/assets/images/grid.png");*/
     transform-origin: top left;
+}
+
+.controlpad
+{
+    position:absolute;
+    left:10px;
+    top:10px;
+    width:100px;
+    height:20px;
+}
+
+.btn-add {
+}
+
+.sheet {
+    position:absolute;
+    left:100px;
+    top:100px;
+    width:100px;
+    height:100px;
+    background-color:#fb00fb;
+
+}
+
+.sheet-resizehandle {
+    position:absolute;
+    background-color:black;
+}
+
+.sheet-resizehandle-topleft {
+    top:0px;
+    left:0px;
+    width:10px;
+    height:10px;
+}
+
+.sheet-resizehandle-topright {
+    top:0px;
+    right:0px;
+    width:10px;
+    height:10px;
+}
+
+.sheet-resizehandle-bottomleft {
+    bottom:0px;
+    left:0px;
+    width:10px;
+    height:10px;
+}
+
+.sheet-resizehandle-bottomright {
+    bottom:0px;
+    right:0px;
+    width:10px;
+    height:10px;
+}
+
+.sheet-resizehandle-left {
+    left:0px;
+    width:10px;
+    height:100%;
+}
+
+.sheet-resizehandle-right {
+     right:0px;
+     width:10px;
+     height:100%;
+ }
+
+.sheet-resizehandle-top {
+    top:0px;
+    height:10px;
+    width:100%;
+}
+
+.sheet-resizehandle-bottom {
+    bottom:0px;
+    height:10px;
+    width:100%;
 }

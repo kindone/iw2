@@ -30,7 +30,7 @@ lazy val server = (project in file("server")).settings(
     "com.typesafe.play" %% "play-slick" % "1.0.1",
     "com.lihaoyi" %% "upickle" % "0.3.4",
     "org.webjars" %% "webjars-play" % "2.4.0",
-
+    "org.webjars" % "codemirror" % "5.11",
     "org.webjars" % "font-awesome" % "4.4.0"
   )
  ).enablePlugins(PlayScala).
