@@ -8,7 +8,7 @@ import scala.scalajs.js
 import scala.scalajs.js.JSApp
 import scalatags.JsDom.all._
 import org.scalajs.dom
-import org.scalajs.jquery.{ JQueryEventObject, jQuery, JQuery }
+import org.scalajs.jquery._
 import facades.Velocity._
 
 /**
@@ -23,14 +23,20 @@ object WallApp extends JSApp {
 
     jQuery("#container-wrap").append(wall.element)
     wall.setup()
+
     jQuery("#container-wrap").append(controlPad.element)
     controlPad.setup()
     controlPad.setOnAddButtonClickListener({ () =>
       wall.createEmptySheet()
     })
 
-    //    val options = js.Dictionary("rtlMoveVisually" -> false, "mode" -> js.Dictionary("name" -> "gfm", "highlightFormatting" -> true), "lineWrapping" -> true)
-    //val cm = CodeMirror(jQuery(wall.element).find(".layer").get(0).asInstanceOf[Element], options)
+    val editorElement = {
+      val containerDiv = div(cls := "editor")()
+      jQuery(containerDiv.render)
+    }
+
+    jQuery("#container-wrap").append(editorElement)
+    val cm = CodeMirror(editorElement.get(0).asInstanceOf[Element], js.Dictionary("rtlMoveVisually" -> false, "mode" -> js.Dictionary("name" -> "gfm", "highlightFormatting" -> true), "lineWrapping" -> true))
 
   }
 }
