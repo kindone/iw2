@@ -47,9 +47,7 @@ class Sheet(private var x: Double = 0.0, private var y: Double = 0.0, private va
     sheetTextElement.html(converter.makeHtml(text))
   }
 
-  def getText(): String = {
-    sheetText
-  }
+  def getText(): String = sheetText
 
   def setup(scaler: (Double) => Double) = {
 

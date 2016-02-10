@@ -31,8 +31,9 @@ lazy val server = (project in file("server")).settings(
     "com.lihaoyi" %% "upickle" % "0.3.4",
     "org.webjars" %% "webjars-play" % "2.4.0",
     "org.webjars" % "codemirror" % "5.11",
-    "org.webjars" % "font-awesome" % "4.4.0"
-  )
+    "org.webjars" % "font-awesome" % "4.4.0",
+    "org.webjars" % "bootstrap" % "3.3.5"
+)
  ).enablePlugins(PlayScala).
   aggregate(clients.map(projectToRef): _*).
   dependsOn(sharedJvm)
@@ -51,6 +52,7 @@ lazy val scalajs = (project in file("scalajs")).settings(
   jsDependencies ++= Seq(
     "org.webjars" % "bootstrap" % "3.3.5" / "bootstrap.min.js",
     "org.webjars" % "jquery" % "2.1.3" / "jquery.min.js",
+    "org.webjars" % "showdown" % "0.3.1" / "compressed/showdown.js",
     "org.webjars" % "jquery-mousewheel" % "3.1.12" / "jquery.mousewheel.js" dependsOn "jquery.min.js",
     "org.webjars" % "velocity" % "1.1.0" / "velocity.min.js" dependsOn "jquery.min.js"
   )
