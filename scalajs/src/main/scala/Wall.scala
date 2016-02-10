@@ -34,8 +34,7 @@ class Wall {
 
   val layer = element.find(".layer")
 
-  def createEmptySheet() = {
-    val sheet = new Sheet(js.Math.random() * 800, js.Math.random() * 800)
+  def appendSheet(sheet: Sheet) = {
     layer.append(sheet.element)
     sheet.setup(scaler)
   }

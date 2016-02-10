@@ -14,4 +14,6 @@ object CodeMirror extends js.Object {
 @js.native
 class CodeMirror extends js.Object {
   def refresh() = js.native
+  def setValue(str: String): Unit = js.native
+  def getValue(): String = js.native
 }

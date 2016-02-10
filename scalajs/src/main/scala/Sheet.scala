@@ -1,5 +1,6 @@
 package com.kindone.infinitewall
 
+import facades.ShowdownConverter
 import org.scalajs.dom
 import org.scalajs.jquery._
 
@@ -13,6 +14,7 @@ class Sheet(private var x: Double = 0.0, private var y: Double = 0.0, private va
 
   val element = {
     val html = div(cls := "sheet")(
+      div(cls := "sheet-text")(),
       div(cls := "sheet-resizehandle sheet-resizehandle-top")(),
       div(cls := "sheet-resizehandle sheet-resizehandle-left")(),
       div(cls := "sheet-resizehandle sheet-resizehandle-right")(),
@@ -30,6 +32,24 @@ class Sheet(private var x: Double = 0.0, private var y: Double = 0.0, private va
 
   private var resizeDownX: Int = 0
   private var resizeDownY: Int = 0
+
+  private var onDoubleClickListener: Option[(Sheet) => Unit] = None
+
+  private val sheetTextElement = element.find(".sheet-text")
+  private var sheetText = ""
+
+  def setOnDoubleClickListener(listener: (Sheet) => Unit) = {
+    onDoubleClickListener = Some(listener)
+  }
+
+  def setText(text: String, converter: ShowdownConverter) = {
+    sheetText = text
+    sheetTextElement.html(converter.makeHtml(text))
+  }
+
+  def getText(): String = {
+    sheetText
+  }
 
   def setup(scaler: (Double) => Double) = {
 
@@ -98,5 +118,10 @@ class Sheet(private var x: Double = 0.0, private var y: Double = 0.0, private va
     }
 
     resizeHandle.each(registerResizeHandle)
+
+    jQuery(element).on("dblclick", (evt: JQueryEventObject) => {
+      val sheet: Sheet = this
+      onDoubleClickListener.map(_.apply(sheet))
+    })
   }
 }

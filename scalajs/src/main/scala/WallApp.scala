@@ -1,6 +1,6 @@
 package com.kindone.infinitewall
 
-import facades.CodeMirror
+import facades.{ ShowdownConverter, CodeMirror }
 import org.scalajs.dom._
 
 import scala.collection.mutable
@@ -16,27 +16,48 @@ import facades.Velocity._
  */
 
 object WallApp extends JSApp {
+
+  val overlay = {
+    val html = div(cls := "overlay-transparent")()
+    jQuery(html.render)
+  }
+
   def main(): Unit = {
+
+    val root = jQuery("#container-wrap")
 
     val wall = new Wall()
     val controlPad = new ControlPad
 
-    jQuery("#container-wrap").append(wall.element)
+    root.append(wall.element)
     wall.setup()
 
-    jQuery("#container-wrap").append(controlPad.element)
+    root.append(controlPad.element)
     controlPad.setup()
-    controlPad.setOnAddButtonClickListener({ () =>
-      wall.createEmptySheet()
-    })
 
-    val editorElement = {
-      val containerDiv = div(cls := "editor")()
-      jQuery(containerDiv.render)
+    root.append(overlay)
+
+    val showdownConverter = new ShowdownConverter()
+
+    val editor = new Editor(showdownConverter)
+    root.append(editor.element)
+    editor.setup()
+
+    lazy val editorClose: js.Function1[JQueryEventObject, js.Any] = (evt: JQueryEventObject) => {
+      editor.close()
+      overlay.hide()
+      overlay.off("mousedown", editorClose)
     }
 
-    jQuery("#container-wrap").append(editorElement)
-    val cm = CodeMirror(editorElement.get(0).asInstanceOf[Element], js.Dictionary("rtlMoveVisually" -> false, "mode" -> js.Dictionary("name" -> "gfm", "highlightFormatting" -> true), "lineWrapping" -> true))
-
+    controlPad.setOnAddButtonClickListener({ () =>
+      // create random sheet
+      val sheet = new Sheet(js.Math.random() * 800, js.Math.random() * 800)
+      wall.appendSheet(sheet)
+      sheet.setOnDoubleClickListener((sheet: Sheet) => {
+        editor.open(sheet)
+        overlay.show()
+        overlay.on("mousedown", editorClose)
+      })
+    })
   }
 }

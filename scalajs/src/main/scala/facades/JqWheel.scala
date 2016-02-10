@@ -9,9 +9,9 @@ import scala.scalajs.js
  */
 @js.native
 class JqWheel extends js.Object {
-  def deltaX: Double = ???
-  def deltaY: Double = ???
-  def deltaFactor: Double = ???
+  def deltaX: Double = js.native
+  def deltaY: Double = js.native
+  def deltaFactor: Double = js.native
 }
 
 object JqWheel {
