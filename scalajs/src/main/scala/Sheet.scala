@@ -10,7 +10,7 @@ import scalatags.JsDom.all._
 /**
  * Created by kindone on 2016. 2. 2..
  */
-class Sheet(private var x: Double = 0.0, private var y: Double = 0.0, private var width: Double = 100, private var height: Double = 100.0) {
+class Sheet(private var x: Double = 0.0, private var y: Double = 0.0, private var width: Double = 100, private var height: Double = 100.0, private var sheetText: String = "") {
 
   val element = {
     val html = div(cls := "sheet")(
@@ -36,7 +36,6 @@ class Sheet(private var x: Double = 0.0, private var y: Double = 0.0, private va
   private var onDoubleClickListener: Option[(Sheet) => Unit] = None
 
   private val sheetTextElement = element.find(".sheet-text")
-  private var sheetText = ""
 
   def setOnDoubleClickListener(listener: (Sheet) => Unit) = {
     onDoubleClickListener = Some(listener)

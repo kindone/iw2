@@ -21,3 +21,6 @@ addSbtPlugin("com.vmunier" % "sbt-play-scalajs" % "0.2.8")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")
 
+addSbtPlugin("org.flywaydb" % "flyway-sbt" % "3.2.1")
+
+resolvers += "Flyway" at "http://flywaydb.org/repo"

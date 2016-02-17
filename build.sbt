@@ -16,6 +16,7 @@ lazy val server = (project in file("server")).settings(
   routesImport += "config.Routes._",
   scalaJSProjects := clients,
   pipelineStages := Seq(scalaJSProd, gzip),
+
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
   libraryDependencies ++= Seq(
     filters,
@@ -32,7 +33,8 @@ lazy val server = (project in file("server")).settings(
     "org.webjars" %% "webjars-play" % "2.4.0",
     "org.webjars" % "codemirror" % "5.11",
     "org.webjars" % "font-awesome" % "4.4.0",
-    "org.webjars" % "bootstrap" % "3.3.5"
+    "org.webjars" % "bootstrap" % "3.3.5",
+    "org.flywaydb" %% "flyway-play" % "2.2.1"
 )
  ).enablePlugins(PlayScala).
   aggregate(clients.map(projectToRef): _*).
@@ -71,9 +73,16 @@ lazy val sharedJs = shared.js
 
 // loads the jvm project at sbt startup
 onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
-
-
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+//
+//seq(flywaySettings: _*)
+//
+//flywayUrl := "jdbc:h2:file:target/foobar"
+//
+//flywayUser := "SA"
+//
+//flywayLocations += "filesystem:conf/db/migration"
+//
+//resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 // Play provides two styles of routers, one expects its actions to be injected, the
 // other, legacy style, accesses its actions statically.
