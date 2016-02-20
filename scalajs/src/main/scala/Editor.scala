@@ -25,7 +25,18 @@ class Editor(showdown: ShowdownConverter) {
   private var sheetOpt: Option[Sheet] = None
 
   def setup() = {
-    cmOpt = Some(CodeMirror(editorElement.get(0).asInstanceOf[Element], js.Dictionary("rtlMoveVisually" -> false, "mode" -> js.Dictionary("name" -> "gfm", "highlightFormatting" -> true), "lineWrapping" -> true)))
+    cmOpt = Some(CodeMirror(editorElement.get(0).asInstanceOf[Element],
+      js.Dictionary("rtlMoveVisually" -> false,
+        "mode" -> js.Dictionary(
+          "name" -> "gfm",
+          "highlightFormatting" -> true),
+        "lineWrapping" -> true)))
+
+    val wheelHandler: js.Function1[JQueryEventObject, Unit] = (evt: JQueryEventObject) => {
+      evt.stopPropagation() // prevent wall to be scaled when wheel-scrolled inside editor
+    }
+
+    jQuery(editorElement).on("mousewheel", wheelHandler)
   }
 
   private var intervalHandle = 0
@@ -38,7 +49,7 @@ class Editor(showdown: ShowdownConverter) {
     intervalHandle = dom.setInterval(() => {
       for (sheet <- sheetOpt; cm <- cmOpt)
         sheet.setText(cm.getValue(), showdown)
-    }, 2000)
+    }, 500)
 
   }
 

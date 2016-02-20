@@ -77,7 +77,7 @@ class Wall {
         .off("mousemove", moveHandler)
     }
 
-    val wheelHandler: js.Function1[JQueryEventObject, js.Any] = (evt: JQueryEventObject) => {
+    val wheelHandler: js.Function1[JQueryEventObject, Boolean] = (evt: JQueryEventObject) => {
       printf("%d %d %d\n", evt.deltaX, evt.deltaY, evt.deltaFactor)
       val prevScale = scale
       if (evt.deltaY > 0)
@@ -89,6 +89,7 @@ class Wall {
       shiftY = (1.0 - scale) * height / 2
 
       layer.css("transform", s"translateX(${panX * scale + shiftX}px) translateY(${panY * scale + shiftY}px) scaleX(${scale}) scaleY(${scale}) rotate(${rotate}deg)")
+      false
     }
 
     jQuery(element).on("mousedown", (evt: JQueryEventObject) => {
@@ -102,10 +103,6 @@ class Wall {
     })
 
     jQuery(dom.window).on("mousewheel", wheelHandler)
-  }
-
-  def setOnUpdate() = {
-
   }
 
 }

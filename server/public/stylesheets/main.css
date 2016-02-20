@@ -76,8 +76,8 @@ html, body{
 
 .sheet-resizehandle {
     position:absolute;
-    background-color:black;
-    opacity:0.01;
+    background-color:fffbaa;
+    opacity:0.0;
 }
 
 .sheet-resizehandle-topleft {
@@ -142,6 +142,7 @@ html, body{
     background-color: white;
     display: none; /*hide initially*/
     overflow:visible;
+    font-size: 11px; /* CodeMirror base font size */
 }
 
 .overlay-transparent {
