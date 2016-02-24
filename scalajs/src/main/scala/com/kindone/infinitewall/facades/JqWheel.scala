@@ -1,4 +1,4 @@
-package facades
+package com.kindone.infinitewall.facades
 
 import org.scalajs.jquery.{ JQueryEventObject, JQuery }
 

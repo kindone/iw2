@@ -1,6 +1,6 @@
-package com.kindone.infinitewall
+package com.kindone.infinitewall.elements
 
-import facades.{ ShowdownConverter, CodeMirror }
+import com.kindone.infinitewall.facades.{ CodeMirror, ShowdownConverter }
 import org.scalajs.dom
 import org.scalajs.dom._
 import org.scalajs.jquery._
@@ -48,14 +48,14 @@ class Editor(showdown: ShowdownConverter) {
     cmOpt.foreach(_.setValue(sheet.getText()))
     intervalHandle = dom.setInterval(() => {
       for (sheet <- sheetOpt; cm <- cmOpt)
-        sheet.setText(cm.getValue(), showdown)
+        sheet.setText(cm.getValue())
     }, 500)
 
   }
 
   def close() = {
     for (sheet <- sheetOpt; cm <- cmOpt)
-      sheet.setText(cm.getValue(), showdown)
+      sheet.setText(cm.getValue())
 
     jQuery(editorElement).hide()
     dom.clearInterval(intervalHandle)

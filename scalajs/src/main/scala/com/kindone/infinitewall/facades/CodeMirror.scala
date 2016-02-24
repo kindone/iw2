@@ -1,4 +1,4 @@
-package facades
+package com.kindone.infinitewall.facades
 
 import scala.scalajs.js
 import org.scalajs.dom.raw.Element

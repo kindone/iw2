@@ -1,17 +1,17 @@
-package com.kindone.infinitewall
+package com.kindone.infinitewall.elements
 
+import com.kindone.infinitewall.persistence.{ Wall => WallModel }
+import com.kindone.infinitewall.events._
+import com.kindone.infinitewall.facades.JqWheel._
 import org.scalajs.dom
-import org.scalajs.dom._
 import org.scalajs.jquery._
 
 import scala.scalajs.js
 import scalatags.JsDom.all._
-import facades.JqWheel._
 
-/**
- * Created by kindone on 2016. 1. 31..
- */
-class Wall {
+class Wall(model: WallModel) extends WallEventDispatcher {
+
+  val id = model.id
 
   private var scale = 1.0
   private var panX = 0.0
@@ -37,16 +37,27 @@ class Wall {
   def appendSheet(sheet: Sheet) = {
     layer.append(sheet.element)
     sheet.setup(scaler)
+    dispatchSheetAppendedEvent(SheetAppendedEvent(sheet.id))
   }
 
   def scaler(distance: Double) = {
     distance / scale
   }
 
+  private def width = jQuery(element).width()
+  private def height = jQuery(element).height()
+
+  private def recalculateTranslation(totalX: Double, totalY: Double) = {
+    panX = (totalX + (scale - 1.0) * width / 2) / scale
+    panY = (totalY + (scale - 1.0) * height / 2) / scale
+    shiftX = totalX - panX * scale
+    shiftY = totalY - panY * scale
+  }
+
   def setup(): Unit = {
 
-    def width = jQuery(element).width()
-    def height = jQuery(element).height()
+    scale = model.scale
+    recalculateTranslation(model.x, model.y)
 
     val layer = jQuery(element).find(".layer")
 
@@ -66,15 +77,16 @@ class Wall {
       val totalY = panY * scale + shiftY + diffY
 
       // recalculate components from diff
-      panX = (totalX + (scale - 1.0) * width / 2) / scale
-      panY = (totalY + (scale - 1.0) * height / 2) / scale
-      shiftX = totalX - panX * scale
-      shiftY = totalY - panY * scale
+      recalculateTranslation(totalX, totalY)
 
       layer.css("transform", s"translateX(${panX * scale + shiftX}px) translateY(${panY * scale + shiftY}px) scaleX($scale) scaleY($scale) rotate(${rotate}deg)")
       jQuery("body")
         .off("mouseup", upHandler)
         .off("mousemove", moveHandler)
+
+      dispatchViewChangedEvent(new ViewChangeEvent(panX * scale + shiftX, panX * scale + shiftX, scale))
+
+      element
     }
 
     val wheelHandler: js.Function1[JQueryEventObject, Boolean] = (evt: JQueryEventObject) => {
@@ -89,6 +101,7 @@ class Wall {
       shiftY = (1.0 - scale) * height / 2
 
       layer.css("transform", s"translateX(${panX * scale + shiftX}px) translateY(${panY * scale + shiftY}px) scaleX(${scale}) scaleY(${scale}) rotate(${rotate}deg)")
+      dispatchViewChangedEvent(new ViewChangeEvent(panX * scale + shiftX, panY * scale + shiftY, scale))
       false
     }
 
@@ -99,7 +112,6 @@ class Wall {
       println("mousedown - pan")
       jQuery("body").on("mousemove", moveHandler)
       jQuery("body").on("mouseup", upHandler)
-
     })
 
     jQuery(dom.window).on("mousewheel", wheelHandler)

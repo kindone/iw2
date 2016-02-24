@@ -29,7 +29,7 @@ lazy val server = (project in file("server")).settings(
     "com.vmunier" %% "play-scalajs-scripts" % "0.3.0",
     "com.typesafe.slick" %% "slick" % "3.0.2",
     "com.typesafe.play" %% "play-slick" % "1.0.1",
-    "com.lihaoyi" %% "upickle" % "0.3.4",
+    "com.lihaoyi" %% "upickle" % "0.3.8",
     "org.webjars" %% "webjars-play" % "2.4.0",
     "org.webjars" % "codemirror" % "5.11",
     "org.webjars" % "font-awesome" % "4.4.0",
@@ -49,7 +49,7 @@ lazy val scalajs = (project in file("scalajs")).settings(
     "com.lihaoyi" %%% "scalatags" % "0.5.4",
     "com.lihaoyi" %%% "scalarx" % "0.2.8",
     "be.doeraene" %%% "scalajs-jquery" % "0.8.0",
-    "com.lihaoyi" %%% "upickle" % "0.3.4"
+    "com.lihaoyi" %%% "upickle" % "0.3.8"
   ),
   jsDependencies ++= Seq(
     "org.webjars" % "bootstrap" % "3.3.5" / "bootstrap.min.js",
