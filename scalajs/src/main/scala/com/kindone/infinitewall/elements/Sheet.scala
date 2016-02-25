@@ -21,11 +21,12 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends SheetEventD
       div(cls := "sheet-resizehandle sheet-resizehandle-right")(),
       div(cls := "sheet-resizehandle sheet-resizehandle-bottom")(),
       div(cls := "sheet-resizehandle sheet-resizehandle-topleft")(),
-      div(cls := "sheet-resizehandle sheet-resizehandle-topright")(
-        span(cls := "glyphicon glyphicon-search")()
-      ),
+      div(cls := "sheet-resizehandle sheet-resizehandle-topright")(),
       div(cls := "sheet-resizehandle sheet-resizehandle-bottomleft")(),
-      div(cls := "sheet-resizehandle sheet-resizehandle-bottomright")()
+      div(cls := "sheet-resizehandle sheet-resizehandle-bottomright")(),
+      div(cls := "sheet-closehandle")(
+        span(cls := "glyphicon glyphicon-remove-sign")()
+      )
 
     )
     jQuery(html.render)
@@ -71,6 +72,7 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends SheetEventD
       "width" -> s"${width}px", "height" -> s"${height}px"))
 
     val resizeHandle = element.find(".sheet-resizehandle-bottomright")
+    val closeHandle = element.find(".sheet-closehandle")
 
     lazy val moveHandler: js.Function1[JQueryEventObject, js.Any] =
       (evt: JQueryEventObject) => {
@@ -155,5 +157,15 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends SheetEventD
       val sheet: Sheet = this
       onDoubleClickListener.map(_.apply(sheet))
     })
+
+    val self = this
+
+    closeHandle.on("click", (evt: JQueryEventObject) => {
+      dispatchSheetCloseEvent(new SheetCloseEvent(id, self))
+    })
+  }
+
+  def cleanup() = {
+
   }
 }

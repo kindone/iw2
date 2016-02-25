@@ -18,4 +18,8 @@ class EventDispatcher[T <: Event] {
     for (listener <- eventListeners)
       listener.apply(evt)
   }
+
+  def clear() = {
+    eventListeners = List()
+  }
 }

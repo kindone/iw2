@@ -40,6 +40,11 @@ class Wall(model: WallModel) extends WallEventDispatcher {
     dispatchSheetAppendedEvent(SheetAppendedEvent(sheet.id))
   }
 
+  def removeSheet(sheet: Sheet) = {
+    sheet.element.remove()
+    dispatchSheetRemovedEvent(new SheetRemovedEvent(sheet.id))
+  }
+
   def scaler(distance: Double) = {
     distance / scale
   }
@@ -84,7 +89,7 @@ class Wall(model: WallModel) extends WallEventDispatcher {
         .off("mouseup", upHandler)
         .off("mousemove", moveHandler)
 
-      dispatchViewChangedEvent(new ViewChangeEvent(panX * scale + shiftX, panX * scale + shiftX, scale))
+      dispatchViewChangedEvent(new ViewChangeEvent(panX * scale + shiftX, panY * scale + shiftY, scale))
 
       element
     }

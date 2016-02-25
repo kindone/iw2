@@ -132,6 +132,14 @@ html, body{
     width:100%;
 }
 
+.sheet-closehandle {
+    position:absolute;
+    top:0px;
+    right:0px;
+    width:16px;
+    height:16px;
+}
+
 .editor {
     position: absolute;
     left: 0px;

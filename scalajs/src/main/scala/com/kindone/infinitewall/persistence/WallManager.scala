@@ -38,6 +38,8 @@ class WallManager(localStorageManager: LocalStorageManager) {
     objectManager.save(id, newWall)
   }
 
+  def getSheets(wallId: Long) = sheetsManager.getSheetsInWall(wallId)
+
   def appendSheet(id: Long, sheetId: Long) =
     sheetsManager.addSheetToWall(id, sheetId)
 

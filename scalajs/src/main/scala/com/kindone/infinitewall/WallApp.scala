@@ -27,7 +27,6 @@ object WallApp extends JSApp {
     val localStorageManager = new LocalStorageManager()
     val wallManager = new WallManager(localStorageManager)
     val sheetManager = new SheetManager(localStorageManager)
-    val sheetInWallManager = new SheetInWallManager(localStorageManager)
 
     val root = jQuery("#container-wrap")
 
@@ -66,6 +65,7 @@ object WallApp extends JSApp {
       val sheet = new Sheet(sheetModel, showdownConverter)
       wall.appendSheet(sheet)
 
+      // activate events
       sheet.addOnDimensionChangeListener(new EventListener[SheetDimensionChangeEvent] {
         def apply(evt: SheetDimensionChangeEvent) = {
           sheetManager.setDimension(sheet.id, evt.x, evt.y, evt.w, evt.h)
@@ -76,15 +76,22 @@ object WallApp extends JSApp {
           sheetManager.setText(sheet.id, evt.content)
         }
       })
+      sheet.addOnSheetCloseListener(new EventListener[SheetCloseEvent] {
+        def apply(evt: SheetCloseEvent) = {
+          wall.removeSheet(evt.sheet)
+          sheetManager.delete(evt.sheetId)
+        }
+      })
 
       sheet.setOnDoubleClickListener((sheet: Sheet) => {
         editor.open(sheet)
         overlay.show()
         overlay.on("mousedown", editorClose)
       })
+
     }
 
-    val sheets = sheetInWallManager.getSheetsInWall(wallModel.id)
+    val sheets = wallManager.getSheets(wallModel.id)
     for (sheetId <- sheets) {
       appendSheetToWall(sheetManager.get(sheetId))
     }
@@ -102,6 +109,12 @@ object WallApp extends JSApp {
     wall.addOnViewChangedListener(new EventListener[ViewChangeEvent] {
       def apply(evt: ViewChangeEvent) = {
         wallManager.setView(wall.id, evt.x, evt.y, evt.scale)
+      }
+    })
+
+    wall.addOnSheetRemovedListener(new EventListener[SheetRemovedEvent] {
+      def apply(evt: SheetRemovedEvent) = {
+        wallManager.removeSheet(wall.id, evt.sheetId)
       }
     })
 
