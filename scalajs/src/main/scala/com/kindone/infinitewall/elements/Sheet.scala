@@ -9,7 +9,7 @@ import org.scalajs.jquery._
 import scala.scalajs.js
 import scalatags.JsDom.all._
 
-class Sheet(model: SheetModel, converter: ShowdownConverter) extends SheetEventDispatcher {
+class Sheet(model: SheetModel, converter: ShowdownConverter) extends Element with SheetEventDispatcher {
 
   val id = model.id
 
@@ -58,6 +58,8 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends SheetEventD
   }
 
   def getText(): String = text
+
+  def setup() = setup((x) => 1.0)
 
   def setup(scaler: (Double) => Double) = {
 

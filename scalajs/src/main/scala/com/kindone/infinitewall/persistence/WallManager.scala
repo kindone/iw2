@@ -3,10 +3,10 @@ package com.kindone.infinitewall.persistence
 /**
  * Created by kindone on 2016. 2. 13..
  */
-class WallManager(localStorageManager: LocalStorageManager) {
+class WallManager(localStorage: LocalStorage) {
 
-  private val objectManager = new ObjectManager[Wall](localStorageManager, "wall")
-  private val sheetsManager = new SheetInWallManager(localStorageManager)
+  private val objectManager = new ObjectManager[Wall](localStorage, "wall")
+  private val sheetsManager = new SheetInWallManager(localStorage)
 
   def create(x: Double = 0, y: Double = 0, scale: Double = 1.0): Wall = {
     val id = objectManager.nextId()
@@ -19,6 +19,8 @@ class WallManager(localStorageManager: LocalStorageManager) {
     objectManager.delete(id)
 
   def get(id: Long) = objectManager.getWall(id)
+
+  def getWalls() = objectManager.getWalls()
 
   def pan(id: Long, x: Double, y: Double) = {
     val wall = objectManager.getWall(id).get

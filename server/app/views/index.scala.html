@@ -1,7 +1,22 @@
 @(message: String)
 
 @templates.main("Infinite Wall") {
-    <div id="container-wrap">
-        @*<div class="visual-dummy"></div>*@
+    <div class="container">
+        <table id="walls" class="table table-hover">
+        </table>
     </div>
+
+    <script type="text/javascript">
+        var data = com.kindone.infinitewall.IndexApp().walls()
+        console.log(data)
+        for(var i = 0; i < data.length; i++)
+        {
+            var html = "<tr>" +
+            "<td><a href=\"/wall/" + data[i].id + "\">" + data[i].id + "</td>" +
+            "<td>" + (typeof(data[i].title) == 'undefined' ? "(untitled)" : data[i].title) + "</td>" +
+             "</tr>"
+            $("#walls").append(html)
+        }
+
+    </script>
 }

@@ -5,8 +5,8 @@ import upickle.default._
 /**
  * Created by kindone on 2016. 2. 13..
  */
-class SheetManager(localStorageManager: LocalStorageManager) {
-  private val objectManager = new ObjectManager[Sheet](localStorageManager, "sheet")
+class SheetManager(localStorage: LocalStorage) {
+  private val objectManager = new ObjectManager[Sheet](localStorage, "sheet")
 
   def get(id: Long): Sheet = {
     objectManager.getSheet(id).get

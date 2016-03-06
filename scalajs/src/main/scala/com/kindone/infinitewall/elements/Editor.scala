@@ -3,6 +3,7 @@ package com.kindone.infinitewall.elements
 import com.kindone.infinitewall.facades.{ CodeMirror, ShowdownConverter }
 import org.scalajs.dom
 import org.scalajs.dom._
+import org.scalajs.dom.{ Element => DomElement }
 import org.scalajs.jquery._
 
 import scala.scalajs.js
@@ -11,7 +12,7 @@ import scalatags.JsDom.all._
 /**
  * Created by kindone on 2016. 2. 10..
  */
-class Editor(showdown: ShowdownConverter) {
+class Editor(showdown: ShowdownConverter) extends Element {
   val element = {
     val html = div(cls := "editor-wrapper")(
       div(cls := "editor")()
@@ -25,7 +26,7 @@ class Editor(showdown: ShowdownConverter) {
   private var sheetOpt: Option[Sheet] = None
 
   def setup() = {
-    cmOpt = Some(CodeMirror(editorElement.get(0).asInstanceOf[Element],
+    cmOpt = Some(CodeMirror(editorElement.get(0).asInstanceOf[DomElement],
       js.Dictionary("rtlMoveVisually" -> false,
         "mode" -> js.Dictionary(
           "name" -> "gfm",

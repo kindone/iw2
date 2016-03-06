@@ -9,7 +9,7 @@ import org.scalajs.jquery._
 import scala.scalajs.js
 import scalatags.JsDom.all._
 
-class Wall(model: WallModel) extends WallEventDispatcher {
+class Wall(model: WallModel) extends Element with WallEventDispatcher {
 
   val id = model.id
 
@@ -23,7 +23,7 @@ class Wall(model: WallModel) extends WallEventDispatcher {
   private var downY: Int = 0
 
   val element = {
-    val containerDiv = div(cls := "container")(
+    val containerDiv = div(cls := "wall")(
       //      div(id := "centerx")(),
       //      div(id := "centery")(),
       div(cls := "layer")( //        div(cls := "visual-dummy")()
@@ -41,7 +41,7 @@ class Wall(model: WallModel) extends WallEventDispatcher {
   }
 
   def removeSheet(sheet: Sheet) = {
-    sheet.element.remove()
+    layer.remove(sheet.element)
     dispatchSheetRemovedEvent(new SheetRemovedEvent(sheet.id))
   }
 

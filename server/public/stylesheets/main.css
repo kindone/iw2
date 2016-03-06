@@ -2,14 +2,23 @@ html, body{
     width:100%;
     height:100%
 }
-#container-wrap {
+
+#stage {
     display:block;
     width:100%;
     height:100%;
     overflow:hidden;
 }
 
-.container
+.wallview
+{
+    display:block;
+    width:100%;
+    height:100%;
+    background-color:#F2F2F2;
+}
+
+.wall
 {
     display:block;
     width:100%;

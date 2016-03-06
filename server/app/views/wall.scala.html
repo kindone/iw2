@@ -1,0 +1,10 @@
+@(message: String, id:Long)
+
+@templates.main("Infinite Wall") {
+    <div id="stage">
+    </div>
+
+    <script type="text/javascript">
+        com.kindone.infinitewall.WallApp().setup(@id)
+    </script>
+}

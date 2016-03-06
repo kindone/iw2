@@ -6,28 +6,35 @@ import upickle.default._
 /**
  * Created by kindone on 2016. 2. 20..
  */
-class ObjectManager[T](localStorageManager: LocalStorageManager, name: String) {
+class ObjectManager[T](localStorage: LocalStorage, name: String) {
 
   def save(id: Long, obj: Sheet) = {
-    localStorageManager.setItem(objectKey(id), write(obj))
+    localStorage.setItem(objectKey(id), write(obj))
     register(id)
   }
 
   def save(id: Long, obj: Wall) = {
-    localStorageManager.setItem(objectKey(id), write(obj))
+    localStorage.setItem(objectKey(id), write(obj))
     register(id)
   }
 
   def getSheet(id: Long): Option[Sheet] = {
-    localStorageManager.getItem(objectKey(id)).map(read[Sheet](_))
+    localStorage.getItem(objectKey(id)).map(read[Sheet](_))
   }
 
   def getWall(id: Long): Option[Wall] = {
-    localStorageManager.getItem(objectKey(id)).map(read[Wall](_))
+    localStorage.getItem(objectKey(id)).map(read[Wall](_))
+  }
+
+  def getWalls(): Seq[Wall] = {
+    val ids = localStorage.getItem(objectSetKey).map(read[Seq[Long]](_))
+    ids.getOrElse(Seq()).map { id =>
+      getWall(id).get
+    }
   }
 
   def delete(id: Long) = {
-    localStorageManager.removeItem(objectKey(id))
+    localStorage.removeItem(objectKey(id))
     unregister(id)
   }
 
@@ -38,16 +45,16 @@ class ObjectManager[T](localStorageManager: LocalStorageManager, name: String) {
   private val objectSetKey = prefix + "objectSet"
 
   private def maxId: Long = {
-    val value = localStorageManager.getItem(maxIdKey)
+    val value = localStorage.getItem(maxIdKey)
     if (value.isEmpty) {
-      localStorageManager.setItem(maxIdKey, "0")
+      localStorage.setItem(maxIdKey, "0")
       0
     } else
       value.get.toLong
   }
 
   private def maxId_=(value: Long): Unit = {
-    localStorageManager.setItem(prefix + "maxId", value.toString)
+    localStorage.setItem(prefix + "maxId", value.toString)
   }
 
   def nextId() = {
@@ -55,15 +62,15 @@ class ObjectManager[T](localStorageManager: LocalStorageManager, name: String) {
     maxId
   }
 
-  private var objects: Set[Long] = localStorageManager.getItem(objectSetKey).map(read[Set[Long]]).getOrElse(Set())
+  private var objects: Set[Long] = localStorage.getItem(objectSetKey).map(read[Set[Long]]).getOrElse(Set())
 
   private def register(id: Long) = {
     objects = objects + id
-    localStorageManager.setItem(objectSetKey, write(objects))
+    localStorage.setItem(objectSetKey, write(objects))
   }
 
   private def unregister(id: Long) = {
     objects = objects - id
-    localStorageManager.setItem(objectSetKey, write(objects))
+    localStorage.setItem(objectSetKey, write(objects))
   }
 }

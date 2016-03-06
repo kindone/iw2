@@ -7,7 +7,7 @@ import scalatags.JsDom.all._
 /**
  * Created by kindone on 2016. 2. 2..
  */
-class ControlPad {
+class ControlPad extends Element {
 
   private var onAddButtonClickListener: Option[() => Unit] = None
   private var onClearDBButtonClickListener: Option[() => Unit] = None

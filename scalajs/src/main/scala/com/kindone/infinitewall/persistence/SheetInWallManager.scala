@@ -3,8 +3,8 @@ package com.kindone.infinitewall.persistence
 /**
  * Created by kindone on 2016. 2. 20..
  */
-private class SheetInWallManager(localStorageManager: LocalStorageManager) {
-  private val relationManager = new RelationManager(localStorageManager, "sheetInWall")
+private class SheetInWallManager(localStorage: LocalStorage) {
+  private val relationManager = new RelationManager(localStorage, "sheetInWall")
 
   def addSheetToWall(wallId: Long, sheetId: Long) = {
     relationManager.create(wallId, sheetId)

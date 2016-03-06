@@ -4,7 +4,7 @@ import org.scalajs.dom
 /**
  * Created by kindone on 2016. 2. 20..
  */
-class LocalStorageManager {
+class LocalStorage {
   def getItem(key: String): Option[String] = {
     val result = dom.window.localStorage.getItem(key)
     if (result != null)
