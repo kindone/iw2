@@ -3,6 +3,7 @@ package com.kindone.infinitewall
 import com.kindone.infinitewall.elements._
 import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.ShowdownConverter
+import com.kindone.infinitewall.persistence.localstorage.LocalStorage
 import com.kindone.infinitewall.persistence.{ Sheet => SheetModel, _ }
 import org.scalajs.jquery._
 

@@ -1,11 +1,11 @@
-package com.kindone.infinitewall.persistence
+package com.kindone.infinitewall.persistence.localstorage
 
 import upickle.default._
 
 /**
  * Created by kindone on 2016. 2. 20..
  */
-class RelationManager(localStorage: LocalStorage, name: String) {
+private class RelationManager(localStorage: LocalStorage, name: String) {
   private val prefix = name + "_"
 
   private def objectSetKey(subjectId: Long) = prefix + "objectSet_" + subjectId

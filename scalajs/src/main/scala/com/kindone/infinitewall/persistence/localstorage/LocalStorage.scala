@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.persistence
+package com.kindone.infinitewall.persistence.localstorage
 
 import org.scalajs.dom
 /**

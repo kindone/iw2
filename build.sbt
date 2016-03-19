@@ -34,6 +34,7 @@ lazy val server = (project in file("server")).settings(
     "org.webjars" % "codemirror" % "5.11",
     "org.webjars" % "font-awesome" % "4.4.0",
     "org.webjars" % "bootstrap" % "3.3.5",
+    "org.webjars" % "react" % "0.14.7",
     "org.flywaydb" %% "flyway-play" % "2.2.1"
 )
  ).enablePlugins(PlayScala).

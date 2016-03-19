@@ -1,12 +1,14 @@
-package com.kindone.infinitewall.persistence
+package com.kindone.infinitewall.persistence.localstorage
 
-import com.kindone.infinitewall.persistence.Sheet
+import com.kindone.infinitewall.persistence.{ Sheet, Wall }
 import upickle.default._
+
+import scala.concurrent.Future
 
 /**
  * Created by kindone on 2016. 2. 20..
  */
-class ObjectManager[T](localStorage: LocalStorage, name: String) {
+private class ObjectManager[T](localStorage: LocalStorage, name: String) {
 
   def save(id: Long, obj: Sheet) = {
     localStorage.setItem(objectKey(id), write(obj))

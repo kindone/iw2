@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.persistence
+package com.kindone.infinitewall.persistence.localstorage
 
 /**
  * Created by kindone on 2016. 2. 20..
