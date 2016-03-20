@@ -4,7 +4,27 @@
 
 # Home page
 GET     /                           @controllers.Application.index
-GET     /wall/:id                   @controllers.Application.wall(id:Long)
+GET     /wall/:id.html              @controllers.Application.wall(id:Long)
+
+GET     /wall                  @controllers.WallController.getAll()
+POST    /wall                  @controllers.WallController.create()
+
+GET     /wall/:id              @controllers.WallController.get(id:Long)
+DELETE  /wall/:id              @controllers.WallController.delete(id:Long)
+PUT     /wall/:id/zoom         @controllers.WallController.setZoom(id:Long)
+PUT     /wall/:id/pan          @controllers.WallController.setPan(id:Long)
+PUT     /wall/:id/view         @controllers.WallController.setView(id:Long)
+
+POST    /wall/:id/sheet        @controllers.WallController.createSheet(id:Long)
+DELETE  /wall/:id/sheet/:sheetId    @controllers.WallController.deleteSheet(id:Long, sheetId:Long)
+
+GET     /sheet/:id             @controllers.SheetController.get(id:Long)
+PUT     /sheet/:id/position    @controllers.SheetController.setPosition(id:Long)
+PUT     /sheet/:id/size        @controllers.SheetController.setSize(id:Long)
+PUT     /sheet/:id/text        @controllers.SheetController.setText(id:Long)
+PUT     /sheet/:id/dimension   @controllers.SheetController.setDimension(id:Long)
+
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

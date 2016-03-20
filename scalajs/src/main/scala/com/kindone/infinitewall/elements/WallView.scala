@@ -25,8 +25,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
   def setup() = {
 
     val wallModelFuture = {
-      for(requestedWall <- persistence.wallManager.get(id))
-      {
+      for (requestedWall <- persistence.wallManager.get(id)) yield {
         if (!requestedWall.isEmpty) {
           requestedWall.get
         } else {
@@ -61,7 +60,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         overlay.off("mousedown", editorClose)
       }
 
-      def appendSheetToWall(sheetModel: SheetModel) = {
+      def createSheet(sheetModel: SheetModel) = {
         val sheet = new Sheet(sheetModel, showdownConverter)
         wall.appendSheet(sheet)
 
@@ -79,7 +78,6 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         sheet.addOnSheetCloseListener(new EventListener[SheetCloseEvent] {
           def apply(evt: SheetCloseEvent) = {
             wall.removeSheet(evt.sheet)
-            sheetManager.delete(evt.sheetId)
           }
         })
 
@@ -96,35 +94,25 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         sheetId <- sheets;
         sheet <- sheetManager.get(sheetId)
       ) {
-        appendSheetToWall(sheet)
+        createSheet(sheet)
       }
 
-      wall.addOnSheetAppendedListener(new EventListener[SheetAppendedEvent] {
-        def apply(evt: SheetAppendedEvent) = {
-          wallManager.appendSheet(wall.id, evt.sheetId)
-        }
-      })
       wall.addOnSheetRemovedListener(new EventListener[SheetRemovedEvent] {
         def apply(evt: SheetRemovedEvent) = {
-          wallManager.appendSheet(wall.id, evt.sheetId)
+          wallManager.deleteSheet(wall.id, evt.sheetId)
         }
       })
+
       wall.addOnViewChangedListener(new EventListener[ViewChangeEvent] {
         def apply(evt: ViewChangeEvent) = {
           wallManager.setView(wall.id, evt.x, evt.y, evt.scale)
         }
       })
 
-      wall.addOnSheetRemovedListener(new EventListener[SheetRemovedEvent] {
-        def apply(evt: SheetRemovedEvent) = {
-          wallManager.removeSheet(wall.id, evt.sheetId)
-        }
-      })
-
       controlPad.setOnAddButtonClickListener({ () =>
-        // create random sheet
-        for (sheetModel <- sheetManager.create(js.Math.random() * 800, js.Math.random() * 800, 100, 100, ""))
-          appendSheetToWall(sheetModel)
+        // create random sheet model first and realize
+        for (sheetModel <- wallManager.createSheet(wall.id, js.Math.random() * 800, js.Math.random() * 800, 100, 100, ""))
+          createSheet(sheetModel)
       })
 
       controlPad.setOnClearDBButtonClickListener({ () =>

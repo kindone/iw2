@@ -9,7 +9,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 /**
  * Created by kindone on 2016. 2. 13..
  */
-class WallManager(localStorage: LocalStorage) extends WallManagerAPI {
+class WallManager(localStorage: LocalStorage, sheetManager: SheetManager) extends WallManagerAPI {
 
   private val objectManager = new ObjectManager[Wall](localStorage, "wall")
   private val sheetsManager = new SheetInWallManager(localStorage)
@@ -55,13 +55,16 @@ class WallManager(localStorage: LocalStorage) extends WallManagerAPI {
     sheetsManager.getSheetsInWall(wallId)
   }
 
-  def appendSheet(id: Long, sheetId: Long) = Future {
-    sheetsManager.addSheetToWall(id, sheetId)
-    true
+  def createSheet(id: Long, x: Double, y: Double, width: Double, height: Double, text: String) = {
+    for (sheet <- sheetManager.create(x, y, width, height, text)) yield {
+      sheetsManager.addSheetToWall(id, sheet.id)
+      sheet
+    }
   }
 
-  def removeSheet(id: Long, sheetId: Long) = Future {
+  def deleteSheet(id: Long, sheetId: Long) = Future {
     sheetsManager.removeSheetFromWall(id, sheetId)
+    sheetManager.delete(sheetId)
     true
   }
 

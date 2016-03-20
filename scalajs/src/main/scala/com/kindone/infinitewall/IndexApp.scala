@@ -1,5 +1,6 @@
 package com.kindone.infinitewall
 
+import com.kindone.infinitewall.persistence.Persistence
 import com.kindone.infinitewall.persistence.localstorage.{ WallManager, LocalStorage }
 import upickle.default._
 import scala.scalajs.js.JSON
@@ -18,7 +19,8 @@ class IndexApp {
     import js.JSConverters._
 
     val localStorage = new LocalStorage()
-    val wallManager = new WallManager(localStorage)
+    val persistence = new Persistence(localStorage)
+    val wallManager = persistence.wallManager
     val wallsFuture = wallManager.getWalls().map { walls =>
       walls.map { wall =>
         JSON.parse(write(wall)).asInstanceOf[js.Dictionary[Any]]
@@ -33,7 +35,8 @@ class IndexApp {
   @JSExport
   def createWall(title: String, onComplete: js.Function1[js.Dictionary[Any], Unit]): Unit = {
     val localStorage = new LocalStorage()
-    val wallManager = new WallManager(localStorage)
+    val persistence = new Persistence(localStorage)
+    val wallManager = persistence.wallManager
     val wallFuture = wallManager.create(title)
     wallFuture.foreach { wall =>
       val result = JSON.parse(write(wall)).asInstanceOf[js.Dictionary[Any]]
@@ -44,7 +47,8 @@ class IndexApp {
   @JSExport
   def deleteWall(id: Int, onComplete: js.Function1[Boolean, Unit]): Unit = {
     val localStorage = new LocalStorage()
-    val wallManager = new WallManager(localStorage)
+    val persistence = new Persistence(localStorage)
+    val wallManager = persistence.wallManager
     wallManager.delete(id).map { status =>
       onComplete.apply(status)
     }

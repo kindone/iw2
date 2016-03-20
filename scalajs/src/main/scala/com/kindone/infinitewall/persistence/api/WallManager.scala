@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.persistence.api
 
-import com.kindone.infinitewall.persistence.Wall
+import com.kindone.infinitewall.persistence.{ Sheet, Wall }
 
 import scala.concurrent.Future
 
@@ -25,8 +25,8 @@ trait WallManager {
 
   def getSheets(wallId: Long): Future[Set[Long]]
 
-  def appendSheet(id: Long, sheetId: Long): Future[Boolean]
+  def createSheet(id: Long, x: Double, y: Double, width: Double, height: Double, text: String): Future[Sheet]
 
-  def removeSheet(id: Long, sheetId: Long): Future[Boolean]
+  def deleteSheet(id: Long, sheetId: Long): Future[Boolean]
 
 }

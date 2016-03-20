@@ -15,7 +15,7 @@
             render: function() {
                 return (
                     <tr>
-                        <td><a href={"/wall/" + this.props.id}>/wall/{this.props.id}</a></td>
+                        <td><a href={"/wall/" + this.props.id +".html"}>/wall/{this.props.id}.html</a></td>
                         <td>{(typeof(this.props.title) == 'undefined' ? "(untitled)" : this.props.title)}</td>
                         <td><button type="button" className="btn btn-default" value={this.props.id} onClick={this.props.deleteWallHandler}>Delete</button></td>
                     </tr>

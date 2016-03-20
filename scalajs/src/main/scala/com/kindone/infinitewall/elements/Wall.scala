@@ -41,7 +41,7 @@ class Wall(model: WallModel) extends Element with WallEventDispatcher {
   }
 
   def removeSheet(sheet: Sheet) = {
-    layer.remove(sheet.element)
+    sheet.element.remove()
     dispatchSheetRemovedEvent(new SheetRemovedEvent(sheet.id))
   }
 
