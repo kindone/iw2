@@ -15,6 +15,7 @@ PUT     /wall/:id/zoom         @controllers.WallController.setZoom(id:Long)
 PUT     /wall/:id/pan          @controllers.WallController.setPan(id:Long)
 PUT     /wall/:id/view         @controllers.WallController.setView(id:Long)
 
+GET     /wall/:id/sheet        @controllers.WallController.getSheets(id:Long)
 POST    /wall/:id/sheet        @controllers.WallController.createSheet(id:Long)
 DELETE  /wall/:id/sheet/:sheetId    @controllers.WallController.deleteSheet(id:Long, sheetId:Long)
 

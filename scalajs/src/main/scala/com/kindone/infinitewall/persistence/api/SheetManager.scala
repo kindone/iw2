@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.persistence.api
 
-import com.kindone.infinitewall.persistence.Sheet
+import com.kindone.infinitewall.data.Sheet
 
 import scala.concurrent.Future
 

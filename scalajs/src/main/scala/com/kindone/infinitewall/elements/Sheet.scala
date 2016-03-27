@@ -2,7 +2,7 @@ package com.kindone.infinitewall.elements
 
 import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.ShowdownConverter
-import com.kindone.infinitewall.persistence.{ Sheet => SheetModel }
+import com.kindone.infinitewall.data.{ Sheet => SheetModel }
 import org.scalajs.dom
 import org.scalajs.jquery._
 

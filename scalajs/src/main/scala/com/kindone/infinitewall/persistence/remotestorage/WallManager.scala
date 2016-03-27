@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.persistence.remotestorage
 
-import com.kindone.infinitewall.persistence.{ Sheet, Wall }
+import com.kindone.infinitewall.data.{ Sheet, Wall }
 import org.scalajs.dom.ext.Ajax
 import upickle.default._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

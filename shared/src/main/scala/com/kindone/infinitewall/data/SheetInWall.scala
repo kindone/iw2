@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.persistence
+package com.kindone.infinitewall.data
 
 /**
  * Created by kindone on 2016. 2. 20..

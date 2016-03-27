@@ -4,7 +4,8 @@ import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.ShowdownConverter
 import org.scalajs.jquery._
 import scala.scalajs.js
-import com.kindone.infinitewall.persistence.{ Wall => WallModel, Sheet => SheetModel, _ }
+import com.kindone.infinitewall.data.{ Wall => WallModel, Sheet => SheetModel }
+import com.kindone.infinitewall.persistence.Persistence
 import scalatags.JsDom.all._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 

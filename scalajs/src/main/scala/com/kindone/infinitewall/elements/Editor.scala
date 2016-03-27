@@ -29,7 +29,7 @@ class Editor(showdown: ShowdownConverter) extends Element {
     cmOpt = Some(CodeMirror(editorElement.get(0).asInstanceOf[DomElement],
       js.Dictionary("rtlMoveVisually" -> false,
         "mode" -> js.Dictionary(
-          "name" -> "gfm",
+          "name" -> "markdown",
           "highlightFormatting" -> true),
         "lineWrapping" -> true)))
 

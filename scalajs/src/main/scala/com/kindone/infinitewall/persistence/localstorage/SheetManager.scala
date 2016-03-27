@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.persistence.localstorage
 
-import com.kindone.infinitewall.persistence.Sheet
+import com.kindone.infinitewall.data.Sheet
 import com.kindone.infinitewall.persistence.api.{ SheetManager => SheetManagerAPI }
 
 import scala.concurrent.Future

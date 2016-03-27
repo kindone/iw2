@@ -153,7 +153,7 @@ html, body{
     position: absolute;
     left: 0px;
     top: 0px;
-    width: 200px;
+    width: 500px;
     height: 100%;
     /*padding-left:60px;*/
     background-color: white;
@@ -173,9 +173,25 @@ html, body{
     display:none;
 }
 
+.CodeMirror {
+    height:auto;
+}
+
 .CodeMirror-lines
 {
     margin-left:60px;
 }
+
+.sheet-text h1, h2, h3, h4, h5, h6
+{
+    color: #6d87ff;
+}
+
+.sheet-text li
+{
+    color: #252dff;
+}
+
+
 
 /* index */
