@@ -56,12 +56,22 @@ class WallManager {
     SQL"""select
           sheets.id, sheets.x, sheets.y,
           sheets.width, sheets.height, sheets.content
-          from sheets,sheets_in_wall
-          where sheets_in_wall.wall_id = $id
-          and sheets.id = sheets_in_wall.sheet_id""".map {
+          from sheets INNER JOIN sheets_in_wall
+          ON sheets.id = sheets_in_wall.sheet_id
+          where sheets_in_wall.wall_id = $id""".map {
       case Row(id: Long, x: Double, y: Double,
-        width: Double, height: Double, content: String) => Sheet(id, x, y, width, height, content)
+        width: Double, height: Double, content: java.sql.Clob) => Sheet(id, x, y, width, height, content.getSubString(1, content.length.asInstanceOf[Int]))
     }.list()
+  }
+
+  def getSheetIds(id: Long) = DB.withConnection { implicit c =>
+    SQL"""select
+          sheets.id
+          from sheets INNER JOIN sheets_in_wall
+          ON sheets.id = sheets_in_wall.sheet_id
+          where sheets_in_wall.wall_id = $id""".map {
+      case Row(id: Long) => id
+    }.list().toSet
   }
 
   def createSheet(id: Long, sheet: Sheet) = DB.withTransaction { implicit c =>

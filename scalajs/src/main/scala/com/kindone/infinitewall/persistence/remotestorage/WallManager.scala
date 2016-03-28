@@ -1,6 +1,7 @@
 package com.kindone.infinitewall.persistence.remotestorage
 
 import com.kindone.infinitewall.data.{ Sheet, Wall }
+import com.kindone.infinitewall.persistence.api.{ WallManager => WallManagerAPI }
 import org.scalajs.dom.ext.Ajax
 import upickle.default._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -10,12 +11,12 @@ import scala.concurrent.Future
 /**
  * Created by kindone on 2016. 3. 20..
  */
-class WallManager(site: String) {
+class WallManager(site: String) extends WallManagerAPI {
   def create(title: String, x: Double = 0, y: Double = 0, scale: Double = 1.0): Future[Wall] = {
-    val wall = new Wall(0, x, y, scale)
+    val wall = new Wall(0, x, y, scale, title)
     for (
       response <- Ajax.post(site +
-        s"/wall", write[Wall](wall))
+        s"/wall", write[Wall](wall), headers = Map("X-Requested-With" -> "XMLHttpRequest"))
     ) yield read[Wall](response.responseText)
   }
 
@@ -80,7 +81,7 @@ class WallManager(site: String) {
     val sheet = new Sheet(0, x, y, width, height, text)
     for (
       response <- Ajax.post(site +
-        s"/wall/$id/sheet", write(sheet))
+        s"/wall/$id/sheet", write(sheet), headers = Map("X-Requested-With" -> "XMLHttpRequest"))
     ) yield read[Sheet](response.responseText)
   }
 

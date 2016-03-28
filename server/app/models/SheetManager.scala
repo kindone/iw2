@@ -11,9 +11,9 @@ import anorm._
  */
 class SheetManager {
   def find(id: Long) = DB.withConnection { implicit c =>
-    SQL"select sid, x, y, width, height, content from sheets where id = $id".map {
+    SQL"select id, x, y, width, height, content from sheets where id = $id".map {
       case Row(id: Long, x: Double, y: Double,
-        width: Double, height: Double, content: String) => Sheet(id, x, y, width, height, content)
+        width: Double, height: Double, content: java.sql.Clob) => Sheet(id, x, y, width, height, content.getSubString(1, content.length.asInstanceOf[Int]))
     }.singleOpt
   }
 
@@ -34,7 +34,7 @@ class SheetManager {
   def setDimension(id: Long, x: Double, y: Double, width: Double, height: Double) =
     DB.withConnection { implicit c =>
       SQL"""update sheets set x = $x, y = $y, width = $width, height = $height
-           |where id = $id""".executeUpdate()
+           where id = $id""".executeUpdate()
     }
 
   def setText(id: Long, text: String) = DB.withConnection { implicit c =>

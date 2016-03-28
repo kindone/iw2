@@ -1,7 +1,8 @@
 package com.kindone.infinitewall
 
-import com.kindone.infinitewall.persistence.Persistence
-import com.kindone.infinitewall.persistence.localstorage.{ WallManager, LocalStorage }
+import com.kindone.infinitewall.persistence.api.Persistence
+import com.kindone.infinitewall.persistence.localstorage.{ LocalPersistence, WallManager, LocalStorage }
+import com.kindone.infinitewall.persistence.remotestorage.RemotePersistence
 import upickle.default._
 import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSExport
@@ -13,13 +14,19 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
  * Created by kindone on 2016. 3. 6..
  */
 @JSExport
-class IndexApp {
+class IndexApp(val useLocalStorage: Boolean = true) {
+
+  val persistence: Persistence = {
+    if (useLocalStorage)
+      new LocalPersistence()
+    else
+      new RemotePersistence("")
+  }
+
   @JSExport
   def walls(onComplete: js.Function1[js.Array[js.Dictionary[Any]], Unit]): Unit = {
     import js.JSConverters._
 
-    val localStorage = new LocalStorage()
-    val persistence = new Persistence(localStorage)
     val wallManager = persistence.wallManager
     val wallsFuture = wallManager.getWalls().map { walls =>
       walls.map { wall =>
@@ -34,8 +41,6 @@ class IndexApp {
 
   @JSExport
   def createWall(title: String, onComplete: js.Function1[js.Dictionary[Any], Unit]): Unit = {
-    val localStorage = new LocalStorage()
-    val persistence = new Persistence(localStorage)
     val wallManager = persistence.wallManager
     val wallFuture = wallManager.create(title)
     wallFuture.foreach { wall =>
@@ -46,8 +51,6 @@ class IndexApp {
 
   @JSExport
   def deleteWall(id: Int, onComplete: js.Function1[Boolean, Unit]): Unit = {
-    val localStorage = new LocalStorage()
-    val persistence = new Persistence(localStorage)
     val wallManager = persistence.wallManager
     wallManager.delete(id).map { status =>
       onComplete.apply(status)

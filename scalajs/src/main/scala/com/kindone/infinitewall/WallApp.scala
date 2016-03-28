@@ -3,9 +3,10 @@ package com.kindone.infinitewall
 import com.kindone.infinitewall.elements._
 import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.ShowdownConverter
-import com.kindone.infinitewall.persistence.localstorage.LocalStorage
+import com.kindone.infinitewall.persistence.api.Persistence
+import com.kindone.infinitewall.persistence.localstorage.{ LocalPersistence, LocalStorage }
 import com.kindone.infinitewall.data.{ Sheet => SheetModel, _ }
-import com.kindone.infinitewall.persistence.Persistence
+import com.kindone.infinitewall.persistence.remotestorage.RemotePersistence
 import org.scalajs.jquery._
 
 import scala.scalajs.js
@@ -18,14 +19,17 @@ import scalatags.JsDom.all._
  */
 
 @JSExport
-object WallApp {
+class WallApp(val useLocalStorage: Boolean = true) {
+
+  val persistence: Persistence = {
+    if (useLocalStorage)
+      new LocalPersistence()
+    else
+      new RemotePersistence("")
+  }
 
   @JSExport
   def setup(wallId: Int): Unit = {
-
-    // load data
-    val localStorageManager = new LocalStorage()
-    val persistence = new Persistence(localStorageManager)
 
     val stage = jQuery("#stage")
     val wallView = new WallView(wallId, persistence)

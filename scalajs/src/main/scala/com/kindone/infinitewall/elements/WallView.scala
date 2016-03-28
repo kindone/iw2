@@ -2,10 +2,10 @@ package com.kindone.infinitewall.elements
 
 import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.ShowdownConverter
+import com.kindone.infinitewall.persistence.api.Persistence
 import org.scalajs.jquery._
 import scala.scalajs.js
 import com.kindone.infinitewall.data.{ Wall => WallModel, Sheet => SheetModel }
-import com.kindone.infinitewall.persistence.Persistence
 import scalatags.JsDom.all._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 

@@ -50,7 +50,7 @@ class Editor(showdown: ShowdownConverter) extends Element {
     intervalHandle = dom.setInterval(() => {
       for (sheet <- sheetOpt; cm <- cmOpt)
         sheet.setText(cm.getValue())
-    }, 500)
+    }, 1500)
 
   }
 

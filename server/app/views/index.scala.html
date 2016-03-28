@@ -9,7 +9,8 @@
     </script>
 
     <script type="text/babel">
-
+        var useLocalStorage = false
+        var app = com.kindone.infinitewall.IndexApp(useLocalStorage)
 
         var Row = React.createClass({
             render: function() {
@@ -46,7 +47,7 @@
             getInitialState: function() {
                 var self = this
                 // async loading
-                com.kindone.infinitewall.IndexApp().walls(function(walls) {
+                app.walls(function(walls) {
                     self.setState({data:walls})
                 })
                 return {data:[]}
@@ -57,9 +58,9 @@
                 $("#wallTitleToCreate" ).val("")
 
                 var self = this
-                var wall = com.kindone.infinitewall.IndexApp().createWall(title, function(wall)
+                var wall = app.createWall(title, function(wall)
                 {
-                    com.kindone.infinitewall.IndexApp().walls(function(walls) {
+                    app.walls(function(walls) {
                         self.setState({data:walls})
                     })
                 })
@@ -71,9 +72,9 @@
 
                 var self = this
 
-                com.kindone.infinitewall.IndexApp().deleteWall(parseInt(id), function(status){
+                app.deleteWall(parseInt(id), function(status){
                     if(status) {
-                        com.kindone.infinitewall.IndexApp().walls(function(walls) {
+                        app.walls(function(walls) {
                             self.setState ( { data : walls } )
                         })
                     }

@@ -24,7 +24,7 @@ class SheetManager(site: String) extends SheetManagerAPI {
     val sheet = new Sheet(0, x, y, width, height, text)
     for (
       response <- Ajax.post(site +
-        s"/sheet", write[Sheet](sheet))
+        s"/sheet", write[Sheet](sheet), headers = Map("X-Requested-With" -> "XMLHttpRequest"))
     ) yield read[Sheet](response.responseText)
   }
 
@@ -63,7 +63,7 @@ class SheetManager(site: String) extends SheetManagerAPI {
     val sheet = new Sheet(0, 0, 0, 0, 0, text)
     for (
       response <- Ajax.put(site +
-        s"/sheeet/$id/text", write[Sheet](sheet))
+        s"/sheet/$id/text", write[Sheet](sheet))
     ) yield response.status == 200
   }
 }

@@ -26,8 +26,8 @@ class WallController extends Controller {
 
   def create() = Action { implicit request =>
     val wall = read[Wall](bodyText)
-    wallManager.create(wall)
-    Ok("")
+    val wallId = wallManager.create(wall)
+    Ok(write[Wall](wall.copy(id = wallId))).as("application/json")
   }
 
   def delete(id: Long) = Action {
@@ -54,13 +54,13 @@ class WallController extends Controller {
   }
 
   def getSheets(id: Long) = Action {
-    Ok(write[List[Sheet]](wallManager.getSheets(id))).as("application/json")
+    Ok(write[Set[Long]](wallManager.getSheetIds(id))).as("application/json")
   }
 
   def createSheet(id: Long) = Action { implicit request =>
     val sheet = read[Sheet](bodyText)
     val sheetId = wallManager.createSheet(id, sheet)
-    Ok("{id: " + sheetId + "}").as("application/json")
+    Ok(write[Sheet](sheet.copy(id = sheetId))).as("application/json")
   }
 
   def deleteSheet(id: Long, sheetId: Long) = Action {

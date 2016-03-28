@@ -14,12 +14,10 @@ class SheetController extends Controller {
   lazy val sheetManager = new SheetManager
 
   def get(id: Long) = Action {
-    Ok(write[Option[Sheet]](sheetManager.find(id))).as("application/json")
-  }
-
-  def delete(id: Long) = Action {
-    sheetManager.delete(id)
-    Ok("")
+    sheetManager.find(id) match {
+      case Some(sheet) => Ok(write[Sheet](sheet)).as("application/json")
+      case None        => NotFound
+    }
   }
 
   def setPosition(id: Long) = Action { implicit request =>
