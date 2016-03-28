@@ -49,6 +49,8 @@ class Wall(model: WallModel) extends Element with WallEventDispatcher {
     distance / scale
   }
 
+  def center = (panX, panY)
+
   private def width = jQuery(element).width()
   private def height = jQuery(element).height()
 

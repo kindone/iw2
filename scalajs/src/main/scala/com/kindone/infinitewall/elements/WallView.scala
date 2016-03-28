@@ -112,7 +112,8 @@ class WallView(id: Long, persistence: Persistence) extends Element {
 
       controlPad.setOnAddButtonClickListener({ () =>
         // create random sheet model first and realize
-        for (sheetModel <- wallManager.createSheet(wall.id, js.Math.random() * 800, js.Math.random() * 800, 100, 100, ""))
+        println(wall.center)
+        for (sheetModel <- wallManager.createSheet(wall.id, js.Math.random() * 800, js.Math.random() * 600, 100, 100, ""))
           createSheet(sheetModel)
       })
 
