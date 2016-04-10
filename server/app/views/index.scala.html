@@ -1,104 +1,113 @@
 @(message: String)
 
 @templates.main("Infinite Wall") {
-    <div class="container" id="container">
+    <div class="container">
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="active"><a id="tab-signup-button" href="#tab-signup" data-toggle="tab">Signup</a></li>
+            <li role="presentation"><a id="tab-login-button" href="#tab-login" data-toggle="tab">Login</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="tab-signup">
+                <div class="well">
+                    <form id="form-signup" method="POST" action="@routes.UserController.create()" class="form-horizontal">
+                        <div class="form-group">
+                            <label for="inputEmail" class="col-sm-2 control-label">Email</label>
+                            <div class="col-sm-6">
+                                <input name="email" type="email" class="form-control" id="inputEmail" placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassword" class="col-sm-2 control-label">Password</label>
+                            <div class="col-sm-6">
+                                <input name="password" type="password" class="form-control" id="inputPassword" placeholder="Password"">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPasswordC" class="col-sm-2 control-label">Password Confirm</label>
+                            <div class="col-sm-6">
+                                <input name="password_confirm" type="password" class="form-control" id="inputPasswordC" placeholder="Password Again"">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-6">
+                                <button id="form-signup-button" type="submit" class="btn btn-default">Sign Up</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane" id="tab-login">
+                <div class="well">
+                    <form id="form-login" method="POST" action="@routes.SessionController.create()" class="form-inline">
+                        <div class="form-group">
+                            <label class="sr-only" for="exampleInputEmail">Email address</label>
+                            <input name="email" type="email" class="form-control input-sm" id="exampleInputEmail" placeholder="Enter email">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="exampleInputPassword">Password</label>
+                            <input name="password" type="password" class="form-control input-sm" id="exampleInputPassword" placeholder="Password">
+                        </div>
+                        <button id="form-login-button" type="submit" class="btn btn-default">Sign in</button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
     <script type="text/javascript">
+        $.fn.serializeFormJSON = function () {
+            var o = {}
+            var a = this.serializeArray()
+            $.each(a, function () {
+                if (o[this.name]) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]]
+                    }
+                    o[this.name].push(this.value || '')
+                } else {
+                    o[this.name] = this.value || ''
+                }
+            })
+            return JSON.stringify(o)
+        }
 
-    </script>
-
-    <script type="text/babel">
-        var useLocalStorage = false
-        var app = com.kindone.infinitewall.IndexApp(useLocalStorage)
-
-        var Row = React.createClass({
-            render: function() {
-                return (
-                    <tr>
-                        <td><a href={"/wall/" + this.props.id +".html"}>/wall/{this.props.id}.html</a></td>
-                        <td>{(typeof(this.props.title) == 'undefined' ? "(untitled)" : this.props.title)}</td>
-                        <td><button type="button" className="btn btn-default" value={this.props.id} onClick={this.props.deleteWallHandler}>Delete</button></td>
-                    </tr>
-                )
-            }
-        })
-
-        var WallTable = React.createClass({
-            render: function() {
-                var deleteWallHandler = this.props.deleteWallHandler
-                return (<table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <td>Link</td><td>Title</td><td></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {
-                        this.props.data.map(function(item){
-                            return <Row key={item.id} id={item.id} title={item.title} deleteWallHandler={deleteWallHandler}/>
-                        })}
-                        </tbody>
-                    </table>)
-            }
-        })
-
-        var WallManager = React.createClass({
-            getInitialState: function() {
-                var self = this
-                // async loading
-                app.walls(function(walls) {
-                    self.setState({data:walls})
-                })
-                return {data:[]}
-            },
-            createWall: function()
+        $('#form-signup-button').click(
+            function()
             {
-                var title = $("#wallTitleToCreate").val()
-                $("#wallTitleToCreate" ).val("")
-
-                var self = this
-                var wall = app.createWall(title, function(wall)
-                {
-                    app.walls(function(walls) {
-                        self.setState({data:walls})
-                    })
-                })
-            },
-            deleteWall: function(event) {
-                if(!confirm("Are you sure you want to delete this wall?"))
-                    return;
-                var id = event.target.value
-
-                var self = this
-
-                app.deleteWall(parseInt(id), function(status){
-                    if(status) {
-                        app.walls(function(walls) {
-                            self.setState ( { data : walls } )
-                        })
+                $.ajax('/user', {
+                    method: 'POST',
+                    contentType: 'text/plain', // FIXME
+                    data: $('#form-signup').serializeFormJSON(),
+                    complete: function(xhr, status) {
+                        $('#tab-login-button').show()
+                    },
+                    error: function(xhr, status) {
+                        // TODO
                     }
                 })
-
-            },
-            render: function() {
-                return(<div>
-                    <form className="form-inline">
-                    <div className="form-group">
-                    <label htmlFor="wallTitleToCreate">Create</label>
-                    <input type="text" className="form-control" id="wallTitleToCreate" placeholder="Wall Title"/>
-                    </div>
-                    <button type="button" className="btn btn-default" onClick={this.createWall}>Create</button>
-                    </form>
-
-                    <div id="walls">
-                        <WallTable data={this.state.data} deleteWallHandler={this.deleteWall}/>
-                    </div>
-                </div>)
+                return false;
             }
-        })
+        )
 
-        ReactDOM.render(<WallManager/>, document.getElementById("container"))
-
+         $('#form-login-button').click(
+            function()
+            {
+                $.ajax('/session', {
+                    method: 'POST',
+                    contentType: 'text/plain', // FIXME
+                    data: $('#form-login').serializeFormJSON(),
+                    complete: function(xhr, status) {
+                        window.location.href = "/wall.html"
+                    },
+                    error: function(xhr, status) {
+                        // TODO
+                    }
+                })
+                return false;
+            }
+        )
     </script>
 }

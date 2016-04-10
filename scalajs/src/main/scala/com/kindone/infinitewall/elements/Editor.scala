@@ -54,12 +54,16 @@ class Editor(showdown: ShowdownConverter) extends Element {
 
   }
 
-  def close() = {
+  def close(): Unit = {
     for (sheet <- sheetOpt; cm <- cmOpt)
       sheet.setText(cm.getValue())
 
     jQuery(editorElement).hide()
     dom.clearInterval(intervalHandle)
+  }
+
+  def focus(): Unit = {
+    cmOpt.get.focus()
   }
 
 }

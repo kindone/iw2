@@ -84,6 +84,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
 
         sheet.setOnDoubleClickListener((sheet: Sheet) => {
           editor.open(sheet)
+          editor.focus()
           overlay.show()
           overlay.on("mousedown", editorClose)
         })

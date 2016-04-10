@@ -16,4 +16,5 @@ class CodeMirror extends js.Object {
   def refresh() = js.native
   def setValue(str: String): Unit = js.native
   def getValue(): String = js.native
+  def focus(): Unit = js.native
 }
