@@ -6,7 +6,8 @@ import com.kindone.infinitewall.facades.ShowdownConverter
 import com.kindone.infinitewall.persistence.api.Persistence
 import com.kindone.infinitewall.persistence.localstorage.{ LocalPersistence, LocalStorage }
 import com.kindone.infinitewall.data.{ Sheet => SheetModel, _ }
-import com.kindone.infinitewall.persistence.remotestorage.RemotePersistence
+import com.kindone.infinitewall.persistence.httpstorage.HttpPersistence
+import com.kindone.infinitewall.persistence.wsstorage.WebSocketPersistence
 import org.scalajs.jquery._
 
 import scala.scalajs.js
@@ -19,13 +20,15 @@ import scalatags.JsDom.all._
  */
 
 @JSExport
-class WallApp(val useLocalStorage: Boolean = true) {
+class WallApp(val useLocalStorage: Boolean = true, val useWS: Boolean = false) {
 
   val persistence: Persistence = {
     if (useLocalStorage)
       new LocalPersistence()
+    else if (useWS)
+      new WebSocketPersistence("localhost:9000")
     else
-      new RemotePersistence("")
+      new HttpPersistence("")
   }
 
   @JSExport

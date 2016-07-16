@@ -12,18 +12,18 @@ class WallManager {
 
   def findAll()(implicit userId: Long) =
     DB.withConnection { implicit c =>
-      SQL"""select walls.id,walls.x,walls.y,walls.scale,walls.title from walls, walls_of_user
+      SQL"""select walls.id,walls.state_id,walls.x,walls.y,walls.scale,walls.title from walls, walls_of_user
            where walls_of_user.user_id = $userId and walls_of_user.wall_id = walls.id
          """.map {
-        case Row(id: Long, x: Double, y: Double, scale: Double, title: String) => Wall(id, x, y, scale, title)
+        case Row(id: Long, stateId: Long, x: Double, y: Double, scale: Double, title: String) => Wall(id, stateId, x, y, scale, title)
       }.list()
     }
 
   def find(id: Long)(implicit userId: Long) =
     wallOfUser(id, userId).map { wallId =>
       DB.withConnection { implicit c =>
-        SQL"select id,x,y,scale,title from walls where id = $wallId".map {
-          case Row(id: Long, x: Double, y: Double, scale: Double, title: String) => Wall(id, x, y, scale, title)
+        SQL"select id,state_id,x,y,scale,title from walls where id = $wallId".map {
+          case Row(id: Long, stateId: Long, x: Double, y: Double, scale: Double, title: String) => Wall(id, stateId, x, y, scale, title)
         }.singleOpt
       }
     }.get
@@ -31,7 +31,7 @@ class WallManager {
   def create(wall: Wall)(implicit userId: Long): Long = {
     // returns id
     val wallId: Long = DB.withTransaction { implicit c =>
-      val wallIdOpt: Option[Long] = SQL"insert into walls(x, y, scale, title) values(${wall.x}, ${wall.y}, ${wall.scale}, ${wall.title})".executeInsert()
+      val wallIdOpt: Option[Long] = SQL"insert into walls(state_id, x, y, scale, title) values(0, ${wall.x}, ${wall.y}, ${wall.scale}, ${wall.title})".executeInsert()
       SQL"insert into walls_of_user(wall_id, user_id) values(${wallIdOpt.get}, $userId)".executeInsert()
       wallIdOpt.get
     }
@@ -66,16 +66,23 @@ class WallManager {
       }
     }
 
+  def setTitle(id: Long, title: String)(implicit userId: Long) =
+    wallOfUser(id, userId).foreach { _ =>
+      DB.withConnection { implicit c =>
+        SQL"update walls set title=$title where id = $id".executeUpdate()
+      }
+    }
+
   def getSheets(id: Long)(implicit userId: Long) = DB.withConnection { implicit c =>
     wallOfUser(id, userId).map { wallId =>
       SQL"""select
-            sheets.id, sheets.x, sheets.y,
+            sheets.id, sheets.state_id, sheets.x, sheets.y,
             sheets.width, sheets.height, sheets.content
             from sheets INNER JOIN sheets_in_wall
             ON sheets.id = sheets_in_wall.sheet_id
             where sheets_in_wall.wall_id = $id""".map {
-        case Row(id: Long, x: Double, y: Double,
-          width: Double, height: Double, content: java.sql.Clob) => Sheet(id, x, y, width, height, content.getSubString(1, content.length.asInstanceOf[Int]))
+        case Row(id: Long, stateId: Long, x: Double, y: Double,
+          width: Double, height: Double, content: java.sql.Clob) => Sheet(id, stateId, x, y, width, height, content.getSubString(1, content.length.asInstanceOf[Int]))
       }.list()
     }.get
   }
@@ -94,8 +101,8 @@ class WallManager {
 
   def createSheet(id: Long, sheet: Sheet)(implicit userId: Long) = DB.withTransaction { implicit c =>
     wallOfUser(id, userId).flatMap { wallId =>
-      val sheetId: Option[Long] = SQL"""insert into sheets(x, y, width, height, content)
-        values(${sheet.x}, ${sheet.y}, ${sheet.width}, ${sheet.height}, ${sheet.text})""".executeInsert()
+      val sheetId: Option[Long] = SQL"""insert into sheets(state_id, x, y, width, height, content)
+        values(0, ${sheet.x}, ${sheet.y}, ${sheet.width}, ${sheet.height}, ${sheet.text})""".executeInsert()
       SQL"insert into sheets_in_wall(wall_id, sheet_id) values($id, ${sheetId.get})".executeInsert()
       sheetId
     }.get

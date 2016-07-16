@@ -47,7 +47,7 @@ class Editor(showdown: ShowdownConverter) extends Element {
 
     jQuery(editorElement).show()
     cmOpt.foreach(_.setValue(sheet.getText()))
-    intervalHandle = dom.setInterval(() => {
+    intervalHandle = dom.window.setInterval(() => {
       for (sheet <- sheetOpt; cm <- cmOpt)
         sheet.setText(cm.getValue())
     }, 1500)
@@ -59,7 +59,7 @@ class Editor(showdown: ShowdownConverter) extends Element {
       sheet.setText(cm.getValue())
 
     jQuery(editorElement).hide()
-    dom.clearInterval(intervalHandle)
+    dom.window.clearInterval(intervalHandle)
   }
 
   def focus(): Unit = {

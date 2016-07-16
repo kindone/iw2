@@ -11,15 +11,16 @@ import anorm._
  */
 class SheetManager {
   def find(id: Long)(implicit userId: Long) = DB.withConnection { implicit c =>
-    SQL"""select sheets.id, sheets.x, sheets.y, sheets.width, sheets.height, sheets.content
+    SQL"""select sheets.id, sheets.state_id,
+          sheets.x, sheets.y, sheets.width, sheets.height, sheets.content
           from sheets, sheets_in_wall, walls_of_user
           where sheets_in_wall.sheet_id = $id
           and walls_of_user.user_id = $userId
           and sheets_in_wall.wall_id = walls_of_user.wall_id
           and walls_of_user.wall_id = sheets_in_wall.wall_id
           and sheets.id = $id""".map {
-      case Row(id: Long, x: Double, y: Double,
-        width: Double, height: Double, content: java.sql.Clob) => Sheet(id, x, y, width, height, content.getSubString(1, content.length.asInstanceOf[Int]))
+      case Row(id: Long, stateId: Long, x: Double, y: Double,
+        width: Double, height: Double, content: java.sql.Clob) => Sheet(id, stateId, x, y, width, height, content.getSubString(1, content.length.asInstanceOf[Int]))
     }.singleOpt
   }
 

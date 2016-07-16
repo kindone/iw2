@@ -19,6 +19,8 @@ class EventDispatcher[T <: Event] {
       listener.apply(evt)
   }
 
+  def isEmpty() = eventListeners.isEmpty
+
   def clear() = {
     eventListeners = List()
   }

@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.events
+package com.kindone.infinitewall.elements.events
 
 /**
  * Created by kindone on 2016. 2. 24..

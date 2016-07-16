@@ -18,7 +18,7 @@ class SheetManager(localStorage: LocalStorage) extends SheetManagerAPI {
 
   def create(x: Double, y: Double, width: Double, height: Double, text: String): Future[Sheet] = Future {
     val id = objectManager.nextId()
-    val sheet = new Sheet(id, x, y, width, height, text)
+    val sheet = new Sheet(id, 0, x, y, width, height, text)
     objectManager.save(id, sheet)
     println("sheet created")
     sheet
@@ -32,28 +32,28 @@ class SheetManager(localStorage: LocalStorage) extends SheetManagerAPI {
 
   def move(id: Long, x: Double, y: Double) = Future {
     val sheet = objectManager.getSheet(id).get
-    val newSheet = new Sheet(id, x, y, sheet.width, sheet.height, sheet.text)
+    val newSheet = new Sheet(id, 0, x, y, sheet.width, sheet.height, sheet.text)
     objectManager.save(id, newSheet)
     true
   }
 
   def resize(id: Long, width: Double, height: Double) = Future {
     val sheet = objectManager.getSheet(id).get
-    val newSheet = new Sheet(sheet.id, sheet.x, sheet.y, width, height, sheet.text)
+    val newSheet = new Sheet(sheet.id, 0, sheet.x, sheet.y, width, height, sheet.text)
     objectManager.save(sheet.id, newSheet)
     true
   }
 
   def setDimension(id: Long, x: Double, y: Double, width: Double, height: Double) = Future {
     val sheet = objectManager.getSheet(id).get
-    val newSheet = new Sheet(sheet.id, x, y, width, height, sheet.text)
+    val newSheet = new Sheet(sheet.id, 0, x, y, width, height, sheet.text)
     objectManager.save(sheet.id, newSheet)
     true
   }
 
   def setText(id: Long, text: String) = Future {
     val sheet = objectManager.getSheet(id).get
-    val newSheet = new Sheet(sheet.id, sheet.x, sheet.y, sheet.width, sheet.height, text)
+    val newSheet = new Sheet(sheet.id, 0, sheet.x, sheet.y, sheet.width, sheet.height, text)
     objectManager.save(sheet.id, newSheet)
     true
   }

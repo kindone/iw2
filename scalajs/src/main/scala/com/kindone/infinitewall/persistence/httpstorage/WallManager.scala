@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.persistence.remotestorage
+package com.kindone.infinitewall.persistence.httpstorage
 
 import com.kindone.infinitewall.data.{ Sheet, Wall }
 import com.kindone.infinitewall.persistence.api.{ WallManager => WallManagerAPI }
@@ -13,7 +13,7 @@ import scala.concurrent.Future
  */
 class WallManager(site: String) extends WallManagerAPI {
   def create(title: String, x: Double = 0, y: Double = 0, scale: Double = 1.0): Future[Wall] = {
-    val wall = new Wall(0, x, y, scale, title)
+    val wall = new Wall(0, 0, x, y, scale, title)
     for (
       response <- Ajax.post(site +
         s"/wall", write[Wall](wall), headers = Map("X-Requested-With" -> "XMLHttpRequest"))
@@ -47,7 +47,7 @@ class WallManager(site: String) extends WallManagerAPI {
   }
 
   def pan(id: Long, x: Double, y: Double): Future[Boolean] = {
-    val wall = new Wall(id, x, y, 0)
+    val wall = new Wall(id, 0, x, y, 0)
     for (
       response <- Ajax.put(site +
         s"/wall/$id/pan", write[Wall](wall))
@@ -55,7 +55,7 @@ class WallManager(site: String) extends WallManagerAPI {
   }
 
   def zoom(id: Long, scale: Double): Future[Boolean] = {
-    val wall = new Wall(id, 0, 0, scale)
+    val wall = new Wall(id, 0, 0, 0, scale)
     for (
       response <- Ajax.put(site +
         s"/wall/$id/zoom", write[Wall](wall))
@@ -63,10 +63,18 @@ class WallManager(site: String) extends WallManagerAPI {
   }
 
   def setView(id: Long, x: Double, y: Double, scale: Double): Future[Boolean] = {
-    val wall = new Wall(id, x, y, scale)
+    val wall = new Wall(id, 0, x, y, scale)
     for (
       response <- Ajax.put(site +
         s"/wall/$id/view", write[Wall](wall))
+    ) yield response.status == 200
+  }
+
+  def setTitle(id: Long, title: String): Future[Boolean] = {
+    val wall = new Wall(id, 0, 0, 0, 0, title)
+    for (
+      response <- Ajax.put(site +
+        s"/wall/$id/title", write[Wall](wall))
     ) yield response.status == 200
   }
 
@@ -77,11 +85,11 @@ class WallManager(site: String) extends WallManagerAPI {
     ) yield read[Set[Long]](response.responseText)
   }
 
-  def createSheet(id: Long, x: Double, y: Double, width: Double, height: Double, text: String): Future[Sheet] = {
-    val sheet = new Sheet(0, x, y, width, height, text)
+  def createSheet(wallId: Long, x: Double, y: Double, width: Double, height: Double, text: String): Future[Sheet] = {
+    val sheet = new Sheet(0, 0, x, y, width, height, text)
     for (
       response <- Ajax.post(site +
-        s"/wall/$id/sheet", write(sheet), headers = Map("X-Requested-With" -> "XMLHttpRequest"))
+        s"/wall/$wallId/sheet", write(sheet), headers = Map("X-Requested-With" -> "XMLHttpRequest"))
     ) yield read[Sheet](response.responseText)
   }
 

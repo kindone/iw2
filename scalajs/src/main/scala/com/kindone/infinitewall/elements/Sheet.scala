@@ -1,5 +1,6 @@
 package com.kindone.infinitewall.elements
 
+import com.kindone.infinitewall.elements.events.{ SheetEventDispatcher, SheetDimensionChangeEvent, SheetContentChangeEvent, SheetCloseEvent }
 import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.ShowdownConverter
 import com.kindone.infinitewall.data.{ Sheet => SheetModel }
@@ -113,8 +114,8 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends Element wit
       false
     })
 
-    val registerResizeHandle: js.Function2[js.Any, dom.Element, js.Any] =
-      (_: js.Any, handle: dom.Element) => {
+    val registerResizeHandle: js.Function2[Int, dom.Element, js.Any] =
+      (_: Int, handle: dom.Element) => {
         lazy val resizeHandler: js.Function1[JQueryEventObject, js.Any] =
           (evt: JQueryEventObject) => {
             val diffX = evt.pageX - resizeDownX

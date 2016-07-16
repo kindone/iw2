@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.persistence.remotestorage
+package com.kindone.infinitewall.persistence.httpstorage
 
 import com.kindone.infinitewall.data.Sheet
 import com.kindone.infinitewall.persistence.api.{ SheetManager => SheetManagerAPI }
@@ -21,7 +21,7 @@ class SheetManager(site: String) extends SheetManagerAPI {
   }
 
   def create(x: Double, y: Double, width: Double, height: Double, text: String): Future[Sheet] = {
-    val sheet = new Sheet(0, x, y, width, height, text)
+    val sheet = new Sheet(0, 0, x, y, width, height, text)
     for (
       response <- Ajax.post(site +
         s"/sheet", write[Sheet](sheet), headers = Map("X-Requested-With" -> "XMLHttpRequest"))
@@ -36,7 +36,7 @@ class SheetManager(site: String) extends SheetManagerAPI {
   }
 
   def move(id: Long, x: Double, y: Double): Future[Boolean] = {
-    val sheet = new Sheet(0, x, y, 0, 0, "")
+    val sheet = new Sheet(0, 0, x, y, 0, 0, "")
     for (
       response <- Ajax.put(site +
         s"/sheet/$id/position", write[Sheet](sheet))
@@ -44,7 +44,7 @@ class SheetManager(site: String) extends SheetManagerAPI {
   }
 
   def resize(id: Long, width: Double, height: Double): Future[Boolean] = {
-    val sheet = new Sheet(0, 0, 0, width, height, "")
+    val sheet = new Sheet(0, 0, 0, 0, width, height, "")
     for (
       response <- Ajax.put(site +
         s"/sheet/$id/size", write[Sheet](sheet))
@@ -52,7 +52,7 @@ class SheetManager(site: String) extends SheetManagerAPI {
   }
 
   def setDimension(id: Long, x: Double, y: Double, width: Double, height: Double): Future[Boolean] = {
-    val sheet = new Sheet(0, x, y, width, height, "")
+    val sheet = new Sheet(0, 0, x, y, width, height, "")
     for (
       response <- Ajax.put(site +
         s"/sheet/$id/dimension", write[Sheet](sheet))
@@ -60,7 +60,7 @@ class SheetManager(site: String) extends SheetManagerAPI {
   }
 
   def setText(id: Long, text: String): Future[Boolean] = {
-    val sheet = new Sheet(0, 0, 0, 0, 0, text)
+    val sheet = new Sheet(0, 0, 0, 0, 0, 0, text)
     for (
       response <- Ajax.put(site +
         s"/sheet/$id/text", write[Sheet](sheet))

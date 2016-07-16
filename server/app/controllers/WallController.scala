@@ -1,17 +1,34 @@
 package controllers
 
+import javax.inject.{ Singleton, Inject }
+
+import actors.{ SheetEventHubActor, WallEventHubActor, WebSocketActor }
+import akka.actor._
+import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.{ Wall, Sheet }
 import models.WallManager
 import play.api._
+import play.api.libs.json.JsValue
 import play.api.mvc._
 import upickle.default._
+
+import scala.concurrent.Future
+import play.api.Play.current
+import upickle.default._
+
+import scala.util.Try
 
 /**
  * Created by kindone on 2016. 3. 20..
  */
-class WallController extends Controller {
+// defining singleton necessary to keep actor reference
+@Singleton
+class WallController @Inject() (system: ActorSystem) extends Controller {
 
   lazy val wallManager = new WallManager
+
+  lazy val wallActor = system.actorOf(WallEventHubActor.props(), name = "wallEventHubActor")
+  lazy val sheetActor = system.actorOf(SheetEventHubActor.props(), name = "sheetEventHubActor")
 
   def index = UserAction {
     Ok(views.html.wall.index("Your new application is ready."))
@@ -68,6 +85,13 @@ class WallController extends Controller {
     Ok("")
   }
 
+  def setTitle(id: Long) = UserAction { implicit request =>
+    implicit val userId = request.userId
+    val wall = read[Wall](bodyText)
+    wallManager.setTitle(id, wall.title)
+    Ok("")
+  }
+
   def getSheets(id: Long) = UserAction { request =>
     implicit val userId = request.userId
     Ok(write[Set[Long]](wallManager.getSheetIds(id))).as(JSON_TYPE)
@@ -84,5 +108,12 @@ class WallController extends Controller {
     implicit val userId = request.userId
     wallManager.deleteSheet(id, sheetId)
     Ok("")
+  }
+
+  def websocket = WebSocket.tryAcceptWithActor[String, String] { request =>
+    Future.successful(request.session.get(LOGGED_IN_AS) match {
+      case None         => Left(Forbidden)
+      case Some(userId) => Right(WebSocketActor.props(wallActor, sheetActor, userId.toLong))
+    })
   }
 }

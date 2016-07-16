@@ -9,7 +9,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 lazy val clients = Seq(scalajs)
 
-lazy val scalaV = "2.11.7"
+lazy val scalaV = "2.11.8"
 
 lazy val server = (project in file("server")).settings(
   scalaVersion := scalaV,
@@ -47,15 +47,16 @@ lazy val scalajs = (project in file("scalajs")).settings(
   persistLauncher := true,
   persistLauncher in Test := false,
   libraryDependencies ++= Seq(
-    "org.scala-js" %%% "scalajs-dom" % "0.8.1",
-    "com.lihaoyi" %%% "scalatags" % "0.5.4",
-    "com.lihaoyi" %%% "scalarx" % "0.2.8",
-    "be.doeraene" %%% "scalajs-jquery" % "0.8.0",
-    "com.lihaoyi" %%% "upickle" % "0.3.8"
+    "org.scala-js" %%% "scalajs-dom" % "0.9.0",
+    "com.lihaoyi" %%% "scalatags" % "0.5.5",
+    "com.lihaoyi" %%% "scalarx" % "0.3.1",
+    "be.doeraene" %%% "scalajs-jquery" % "0.9.0",
+    "com.lihaoyi" %%% "upickle" % "0.3.8",
+    "io.monix" %%% "minitest" % "0.22" % "test"
   ),
   jsDependencies ++= Seq(
-    "org.webjars" % "bootstrap" % "3.3.5" / "bootstrap.min.js",
-    "org.webjars" % "jquery" % "2.1.3" / "jquery.min.js",
+    "org.webjars" % "bootstrap" % "3.3.6" / "bootstrap.min.js",
+    "org.webjars" % "jquery" % "2.2.4" / "jquery.min.js",
     "org.webjars" % "showdown" % "0.3.1" / "compressed/showdown.js",
     "org.webjars" % "jquery-mousewheel" % "3.1.12" / "jquery.mousewheel.js" dependsOn "jquery.min.js",
     "org.webjars" % "velocity" % "1.1.0" / "velocity.min.js" dependsOn "jquery.min.js"

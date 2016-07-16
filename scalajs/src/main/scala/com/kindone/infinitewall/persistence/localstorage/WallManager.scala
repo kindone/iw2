@@ -16,7 +16,7 @@ class WallManager(localStorage: LocalStorage, sheetManager: SheetManager) extend
 
   def create(title: String, x: Double = 0, y: Double = 0, scale: Double = 1.0): Future[Wall] = Future {
     val id = objectManager.nextId()
-    val wall = new Wall(id, x, y, scale, title)
+    val wall = new Wall(id, 0, x, y, scale, title)
     objectManager.save(id, wall)
     wall
   }
@@ -32,21 +32,28 @@ class WallManager(localStorage: LocalStorage, sheetManager: SheetManager) extend
 
   def pan(id: Long, x: Double, y: Double) = Future {
     val wall = objectManager.getWall(id).get
-    val newWall = new Wall(id, x, y, wall.scale)
+    val newWall = new Wall(id, 0, x, y, wall.scale)
     objectManager.save(id, newWall)
     true
   }
 
   def zoom(id: Long, scale: Double) = Future {
     val wall = objectManager.getWall(id).get
-    val newWall = new Wall(id, wall.x, wall.y, scale)
+    val newWall = new Wall(id, 0, wall.x, wall.y, scale)
     objectManager.save(id, newWall)
     true
   }
 
   def setView(id: Long, x: Double, y: Double, scale: Double) = Future {
     val wall = objectManager.getWall(id).get
-    val newWall = new Wall(id, x, y, scale)
+    val newWall = new Wall(id, 0, x, y, scale)
+    objectManager.save(id, newWall)
+    true
+  }
+
+  def setTitle(id: Long, title: String): Future[Boolean] = Future {
+    val wall = objectManager.getWall(id).get
+    val newWall = new Wall(id, 0, wall.x, wall.y, wall.scale, title)
     objectManager.save(id, newWall)
     true
   }

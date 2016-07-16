@@ -1,8 +1,11 @@
 package com.kindone.infinitewall.elements
 
+import com.kindone.infinitewall.data.action._
+import com.kindone.infinitewall.elements.events._
 import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.ShowdownConverter
 import com.kindone.infinitewall.persistence.api.Persistence
+import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import org.scalajs.jquery._
 import scala.scalajs.js
 import com.kindone.infinitewall.data.{ Wall => WallModel, Sheet => SheetModel }
@@ -38,7 +41,8 @@ class WallView(id: Long, persistence: Persistence) extends Element {
     val wallManager = persistence.wallManager
     val sheetManager = persistence.sheetManager
 
-    wallModelFuture.foreach { wallModel =>
+    for (wallModel <- wallModelFuture) {
+
       val wall = new Wall(wallModel)
       val controlPad = new ControlPad
 
@@ -89,6 +93,20 @@ class WallView(id: Long, persistence: Persistence) extends Element {
           overlay.on("mousedown", editorClose)
         })
 
+        persistence.sheetManager.addOnUpdateEventHandler(sheet.id, new EventListener[PersistenceUpdateEvent] {
+          def apply(evt: PersistenceUpdateEvent) = {
+            println("wall persistence event:" + evt.toString)
+            evt.action match {
+              // TODO
+              case MoveSheetAction(id, x, y) =>
+              case ResizeSheetAction(id, width, height) =>
+              case ChangeSheetDimensionAction(id, x, y, width, height) =>
+              case ChangeSheetContentAction(id, content, pos) =>
+              case _ =>
+            }
+          }
+        })
+        persistence.sheetManager.subscribe(sheet.id)
       }
 
       for (
@@ -121,6 +139,23 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       controlPad.setOnClearDBButtonClickListener({ () =>
         persistence.clear()
       })
+
+      // add persistence update event
+      persistence.wallManager.addOnUpdateEventHandler(wall.id, new EventListener[PersistenceUpdateEvent] {
+        def apply(evt: PersistenceUpdateEvent) = {
+          println("wall persistence event:" + evt.toString)
+          evt.action match {
+            //TODO
+            case ChangeTitleAction(_, _) =>
+            case CreateSheetAction(_, _) =>
+            case DeleteSheetAction(_, _) =>
+            case _                       =>
+          }
+        }
+      })
+
+      persistence.wallManager.subscribe(wall.id)
+
     }
 
   }
