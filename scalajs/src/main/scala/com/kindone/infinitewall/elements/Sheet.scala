@@ -32,6 +32,8 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends Element wit
     )
     jQuery(html.render)
   }
+
+  private var stateId = 0L
   private var x: Double = 0.0
   private var y: Double = 0.0
   private var width: Double = 100
@@ -52,6 +54,14 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends Element wit
     onDoubleClickListener = Some(listener)
   }
 
+  def updateText(text: String) = {
+
+  }
+
+  def updateDimension() = {
+
+  }
+
   def setText(text: String) = {
     this.text = text
     sheetTextElement.html(converter.makeHtml(text))
@@ -64,6 +74,7 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends Element wit
 
   def setup(scaler: (Double) => Double) = {
 
+    stateId = model.stateId
     x = model.x
     y = model.y
     width = model.width

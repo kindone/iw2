@@ -37,10 +37,10 @@ class SheetEventActor extends Actor {
 
   def receive = {
     case AddEventListener(actorRef) =>
-      Logger.info("listening actor:" + actorRef.toString())
+      Logger.info("listening sheet actor:" + actorRef.toString())
       listeners = listeners + actorRef
     case RemoveEventListener(actorRef) =>
-      Logger.info("unlistening actor:" + actorRef.toString())
+      Logger.info("unlistening sheet actor:" + actorRef.toString())
       listeners = listeners - actorRef
     case UserRequestedAction(out, userId, reqId, action: SheetAlterAction) =>
 

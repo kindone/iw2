@@ -1,6 +1,6 @@
 package actors
 
-import actors.event.RemoveEventListener
+import actors.event.{ AddEventListener, RemoveEventListener }
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.ws.Response
 import com.kindone.infinitewall.data.{ Wall, Sheet }
@@ -57,7 +57,7 @@ class WallEventHubActor extends Actor {
       action match {
 
         case action @ SubscribeWallEventAction(wallId) =>
-          sendToWallEventActor(wallId, out, action)
+          sendToWallEventActor(wallId, out, AddEventListener(out))
 
         case CreateWallAction(title, x, y, scale) =>
           val wallId = wallManager.create(Wall(0, 0, x, y, scale, title))(userId)

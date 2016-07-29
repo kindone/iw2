@@ -37,11 +37,11 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
   }
 
   // request/response id to distinguish concurrent requests
-  private var maxId: Long = 0
+  private var maxReqId: Long = 0
 
-  def nextId() = {
-    maxId = maxId + 1
-    maxId
+  def nextReqId() = {
+    maxReqId = maxReqId + 1
+    maxReqId
   }
 
   def send[T: Reader](action: Action) = {
@@ -49,12 +49,12 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
       promise.asInstanceOf[Promise[T]] success read[T](str)
     }
     val promise = Promise[T]()
-    val msgId = nextId
-    map = map + (msgId -> Record[T](msgId, promise, block))
+    val reqId = nextReqId
+    map = map + (reqId -> Record[T](reqId, promise, block))
 
     // send actually here
     for (ws <- wsFuture) {
-      val msg = write(Request(msgId, action))
+      val msg = write(Request(reqId, action))
       println("ws send: " + msg)
       ws.send(msg)
     }
@@ -65,17 +65,17 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
   def receive(responseStr: String) = {
     println("ws event:" + responseStr)
     read[ServerToClientMessage](responseStr) match {
-      case Response(id, logId, message) =>
-        for (record <- map.get(id)) {
+      case Response(reqId, logId, message) =>
+        for (record <- map.get(reqId)) {
           record.onReceive(message, record.promise)
         }
-        map = map - id
-      case Notification(msgId, action: WallAlterAction) =>
-        dispatchWallNotificationEvent(action.wallId, new PersistenceUpdateEvent(action))
-      case Notification(msgId, action: SheetAlterAction) =>
-        dispatchSheetNotificationEvent(action.sheetId, new PersistenceUpdateEvent(action))
+        map = map - reqId
+      case Notification(logId, action: WallAlterAction) =>
+        dispatchWallNotificationEvent(action.wallId, new PersistenceUpdateEvent(logId, action))
+      case Notification(logId, action: SheetAlterAction) =>
+        dispatchSheetNotificationEvent(action.sheetId, new PersistenceUpdateEvent(logId, action))
       case _ =>
-      // TODO emit unsupported
+        println("warning - unsupported message")
     }
   }
 }

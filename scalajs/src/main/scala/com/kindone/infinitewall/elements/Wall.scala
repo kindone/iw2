@@ -14,6 +14,7 @@ class Wall(model: WallModel) extends Element with WallEventDispatcher {
 
   val id = model.id
 
+  private var stateId = 0L
   private var scale = 1.0
   private var panX = 0.0
   private var panY = 0.0
@@ -64,6 +65,7 @@ class Wall(model: WallModel) extends Element with WallEventDispatcher {
 
   def setup(): Unit = {
 
+    stateId = model.stateId
     scale = model.scale
     recalculateTranslation(model.x, model.y)
 

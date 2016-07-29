@@ -1,7 +1,6 @@
 package actors
 
 import actors.event.{ RemoveEventListener, AddEventListener }
-import actors.util.SubscriberSet
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.Wall
 import com.kindone.infinitewall.data.action._
@@ -32,6 +31,7 @@ class WallEventActor extends Actor {
   }
 
   def broadcast(logId: Long, action: Action) = {
+    Logger.debug("broadcasting wall event: " + action.toString)
     for (listener <- listeners) {
       listener ! notification(logId, action)
     }
@@ -39,10 +39,10 @@ class WallEventActor extends Actor {
 
   def receive = {
     case AddEventListener(actorRef) =>
-      Logger.info("listening actor:" + actorRef.toString())
+      Logger.info("listening wall actor:" + actorRef.toString())
       listeners = listeners + actorRef
     case RemoveEventListener(actorRef) =>
-      Logger.info("unlistening actor:" + actorRef.toString())
+      Logger.info("unlistening wall actor:" + actorRef.toString())
       listeners = listeners - actorRef
     case UserRequestedAction(out, userId, reqId, action: WallAlterAction) =>
 

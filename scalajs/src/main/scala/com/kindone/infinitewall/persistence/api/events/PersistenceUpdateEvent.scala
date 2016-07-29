@@ -6,4 +6,4 @@ import com.kindone.infinitewall.events.Event
 /**
  * Created by kindone on 2016. 5. 30..
  */
-case class PersistenceUpdateEvent(action: Action) extends Event
+case class PersistenceUpdateEvent(logId: Long, action: Action) extends Event

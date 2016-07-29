@@ -43,6 +43,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
 
     for (wallModel <- wallModelFuture) {
 
+      // create views
       val wall = new Wall(wallModel)
       val controlPad = new ControlPad
 
@@ -54,6 +55,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
 
       element.append(overlay)
 
+      // attach editor
       val showdownConverter = new ShowdownConverter()
       val editor = new Editor(showdownConverter)
       element.append(editor.element)
@@ -65,6 +67,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         overlay.off("mousedown", editorClose)
       }
 
+      // sheets
       def createSheet(sheetModel: SheetModel) = {
         val sheet = new Sheet(sheetModel, showdownConverter)
         wall.appendSheet(sheet)
@@ -95,7 +98,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
 
         persistence.sheetManager.addOnUpdateEventHandler(sheet.id, new EventListener[PersistenceUpdateEvent] {
           def apply(evt: PersistenceUpdateEvent) = {
-            println("wall persistence event:" + evt.toString)
+            println("sheet persistence event:" + evt.toString)
             evt.action match {
               // TODO
               case MoveSheetAction(id, x, y) =>
@@ -109,6 +112,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         persistence.sheetManager.subscribe(sheet.id)
       }
 
+      // load and create sheets
       for (
         sheets <- wallManager.getSheets(wallModel.id);
         sheetId <- sheets;
@@ -117,6 +121,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         createSheet(sheet)
       }
 
+      // activate sheet lifecycle events
       wall.addOnSheetRemovedListener(new EventListener[SheetRemovedEvent] {
         def apply(evt: SheetRemovedEvent) = {
           wallManager.deleteSheet(wall.id, evt.sheetId)
@@ -129,6 +134,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         }
       })
 
+      // activate controlpad events
       controlPad.setOnAddButtonClickListener({ () =>
         // create random sheet model first and realize
         println(wall.center)
@@ -140,7 +146,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         persistence.clear()
       })
 
-      // add persistence update event
+      // add wall persistence update event
       persistence.wallManager.addOnUpdateEventHandler(wall.id, new EventListener[PersistenceUpdateEvent] {
         def apply(evt: PersistenceUpdateEvent) = {
           println("wall persistence event:" + evt.toString)

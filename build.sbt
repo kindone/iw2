@@ -36,6 +36,7 @@ lazy val server = (project in file("server")).settings(
     "org.webjars" % "bootstrap" % "3.3.5",
     "org.webjars" % "react" % "0.14.7",
     "org.flywaydb" %% "flyway-play" % "2.2.1",
+    "org.webjars" % "cryptojs" % "3.1.2",
     "org.mindrot" % "jbcrypt" % "0.3m"
 )
  ).enablePlugins(PlayScala).
