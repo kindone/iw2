@@ -8,5 +8,7 @@ target
 /.project
 /.settings
 /.sbtserver
+.js
+.jvm
 project/.sbtserver.lock
 /RUNNING_PID

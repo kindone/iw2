@@ -65,10 +65,21 @@ lazy val scalajs = (project in file("scalajs")).settings(
 ).enablePlugins(ScalaJSPlugin, ScalaJSPlay).
   dependsOn(sharedJs)
 
+val sharedJvmSettings = List(
+  libraryDependencies ++= Seq(
+    "com.lihaoyi" %% "upickle" % "0.3.8"
+  )
+)
 
 lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
   settings(scalaVersion := scalaV).
-  jsConfigure(_ enablePlugins ScalaJSPlay)
+  jsConfigure(_ enablePlugins ScalaJSPlay).
+  jvmSettings(sharedJvmSettings: _*).
+  jsSettings(
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" %%% "upickle" % "0.3.8"
+    )
+  )
 
 scalaJSStage in Global := FastOptStage
 

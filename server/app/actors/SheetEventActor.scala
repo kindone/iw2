@@ -3,6 +3,7 @@ package actors
 import actors.event._
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.action._
+import com.kindone.infinitewall.data.versioncontrol.Change
 import com.kindone.infinitewall.data.ws.{ Notification, Response }
 import models.{ SheetLog, SheetLogManager, SheetManager }
 import play.api.Logger
@@ -25,13 +26,13 @@ class SheetEventActor extends Actor {
     write(Response(reqId, logId, write[T](msg)))
   }
 
-  def notification(logId: Long, action: Action) = {
-    write(Notification(logId, action))
+  def notification(logId: Long, change: Change) = {
+    write(Notification(logId, change))
   }
 
-  def broadcast(logId: Long, action: Action) = {
+  def broadcast(logId: Long, change: Change) = {
     for (listener <- listeners) {
-      listener ! notification(logId, action)
+      listener ! notification(logId, change)
     }
   }
 
@@ -42,7 +43,7 @@ class SheetEventActor extends Actor {
     case RemoveEventListener(actorRef) =>
       Logger.info("unlistening sheet actor:" + actorRef.toString())
       listeners = listeners - actorRef
-    case UserRequestedAction(out, userId, reqId, action: SheetAlterAction) =>
+    case UserGeneratedChange(out, userId, reqId, change @ Change(_, action: SheetAlterAction, _)) =>
 
       var logId: Long = 0
 
@@ -59,12 +60,12 @@ class SheetEventActor extends Actor {
           sheetManager.setDimension(id, x, y, width, height)(userId)
           logId = sheetLogManager.create(SheetLog(id, 0, 2, Some(write(action))))(userId)
           out ! response(reqId, logId, true)
-        case ChangeSheetContentAction(id, content, pos) =>
-          sheetManager.setText(id, content)(userId) // TODO: pos
+        case ChangeSheetContentAction(id, content, pos, length) =>
+          sheetManager.setText(id, content)(userId) // TODO: pos, length
           logId = sheetLogManager.create(SheetLog(id, 0, 3, Some(write(action))))(userId)
           out ! response(reqId, logId, true)
       }
-      broadcast(logId, action)
+      broadcast(logId, change)
     case _ =>
   }
 }

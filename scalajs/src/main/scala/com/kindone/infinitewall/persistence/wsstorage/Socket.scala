@@ -1,7 +1,8 @@
 package com.kindone.infinitewall.persistence.wsstorage
 
 import com.kindone.infinitewall.data.action._
-import com.kindone.infinitewall.data.ws.{ Notification, ServerToClientMessage, Request, Response }
+import com.kindone.infinitewall.data.versioncontrol.{ Read, VersionedAction, Change }
+import com.kindone.infinitewall.data.ws._
 import com.kindone.infinitewall.events.{ EventListener, EventDispatcher }
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.wsstorage.events.{ WebSocketEventDispatcher, WebSocketEvent }
@@ -44,7 +45,7 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
     maxReqId
   }
 
-  def send[T: Reader](action: Action) = {
+  def send[T: Reader](action: VersionedAction) = {
     val block: (String, Promise[_]) => Unit = { (str: String, promise: Promise[_]) =>
       promise.asInstanceOf[Promise[T]] success read[T](str)
     }
@@ -52,9 +53,14 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
     val reqId = nextReqId
     map = map + (reqId -> Record[T](reqId, promise, block))
 
+    val request: ClientToServerMessage = action match {
+      case a: Read   => ReadRequest(reqId, a)
+      case a: Change => ChangeRequest(reqId, a)
+    }
+
     // send actually here
     for (ws <- wsFuture) {
-      val msg = write(Request(reqId, action))
+      val msg = write(request)
       println("ws send: " + msg)
       ws.send(msg)
     }
@@ -70,10 +76,10 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
           record.onReceive(message, record.promise)
         }
         map = map - reqId
-      case Notification(logId, action: WallAlterAction) =>
-        dispatchWallNotificationEvent(action.wallId, new PersistenceUpdateEvent(logId, action))
-      case Notification(logId, action: SheetAlterAction) =>
-        dispatchSheetNotificationEvent(action.sheetId, new PersistenceUpdateEvent(logId, action))
+      case Notification(logId, change @ Change(_, action: WallAlterAction, _)) =>
+        dispatchWallNotificationEvent(action.wallId, new PersistenceUpdateEvent(logId, change))
+      case Notification(logId, change @ Change(_, action: SheetAlterAction, _)) =>
+        dispatchSheetNotificationEvent(action.sheetId, new PersistenceUpdateEvent(logId, change))
       case _ =>
         println("warning - unsupported message")
     }

@@ -2,7 +2,8 @@ package actors
 
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.action._
-import com.kindone.infinitewall.data.ws.Request
+import com.kindone.infinitewall.data.versioncontrol.Change
+import com.kindone.infinitewall.data.ws.ChangeRequest
 import play.api.Logger
 import upickle.default._
 
@@ -12,7 +13,7 @@ import scala.util.Try
  * Created by kindone on 2016. 4. 17..
  */
 
-case class UserRequestedAction(outActor: ActorRef, userId: Long, reqId: Long, action: Action)
+case class UserGeneratedChange(outActor: ActorRef, userId: Long, reqId: Long, change: Change)
 case class ConnectionClosed(outActor: ActorRef, subscribingWalls: Set[Long], subscribingSheets: Set[Long])
 case class SubscribeEvent(outActor: ActorRef, userId: Long, wallId: Long)
 
@@ -46,20 +47,20 @@ class WebSocketActor(wallActor: ActorRef, sheetActor: ActorRef, outActor: ActorR
   def receive = {
     case str: String =>
       Logger.debug("ws event: " + str)
-      val reqTry = Try { read[Request](str) }
+      val reqTry = Try { read[ChangeRequest](str) }
 
       for (req <- reqTry) {
         req match {
-          case Request(reqId, action: SubscribeWallEventAction) =>
+          case ChangeRequest(reqId, change @ Change(_, action: SubscribeWallEventAction, _)) =>
             subscribeWall(action.wallId)
-            wallActor ! UserRequestedAction(outActor, userId, reqId, action)
-          case Request(reqId, action: SubscribeSheetEventAction) =>
+            wallActor ! UserGeneratedChange(outActor, userId, reqId, change)
+          case ChangeRequest(reqId, change @ Change(_, action: SubscribeSheetEventAction, _)) =>
             subscribeSheet(action.sheetId)
-            sheetActor ! UserRequestedAction(outActor, userId, reqId, action)
-          case Request(reqId, wallAction: WallAction) =>
-            wallActor ! UserRequestedAction(outActor, userId, reqId, wallAction)
-          case Request(reqId, sheetAction: SheetAction) =>
-            sheetActor ! UserRequestedAction(outActor, userId, reqId, sheetAction)
+            sheetActor ! UserGeneratedChange(outActor, userId, reqId, change)
+          case ChangeRequest(reqId, change @ Change(_, wallAction: WallAction, _)) =>
+            wallActor ! UserGeneratedChange(outActor, userId, reqId, change)
+          case ChangeRequest(reqId, change @ Change(_, sheetAction: SheetAction, _)) =>
+            sheetActor ! UserGeneratedChange(outActor, userId, reqId, change)
           case _ =>
             Logger.error("Unexpected ActionMessage type")
         }

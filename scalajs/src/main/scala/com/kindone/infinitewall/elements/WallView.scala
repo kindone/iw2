@@ -99,12 +99,12 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         persistence.sheetManager.addOnUpdateEventHandler(sheet.id, new EventListener[PersistenceUpdateEvent] {
           def apply(evt: PersistenceUpdateEvent) = {
             println("sheet persistence event:" + evt.toString)
-            evt.action match {
+            evt.change.action match {
               // TODO
               case MoveSheetAction(id, x, y) =>
               case ResizeSheetAction(id, width, height) =>
               case ChangeSheetDimensionAction(id, x, y, width, height) =>
-              case ChangeSheetContentAction(id, content, pos) =>
+              case ChangeSheetContentAction(id, content, pos, length) =>
               case _ =>
             }
           }
@@ -150,7 +150,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       persistence.wallManager.addOnUpdateEventHandler(wall.id, new EventListener[PersistenceUpdateEvent] {
         def apply(evt: PersistenceUpdateEvent) = {
           println("wall persistence event:" + evt.toString)
-          evt.action match {
+          evt.change.action match {
             //TODO
             case ChangeTitleAction(_, _) =>
             case CreateSheetAction(_, _) =>

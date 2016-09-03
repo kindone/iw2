@@ -2,6 +2,7 @@ package actors
 
 import actors.event.{ AddEventListener, RemoveEventListener }
 import akka.actor.{ Actor, Props, ActorRef }
+import com.kindone.infinitewall.data.versioncontrol.Change
 import com.kindone.infinitewall.data.ws.Response
 import com.kindone.infinitewall.data.{ Wall, Sheet }
 import com.kindone.infinitewall.data.action._
@@ -51,7 +52,7 @@ class WallEventHubActor extends Actor {
 
   def receive = {
 
-    case reqAction @ UserRequestedAction(out, userId, reqId, action: WallAction) =>
+    case userChange @ UserGeneratedChange(out, userId, reqId, Change(_, action: WallAction, _)) =>
       var logId: Long = 0
 
       action match {
@@ -74,7 +75,7 @@ class WallEventHubActor extends Actor {
           val wall = wallManager.find(id)(userId)
           out ! response(reqId, 0, wall)
         case action: WallAlterAction =>
-          sendToWallEventActor(action.wallId, out, reqAction)
+          sendToWallEventActor(action.wallId, out, userChange)
 
         case ListSheetAction(wallId) =>
           out ! response(reqId, 0, wallManager.getSheets(wallId)(userId).map(_.id))

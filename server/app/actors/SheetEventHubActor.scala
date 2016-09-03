@@ -3,6 +3,7 @@ package actors
 import actors.event.{ RemoveEventListener, AddEventListener }
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.action._
+import com.kindone.infinitewall.data.versioncontrol.Change
 import com.kindone.infinitewall.data.ws.Response
 import models.SheetManager
 import play.api.Logger
@@ -42,7 +43,7 @@ class SheetEventHubActor extends Actor {
   }
 
   def receive = {
-    case reqAction @ UserRequestedAction(out, userId, msgId, action: SheetAction) =>
+    case userChange @ UserGeneratedChange(out, userId, msgId, Change(_, action: SheetAction, _)) =>
       action match {
         case action @ SubscribeSheetEventAction(sheetId) =>
           sendToSheetEventActor(sheetId, out, AddEventListener(out))
@@ -53,7 +54,7 @@ class SheetEventHubActor extends Actor {
           out ! response(msgId, 0, sheetManager.find(id)(userId).get)
 
         case action: SheetAlterAction =>
-          sendToSheetEventActor(action.sheetId, out, reqAction)
+          sendToSheetEventActor(action.sheetId, out, userChange)
 
         case _ =>
           Logger.error("Unsupported action type to Sheet Actor received")

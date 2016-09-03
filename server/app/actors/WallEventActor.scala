@@ -4,6 +4,7 @@ import actors.event.{ RemoveEventListener, AddEventListener }
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.Wall
 import com.kindone.infinitewall.data.action._
+import com.kindone.infinitewall.data.versioncontrol.Change
 import com.kindone.infinitewall.data.ws.{ Notification, Response }
 import models._
 import play.api.Logger
@@ -26,14 +27,14 @@ class WallEventActor extends Actor {
     write(Response(reqId, logId, write[T](msg)))
   }
 
-  def notification(logId: Long, action: Action) = {
-    write(Notification(logId, action))
+  def notification(logId: Long, change: Change) = {
+    write(Notification(logId, change))
   }
 
-  def broadcast(logId: Long, action: Action) = {
-    Logger.debug("broadcasting wall event: " + action.toString)
+  def broadcast(logId: Long, change: Change) = {
+    Logger.debug("broadcasting wall event: " + change.toString)
     for (listener <- listeners) {
-      listener ! notification(logId, action)
+      listener ! notification(logId, change)
     }
   }
 
@@ -44,7 +45,7 @@ class WallEventActor extends Actor {
     case RemoveEventListener(actorRef) =>
       Logger.info("unlistening wall actor:" + actorRef.toString())
       listeners = listeners - actorRef
-    case UserRequestedAction(out, userId, reqId, action: WallAlterAction) =>
+    case UserGeneratedChange(out, userId, reqId, change @ Change(_, action: WallAlterAction, _)) =>
 
       var logId: Long = 0
 
@@ -78,7 +79,7 @@ class WallEventActor extends Actor {
         case _ =>
           Logger.warn("This message type is not supported")
       }
-      broadcast(logId, action)
+      broadcast(logId, change)
     case _ =>
   }
 }
