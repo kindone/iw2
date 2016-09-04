@@ -1,14 +1,12 @@
-package com.kindone.infinitewall.data
+package com.kindone.util
 
 import java.security.MessageDigest
 
-import com.kindone.infinitewall.data.versioncontrol.Hasher
-
 /**
- * Created by kindone on 2016. 8. 14..
+ * Created by kindone on 2016. 1. 24..
  */
-object ScalaHasher extends Hasher {
 
+object Hasher {
   def SHA1(input: String): String = {
     val mDigest: MessageDigest = MessageDigest.getInstance("SHA1")
     val result: Array[Byte] = mDigest.digest(input.getBytes)

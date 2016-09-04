@@ -47,7 +47,7 @@ class Repository {
 
 
   // find upstream for state
-  private def getSnapshot(hash:String)(implicit hasher:Hasher):Snapshot = {
+  private def getSnapshot(hash:String):Snapshot = {
 
     if(snapshots.get(hash).isDefined)
     {

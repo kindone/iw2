@@ -67,7 +67,8 @@ lazy val scalajs = (project in file("scalajs")).settings(
 
 val sharedJvmSettings = List(
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %% "upickle" % "0.3.8"
+    "com.lihaoyi" %% "upickle" % "0.3.8",
+    "com.kindone" %% "crosslib" % "0.1-SNAPSHOT"
   )
 )
 
@@ -77,14 +78,19 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
   jvmSettings(sharedJvmSettings: _*).
   jsSettings(
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %%% "upickle" % "0.3.8"
+      "com.lihaoyi" %%% "upickle" % "0.3.8",
+      "com.kindone" %% "crosslib" % "0.1-SNAPSHOT"
     )
   )
+
+lazy val crosslib = project.in(file("crosslib"))
 
 scalaJSStage in Global := FastOptStage
 
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
+
+
 
 // loads the jvm project at sbt startup
 onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
