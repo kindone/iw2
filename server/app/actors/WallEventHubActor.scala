@@ -4,7 +4,7 @@ import actors.event.{ AddEventListener, RemoveEventListener }
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.versioncontrol.Change
 import com.kindone.infinitewall.data.ws.Response
-import com.kindone.infinitewall.data.{ Wall, Sheet }
+import com.kindone.infinitewall.data.Wall
 import com.kindone.infinitewall.data.action._
 import models.{ WallLog, WallLogManager, WallManager }
 import play.api.Logger
@@ -27,6 +27,10 @@ class WallEventHubActor extends Actor {
 
   def response[T: Writer](msgId: Long, logId: Long, msg: T) = {
     write(Response(msgId, logId, write[T](msg)))
+  }
+
+  def response(msgId: Long, result: (Long, Boolean)): String = {
+    response(msgId, result._1, result._2)
   }
 
   var openWalls = Map[Long, ActorRef]()
@@ -52,8 +56,8 @@ class WallEventHubActor extends Actor {
 
   def receive = {
 
-    case userChange @ UserGeneratedChange(out, userId, reqId, Change(_, action: WallAction, _)) =>
-      var logId: Long = 0
+    case userChange @ UserGeneratedChange(out, userId, reqId, Change(action: WallAction, baseLogId, _)) =>
+      var result = (0L, false)
 
       action match {
 
@@ -62,12 +66,12 @@ class WallEventHubActor extends Actor {
 
         case CreateWallAction(title, x, y, scale) =>
           val wallId = wallManager.create(Wall(0, 0, x, y, scale, title))(userId)
-          logId = wallLogManager.create(WallLog(wallId, 0, 0, Some(write(action))))(userId)
-          out ! response(reqId, logId, Wall(wallId, 0, x, y, scale, title))
+          result = wallLogManager.create(WallLog(wallId, baseLogId, 0, Some(write(action))))(userId)
+          out ! response(reqId, result._1, Wall(wallId, 0, x, y, scale, title))
         case DeleteWallAction(wallId) =>
           wallManager.delete(wallId)(userId)
-          logId = wallLogManager.create(WallLog(wallId, 0, 1, Some(write(action))))(userId)
-          out ! response(reqId, logId, true)
+          result = wallLogManager.create(WallLog(wallId, baseLogId, 1, Some(write(action))))(userId)
+          out ! response(reqId, result)
 
         case ListWallAction() =>
           out ! response(reqId, 0, wallManager.findAll()(userId))

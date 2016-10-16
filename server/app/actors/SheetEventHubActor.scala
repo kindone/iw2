@@ -43,7 +43,7 @@ class SheetEventHubActor extends Actor {
   }
 
   def receive = {
-    case userChange @ UserGeneratedChange(out, userId, msgId, Change(_, action: SheetAction, _)) =>
+    case userChange @ UserGeneratedChange(out, userId, msgId, Change(action: SheetAction, _, _)) =>
       action match {
         case action @ SubscribeSheetEventAction(sheetId) =>
           sendToSheetEventActor(sheetId, out, AddEventListener(out))

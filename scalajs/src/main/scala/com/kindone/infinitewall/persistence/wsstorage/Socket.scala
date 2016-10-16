@@ -76,9 +76,9 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
           record.onReceive(message, record.promise)
         }
         map = map - reqId
-      case Notification(logId, change @ Change(_, action: WallAlterAction, _)) =>
+      case Notification(logId, change @ Change(action: WallAlterAction, _, _)) =>
         dispatchWallNotificationEvent(action.wallId, new PersistenceUpdateEvent(logId, change))
-      case Notification(logId, change @ Change(_, action: SheetAlterAction, _)) =>
+      case Notification(logId, change @ Change(action: SheetAlterAction, _, _)) =>
         dispatchSheetNotificationEvent(action.sheetId, new PersistenceUpdateEvent(logId, change))
       case _ =>
         println("warning - unsupported message")

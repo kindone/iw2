@@ -1,7 +1,7 @@
 package com.kindone.infinitewall.versioncontrol
 
 import com.kindone.infinitewall.data.action.{ _ }
-import com.kindone.infinitewall.data.versioncontrol.{ Read, Change }
+import com.kindone.infinitewall.data.versioncontrol.{ Branch, Read, Change }
 import com.kindone.infinitewall.facades.CryptoJS
 import upickle.default._
 
@@ -10,11 +10,13 @@ import upickle.default._
  */
 class VersionControl {
 
-  def createRead(action: ReadonlyAction, parentHash: Option[String] = None) = {
-    Read(action, parentHash)
+  lazy val branch: Branch = new Branch(Branch.genHash)
+
+  def createRead(action: ReadonlyAction, baseLogId: Long = 0) = {
+    Read(action, baseLogId)
   }
 
-  def createChange(action: WriteAction, parentHash: Option[String] = None) = {
+  def createChange(action: WriteAction, baseLogId: Long = 0) = {
     val serializedString = write(action)
     val hash = (new CryptoJS).SHA1(serializedString)
     //    val typeString: String = action match {
@@ -31,7 +33,7 @@ class VersionControl {
     //      case _                             => "unknown"
     //    }
 
-    Change(hash, /* typeString,*/ action, parentHash)
+    Change(action, baseLogId, branch)
   }
 
 }

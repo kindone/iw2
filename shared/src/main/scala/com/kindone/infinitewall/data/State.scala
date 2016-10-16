@@ -1,18 +1,43 @@
 package com.kindone.infinitewall.data
 
 import com.kindone.infinitewall.data.action._
-import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, StringWithState}
+import com.kindone.infinitewall.data.versioncontrol.util.{StringWithHistory, TextOperation}
 
 /**
  * Created by kindone on 2016. 2. 13..
  */
 
 sealed abstract class State {
+  def oid:String
   def applyAction(action:Action):State
 }
 
+trait SheetLike {
+  def id:Long
+  def stateId:Long
+  def x:Double
+  def y:Double
+  def width:Double
+  def height:Double
+  def text:String
+}
+
+trait SheetsInWallLike {
+  def wallId: Long
+  def sheets:Set[Sheet]
+}
+
+trait WallLike {
+  def id: Long
+  def stateId:Long
+  def x: Double
+  def y: Double
+  def scale: Double
+  def title: String
+}
+
 case class Sheet(id: Long, stateId: Long, x: Double, y: Double,
-                 width: Double, height: Double, text: String) extends State
+                 width: Double, height: Double, text: String) extends State //with SheetLike
 {
 
   val oid = "sheet_" + id
@@ -29,14 +54,12 @@ case class Sheet(id: Long, stateId: Long, x: Double, y: Double,
           case ChangeSheetDimensionAction(_, x, y, width, height) =>
             this.copy(x = x, y = y, width = width, height = height)
           case ChangeSheetContentAction(_, content, pos, length) =>
-            val ss = new StringWithState(text)
-            ss.apply(new TextOperation(pos, length, content), 0)
-            this.copy(text = ss.text)
+            this.copy(text = new TextOperation(content, pos, length).transform(text))
           case _ =>
-            this.copy()
+            this
         }
       case _ =>
-        this.copy()
+        this
     }
   }
 }
@@ -59,10 +82,10 @@ case class SheetsInWall(wallId: Long, sheets:Set[Sheet]) extends State
             val newSet = sheets.filter(_.id != sheetId)
             this.copy(sheets = newSet)
           case _ =>
-            this.copy()
+            this
         }
       case _ =>
-        this.copy()
+        this
     }
   }
 }
@@ -85,13 +108,38 @@ case class Wall(id: Long, stateId:Long, x: Double, y: Double, scale: Double, tit
           case ChangeTitleAction(_, title) =>
             this.copy(title = title)
           case _ =>
-            this.copy()
+            this
         }
       case _ =>
-        this.copy()
+        this
     }
   }
 }
 
+case class WallWithSheets(wall:Wall, sheetsInWall:SheetsInWall) extends State
+{
+  val oid = "wws_" + wall.id
 
-//case class WallSnapshot(wall:Wall, sheetsInWall:List[SheetInWall], sheets:List[Sheet]) extends State
+  def applyAction(action:Action):WallWithSheets = {
+    action match {
+      case action: SheetAlterAction =>
+        val newSheets = sheetsInWall.sheets.map { sheet =>
+          if(action.sheetId == sheet.id)
+            sheet.applyAction(action)
+          else
+            sheet
+        }
+        this.copy(sheetsInWall = sheetsInWall.copy(sheets = newSheets))
+      case CreateSheetAction(_, sheet) =>
+        this.copy(sheetsInWall = sheetsInWall.applyAction(action))
+      case DeleteSheetAction(_, sheetId) =>
+        this.copy(sheetsInWall = sheetsInWall.applyAction(action))
+      case action: WallAlterAction =>
+        this.copy(wall = wall.applyAction(action))
+      case _ =>
+        /// unsupported action
+        assert(false)
+        this
+    }
+  }
+}

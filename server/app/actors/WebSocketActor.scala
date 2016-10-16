@@ -51,15 +51,15 @@ class WebSocketActor(wallActor: ActorRef, sheetActor: ActorRef, outActor: ActorR
 
       for (req <- reqTry) {
         req match {
-          case ChangeRequest(reqId, change @ Change(_, action: SubscribeWallEventAction, _)) =>
+          case ChangeRequest(reqId, change @ Change(action: SubscribeWallEventAction, _, _)) =>
             subscribeWall(action.wallId)
             wallActor ! UserGeneratedChange(outActor, userId, reqId, change)
-          case ChangeRequest(reqId, change @ Change(_, action: SubscribeSheetEventAction, _)) =>
+          case ChangeRequest(reqId, change @ Change(action: SubscribeSheetEventAction, _, _)) =>
             subscribeSheet(action.sheetId)
             sheetActor ! UserGeneratedChange(outActor, userId, reqId, change)
-          case ChangeRequest(reqId, change @ Change(_, wallAction: WallAction, _)) =>
+          case ChangeRequest(reqId, change @ Change(wallAction: WallAction, _, _)) =>
             wallActor ! UserGeneratedChange(outActor, userId, reqId, change)
-          case ChangeRequest(reqId, change @ Change(_, sheetAction: SheetAction, _)) =>
+          case ChangeRequest(reqId, change @ Change(sheetAction: SheetAction, _, _)) =>
             sheetActor ! UserGeneratedChange(outActor, userId, reqId, change)
           case _ =>
             Logger.error("Unexpected ActionMessage type")

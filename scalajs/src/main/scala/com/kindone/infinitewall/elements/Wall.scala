@@ -1,9 +1,9 @@
 package com.kindone.infinitewall.elements
 
-import com.kindone.infinitewall.data.{ Wall => WallModel }
 import com.kindone.infinitewall.elements.events.{ WallEventDispatcher, ViewChangeEvent, SheetRemovedEvent, SheetAppendedEvent }
 import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.JqWheel._
+import com.kindone.infinitewall.data.{ Wall => WallModel }
 import org.scalajs.dom
 import org.scalajs.jquery._
 

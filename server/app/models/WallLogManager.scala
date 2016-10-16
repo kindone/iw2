@@ -3,9 +3,10 @@ package models
 import play.api.Logger
 import play.api.Play.current
 import anorm.Row
-import com.kindone.infinitewall.data.{ Wall }
 import play.api.db.DB
 import anorm._
+
+import scala.util.{ Try, Success }
 
 /**
  * Created by kindone on 2016. 6. 26..
@@ -24,7 +25,7 @@ class WallLogManager {
     }.list
   }
 
-  def create(wallLog: WallLog)(implicit userId: Long): Long = {
+  def create(wallLog: WallLog)(implicit userId: Long): Tuple2[Long, Boolean] = {
     // returns id
 
     DB.withTransaction { implicit c =>
@@ -34,11 +35,14 @@ class WallLogManager {
           case Row(id: Long) => id
         }.single()
 
-      SQL"""insert into wall_logs(wall_id, log_id, action_type, action)
+      if (maxId == wallLog.logId) {
+        SQL"""insert into wall_logs(wall_id, log_id, action_type, action)
            VALUES(${wallLog.wallId}, ${maxId}+1, ${wallLog.actionType}, ${wallLog.action})
         """.executeInsert()
 
-      maxId
+        (maxId + 1, true)
+      } else
+        (maxId, false)
     }
     //    Logger.info(find(wallLog.wallId).toString)
   }

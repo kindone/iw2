@@ -2,7 +2,7 @@ package com.kindone.infinitewall.persistence.wsstorage
 
 import com.kindone.infinitewall.data.Sheet
 import com.kindone.infinitewall.data.action._
-import com.kindone.infinitewall.data.versioncontrol.{ Read, Change, Repository }
+import com.kindone.infinitewall.data.versioncontrol.{ Read, Change }
 import com.kindone.infinitewall.events.EventListener
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.api.{ SheetManager => SheetManagerAPI }
@@ -19,12 +19,12 @@ class SheetManager(socket: Socket) extends SheetManagerAPI {
   def genChange(action: WriteAction): Change = {
     // val head = repository.head.match { x => Some(_) }
 
-    vc.createChange(action, None) // TODO: fill parentHash
+    vc.createChange(action, 0) // TODO: fill logId
     // repository.saveChange()
   }
 
   def genRead(action: ReadonlyAction): Read = {
-    vc.createRead(action, None) // TODO: fill parentHash
+    vc.createRead(action, 0) // TODO: fill logId
   }
 
   def get(sheetId: Long): Future[Sheet] = {

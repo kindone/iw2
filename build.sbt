@@ -68,8 +68,10 @@ lazy val scalajs = (project in file("scalajs")).settings(
 val sharedJvmSettings = List(
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "upickle" % "0.3.8",
-    "com.kindone" %% "crosslib" % "0.1-SNAPSHOT"
-  )
+    "com.kindone" %% "crosslib" % "0.1-SNAPSHOT",
+    "io.monix" %% "minitest" % "0.24" % "test"
+  ),
+  testFrameworks += new TestFramework("minitest.runner.Framework")
 )
 
 lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
@@ -89,8 +91,6 @@ scalaJSStage in Global := FastOptStage
 
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
-
-
 
 // loads the jvm project at sbt startup
 onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value

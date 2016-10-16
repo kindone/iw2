@@ -44,7 +44,7 @@ case class DeleteSheetAction(wallId:Long, sheetId:Long) extends WallAlterAction
 case class MoveSheetAction(sheetId:Long, x: Double, y:Double) extends SheetAlterAction
 case class ResizeSheetAction(sheetId:Long, width:Double, height:Double) extends SheetAlterAction
 case class ChangeSheetDimensionAction(sheetId:Long, x: Double, y:Double, width:Double, height: Double) extends SheetAlterAction
-case class ChangeSheetContentAction(sheetId:Long, content:String, pos:Int = 0, length:Int = -1) extends SheetAlterAction
+case class ChangeSheetContentAction(sheetId:Long, content:String, from:Int = 0, numDeleted:Int = -1) extends SheetAlterAction
 
 
 

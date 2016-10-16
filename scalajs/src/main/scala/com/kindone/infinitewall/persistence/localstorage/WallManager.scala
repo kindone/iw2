@@ -12,7 +12,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 class WallManager(localStorage: LocalStorage, sheetManager: SheetManager) extends WallManagerAPI {
 
   private val objectManager = new ObjectManager[Wall](localStorage, "wall")
-  private val sheetsManager = new SheetInWallManager(localStorage)
+  private val sheetsManager = new SheetsInWallManager(localStorage)
 
   def create(title: String, x: Double = 0, y: Double = 0, scale: Double = 1.0): Future[Wall] = Future {
     val id = objectManager.nextId()

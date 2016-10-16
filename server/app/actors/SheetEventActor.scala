@@ -26,6 +26,10 @@ class SheetEventActor extends Actor {
     write(Response(reqId, logId, write[T](msg)))
   }
 
+  def response(reqId: Long, result: Tuple2[Long, Boolean]): String = {
+    response(reqId, result._1, result._2)
+  }
+
   def notification(logId: Long, change: Change) = {
     write(Notification(logId, change))
   }
@@ -43,29 +47,29 @@ class SheetEventActor extends Actor {
     case RemoveEventListener(actorRef) =>
       Logger.info("unlistening sheet actor:" + actorRef.toString())
       listeners = listeners - actorRef
-    case UserGeneratedChange(out, userId, reqId, change @ Change(_, action: SheetAlterAction, _)) =>
-
-      var logId: Long = 0
+    case UserGeneratedChange(out, userId, reqId, change @ Change(action: SheetAlterAction, baseLogId, _)) =>
+      var result: (Long, Boolean) = (0, false)
 
       action match {
         case MoveSheetAction(id, x, y) =>
           sheetManager.setPosition(id, x, y)(userId)
-          logId = sheetLogManager.create(SheetLog(id, 0, 0, Some(write(action))))(userId)
-          out ! response(reqId, logId, true)
+          result = sheetLogManager.create(SheetLog(id, baseLogId, 0, Some(write(action))))(userId)
+          out ! response(reqId, result)
         case ResizeSheetAction(id, width, height) =>
           sheetManager.setSize(id, width, height)(userId)
-          logId = sheetLogManager.create(SheetLog(id, 0, 1, Some(write(action))))(userId)
-          out ! response(reqId, logId, true)
+          result = sheetLogManager.create(SheetLog(id, baseLogId, 1, Some(write(action))))(userId)
+          out ! response(reqId, result)
         case ChangeSheetDimensionAction(id, x, y, width, height) =>
           sheetManager.setDimension(id, x, y, width, height)(userId)
-          logId = sheetLogManager.create(SheetLog(id, 0, 2, Some(write(action))))(userId)
-          out ! response(reqId, logId, true)
+          result = sheetLogManager.create(SheetLog(id, baseLogId, 2, Some(write(action))))(userId)
+          out ! response(reqId, result)
         case ChangeSheetContentAction(id, content, pos, length) =>
           sheetManager.setText(id, content)(userId) // TODO: pos, length
-          logId = sheetLogManager.create(SheetLog(id, 0, 3, Some(write(action))))(userId)
-          out ! response(reqId, logId, true)
+          result = sheetLogManager.create(SheetLog(id, baseLogId, 3, Some(write(action))))(userId)
+          out ! response(reqId, result)
       }
-      broadcast(logId, change)
+      if (result._2)
+        broadcast(result._1, change)
     case _ =>
   }
 }

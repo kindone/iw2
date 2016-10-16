@@ -5,7 +5,7 @@ import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.facades.ShowdownConverter
 import com.kindone.infinitewall.persistence.api.Persistence
 import com.kindone.infinitewall.persistence.localstorage.{ LocalPersistence, LocalStorage }
-import com.kindone.infinitewall.data.{ Sheet => SheetModel, _ }
+import com.kindone.infinitewall.data.{ _ }
 import com.kindone.infinitewall.persistence.httpstorage.HttpPersistence
 import com.kindone.infinitewall.persistence.wsstorage.WebSocketPersistence
 import org.scalajs.jquery._

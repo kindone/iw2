@@ -1,107 +1,87 @@
 package com.kindone.infinitewall.data.versioncontrol
 
-import com.kindone.infinitewall.data.{Wall, Sheet}
-import com.kindone.infinitewall.data.action.{ChangeSheetContentAction, Action}
-import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, StringWithState}
+import com.kindone.infinitewall.data.State
 
 /**
- * Created by kindone on 2016. 7. 24..
+ * Created by kindone on 2016. 10. 2..
  */
-class Repository {
+class Repository(baseState:State) {
+  var states:Vector[StateWithHistory] = Vector(StateWithHistory.create(baseState))
+  var changes:Vector[Change] = Vector()
 
-  private var changes:Map[String, Change] = Map() // index: hash -> change
-  private var parentHashMap:Map[String, String] = Map() // index: parentHash -> hash
-  private var head:Option[Change] = None // TODO
-  private var snapshots:Map[String, Snapshot] = Map() // initial + optimization
+  def append(change:Change):Unit = {
+    checkSanity(change)
 
-  private val remotes:List[Repository] = List() // TODO
-
-  def findChange(hash:String):Option[Change] = {
-    changes.get(hash)
+    changes = changes :+ change
+    val (newSnapshot, _) = states.last.applyChange(change)
+    states = states :+ newSnapshot
+    assert(changes.length + 1 == states.length)
   }
 
-  def initialize(snapshot:Snapshot) = {
-    snapshots = Map(snapshot.hash -> snapshot)
+  // replace changes
+  def rebase(newChanges:Seq[Change]) = {
+    checkSanity(newChanges)
+
+    val targetChanges = getChanges(newChanges.head)
+    val baseChanges = getBaseChanges(newChanges.head)
+    val baseStates = getBaseStates(newChanges.head)
+    val baseLogId = newChanges.head.baseLogId
+
+    // apply new changes first
+    val newStream1 = newChanges.foldLeft((baseStates, baseChanges, baseLogId)) { (stream, change) =>
+      val (states, changes, baseLogId) = stream
+      val (newState, alteredChange) = states.last.applyChange(change)
+
+      (states :+ newState, changes :+ alteredChange.copy(baseLogId = baseLogId), baseLogId +1)
+    }
+
+    // apply old changes on top of it
+    val newStream2 = targetChanges.foldLeft(newStream1) { (stream, change) =>
+      val (states, changes, baseLogId) = stream
+      val (newState, alteredChange) = states.last.applyChange(change)
+
+      (states :+ newState, changes :+ alteredChange.copy(baseLogId = baseLogId), baseLogId +1)
+    }
+
+    states = newStream2._1
+    //changes = baseChanges ++ newChanges ++ targetChanges
+    changes = newStream2._2
+
+    assert(changes.length + 1 == states.length)
   }
 
-  // save change in changes and return rebased change if altered
-  def saveChange(change:Change):Change = {
-    // valid only when there is no key in the change
-    if(changes.get(change.hash).isEmpty) {
-      // rebase if parent exists
-      if(change.parentHash.isDefined && changes.get(change.parentHash.get).isDefined) {
-        changes = changes + (change.hash -> change)
-        rebaseIfNeeded(change)
-      }
-      // save initial change if no change is present
-      else if(change.parentHash.isEmpty && changes.isEmpty) {
-        changes = changes + ("" -> change)
-        change
-      }
-      else
-        throw new IllegalArgumentException("parentHash is invalid: " + change.parentHash.toString)
-    }
-    else
-      throw new IllegalArgumentException("hash for change already exists: " + change.hash)
+  def getChanges(baseChange:Change) = {
+    changes.dropWhile(_.baseLogId != baseChange.baseLogId)
   }
 
-
-  // find upstream for state
-  private def getSnapshot(hash:String):Snapshot = {
-
-    if(snapshots.get(hash).isDefined)
-    {
-      snapshots.get(hash).get
-    }
-    else
-    {
-      var change = changes.get(hash).get
-      var changesToApply = change +: List()
-
-      while(snapshots.get(change.parentHash.get).isEmpty)
-      {
-        change = changes.get(change.parentHash.get).get
-        changesToApply = change +: changesToApply
-      }
-      val baseSnapshot = snapshots.get(change.parentHash.get).get
-      var snapshot = baseSnapshot
-      for(change <- changesToApply)
-      {
-        snapshot = snapshot.applyChange(change)
-      }
-      snapshot
-    }
+  def getLatestState():StateWithHistory = {
+    states.last
   }
 
-  private def rebaseIfNeeded(change:Change):Change = {
-    // if there is no collision(shares same parent), just go
-    val collision = parentHashMap.get(change.parentHash.get)
-    if(collision.isEmpty) {
-      parentHashMap = parentHashMap + (change.parentHash.get -> change.hash)
-      change
-    }
-    // if there is a collision, rebase
-    // rebase: replace with change
-    else {
-      //collision
-      // new change generated
-      change
-    }
+  def getBaseState(baseChange:Change):StateWithHistory = {
+    val index = changes.indexWhere(_.baseLogId == baseChange.baseLogId)
+    assert(index >= 0)
+    states(index)
   }
 
-  // first apply target by inserting, then rebase the rest
-  private def rebaseTextualChange(base:String, changesToRebase:List[TextualChange], target:TextualChange) = {
-    val string = new StringWithState(base)
-    val firstOp = TextOperation(target.pos, target.length, target.content)
-    val newChanges =
-      for(change <- changesToRebase)
-      yield
-    {
-      val secondOp = TextOperation(change.pos, change.length, change.content)
-      string.apply(firstOp, 0)
-      val transformedSecondOp = string.apply(secondOp, 1)
-      TextualChange(transformedSecondOp.content, transformedSecondOp.from, transformedSecondOp.length)
-    }
-    (string.text, newChanges)
+  def getBaseChanges(baseChange:Change):Vector[Change] = {
+    changes.takeWhile(_.baseLogId != baseChange.baseLogId)
   }
+
+  def getBaseStates(baseChange:Change):Vector[StateWithHistory] = {
+    val index = changes.indexWhere(_.baseLogId == baseChange.baseLogId)
+    // s0-(c0)-s1-(c1)-s2- ... -
+    // c1 -> [s0, s1]
+    assert(index >= 0)
+    states.take(index+1)
+  }
+
+  private def checkSanity(changes:Seq[Change]) = {
+//    changes.foreach(checkSanity(_))
+  }
+
+  private def checkSanity(change:Change) = {
+//    assert(changes.find(_.hash == change.hash).isDefined)
+  }
+
 }

@@ -3,7 +3,7 @@ package models
 import play.api.Logger
 import play.api.Play.current
 import anorm.Row
-import com.kindone.infinitewall.data.{ Sheet, Wall }
+import com.kindone.infinitewall.data.Wall
 import play.api.db.DB
 import anorm._
 
@@ -26,8 +26,8 @@ class SheetLogManager {
     }.list
   }
 
-  def create(sheetLog: SheetLog)(implicit userId: Long): Long = {
-    // returns id
+  def create(sheetLog: SheetLog)(implicit userId: Long): Tuple2[Long, Boolean] = {
+    // returns latest log id and success/failure
 
     DB.withTransaction { implicit c =>
       val maxId =
@@ -36,11 +36,14 @@ class SheetLogManager {
           case Row(id: Long) => id
         }.single()
 
-      SQL"""insert into sheet_logs(sheet_id, log_id, action_type, action)
+      if (maxId == sheetLog.logId) {
+        SQL"""insert into sheet_logs(sheet_id, log_id, action_type, action)
            VALUES(${sheetLog.sheetId}, ${maxId}+1, ${sheetLog.actionType}, ${sheetLog.action})
         """.executeInsert()
 
-      maxId
+        (maxId + 1, true)
+      } else
+        (maxId, false)
     }
     //    Logger.info(find(sheetLog.sheetId).toString)
   }
