@@ -20,22 +20,22 @@ import org.scalajs.dom
 class Socket(baseUrl: String) extends WebSocketEventDispatcher {
 
   type OnReceive = (String, Promise[_]) => Unit
-  case class Record[T](id: Long, promise: Promise[T], onReceive: OnReceive)
+  case class Record[T](reqId: Long, promise: Promise[T], onReceive: OnReceive)
 
-  var map = Map[Long, Record[_]]()
+  var pendingRecords = Map[Long, Record[_]]()
 
   val wsPromise = Promise[dom.WebSocket]()
   val wsFuture = wsPromise.future
 
   val ws = new dom.WebSocket("ws://" + baseUrl + "/ws")
-  ws.onmessage = (evt: MessageEvent) => receive(evt.data.toString)
-  ws.onopen = (evt: Event) => {
-    wsPromise success ws
-    dispatchSocketOpenEvent()
-  }
-  ws.onclose = (evt: Event) => {
-    dispatchSocketCloseEvent()
-  }
+    ws.onmessage = (evt: MessageEvent) => receive(evt.data.toString)
+    ws.onopen = (evt: Event) => {
+      wsPromise success ws
+      dispatchSocketOpenEvent()
+    }
+    ws.onclose = (evt: Event) => {
+      dispatchSocketCloseEvent()
+    }
 
   // request/response id to distinguish concurrent requests
   private var maxReqId: Long = 0
@@ -46,12 +46,12 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
   }
 
   def send[T: Reader](action: VersionedAction) = {
-    val block: (String, Promise[_]) => Unit = { (str: String, promise: Promise[_]) =>
+    val onReceiveBlock: (String, Promise[_]) => Unit = { (str: String, promise: Promise[_]) =>
       promise.asInstanceOf[Promise[T]] success read[T](str)
     }
     val promise = Promise[T]()
-    val reqId = nextReqId
-    map = map + (reqId -> Record[T](reqId, promise, block))
+    val reqId = nextReqId()
+    pendingRecords = pendingRecords + (reqId -> Record[T](reqId, promise, onReceiveBlock))
 
     val request: ClientToServerMessage = action match {
       case a: Read   => ReadRequest(reqId, a)
@@ -59,6 +59,7 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
     }
 
     // send actually here
+    // use future in order to prevent messing up w/ uninitialized state
     for (ws <- wsFuture) {
       val msg = write(request)
       println("ws send: " + msg)
@@ -70,12 +71,13 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
 
   def receive(responseStr: String) = {
     println("ws event:" + responseStr)
+
     read[ServerToClientMessage](responseStr) match {
       case Response(reqId, logId, message) =>
-        for (record <- map.get(reqId)) {
+        for (record <- pendingRecords.get(reqId)) {
           record.onReceive(message, record.promise)
         }
-        map = map - reqId
+        pendingRecords = pendingRecords - reqId
       case Notification(logId, change @ Change(action: WallAlterAction, _, _)) =>
         dispatchWallNotificationEvent(action.wallId, new PersistenceUpdateEvent(logId, change))
       case Notification(logId, change @ Change(action: SheetAlterAction, _, _)) =>

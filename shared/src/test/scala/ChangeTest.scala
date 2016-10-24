@@ -19,7 +19,7 @@ object ChangeTest extends SimpleTestSuite {
 //    println(br2.hash)
 
     val base = "Hello world"
-    val baseState = Sheet(id=0, 0, 0, 0, 0, 0, base)
+    val baseState = Sheet(id=0, 0, 0, 0, 0, 0, "Hello world")
     val repository:Repository = new Repository(baseState)
 
     val ac1 = ChangeSheetContentAction(sheetId=0, "Hi!", 0, 5)  // replace Hello

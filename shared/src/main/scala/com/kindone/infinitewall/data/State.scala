@@ -36,6 +36,11 @@ trait WallLike {
   def title: String
 }
 
+trait WallWithSheetsLike {
+  def wall:Wall
+  def sheetsInWall:SheetsInWall
+}
+
 case class Sheet(id: Long, stateId: Long, x: Double, y: Double,
                  width: Double, height: Double, text: String) extends State //with SheetLike
 {
@@ -67,7 +72,7 @@ case class Sheet(id: Long, stateId: Long, x: Double, y: Double,
 case class SheetInWall(wallId: Long, sheetId: Long)
 
 
-case class SheetsInWall(wallId: Long, sheets:Set[Sheet]) extends State
+case class SheetsInWall(wallId: Long, sheets:Map[Long, Sheet]) extends State
 {
   val oid = "sheetsInWall_" + wallId
 
@@ -77,10 +82,9 @@ case class SheetsInWall(wallId: Long, sheets:Set[Sheet]) extends State
         assert(action.wallId == wallId)
         action match {
           case CreateSheetAction(_, sheet) =>
-            this.copy(sheets = (sheets + sheet))
+            this.copy(sheets = (sheets + (sheet.id -> sheet)))
           case DeleteSheetAction(_, sheetId) =>
-            val newSet = sheets.filter(_.id != sheetId)
-            this.copy(sheets = newSet)
+            this.copy(sheets = sheets - sheetId)
           case _ =>
             this
         }
@@ -123,11 +127,11 @@ case class WallWithSheets(wall:Wall, sheetsInWall:SheetsInWall) extends State
   def applyAction(action:Action):WallWithSheets = {
     action match {
       case action: SheetAlterAction =>
-        val newSheets = sheetsInWall.sheets.map { sheet =>
-          if(action.sheetId == sheet.id)
-            sheet.applyAction(action)
+        val newSheets = sheetsInWall.sheets.map { case (id, sheet) =>
+          if(action.sheetId == id)
+            (id, sheet.applyAction(action))
           else
-            sheet
+            (id, sheet)
         }
         this.copy(sheetsInWall = sheetsInWall.copy(sheets = newSheets))
       case CreateSheetAction(_, sheet) =>

@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.data.versioncontrol
 
-import com.kindone.infinitewall.data.action.ChangeSheetContentAction
+import com.kindone.infinitewall.data.action.{WallAlterAction, SheetAlterAction, ChangeSheetContentAction}
 import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, StringWithHistory}
 import com.kindone.infinitewall.data._
 import com.kindone.util.Hasher
@@ -26,20 +26,18 @@ object StateWithHistory {
     }
   }
 
-  def create(sheet:Sheet):StateWithHistory =
+  def create(sheet:Sheet):SheetWithHistory =
     new SheetWithHistory(sheet)
 
-  def create(sheetsInWall:SheetsInWall) =
-    new SheetsInWallWithHistory(sheetsInWall)
-
-  def create(wall:Wall) =
-    new WallWithHistory(wall)
-
-  def create(wall:WallWithSheets) =
-    new WallWithSheets(wall.wall, wall.sheetsInWall)
+  def create(wall:WallWithSheets):StateWithHistory = {
+    val sheets = wall.sheetsInWall.sheets.map { case (id, sheet) =>
+      (id, create(sheet))
+    }
+    new WallWithSheetsWithHistory(wall.wall, sheets)
+  }
 }
 
-class SheetWithHistory(sheet:Sheet, ss:StringWithHistory) extends StateWithHistory with SheetLike{
+class SheetWithHistory(val sheet:Sheet, ss:StringWithHistory) extends StateWithHistory with SheetLike{
 
   def this(sheet:Sheet) {
     this(sheet, new StringWithHistory(sheet.text))
@@ -60,7 +58,7 @@ class SheetWithHistory(sheet:Sheet, ss:StringWithHistory) extends StateWithHisto
         val newSheetWithHistory = new SheetWithHistory(sheet.applyAction(change.action), newSs)
         (newSheetWithHistory, change.copy(action = action.copy(content = op.content, from = op.from, numDeleted = op.numDeleted)))
       case _ =>
-        val newSheetWithHistory = new SheetWithHistory(sheet.applyAction(change.action))
+        val newSheetWithHistory = new SheetWithHistory(sheet.applyAction(change.action), ss)
         (newSheetWithHistory, change)
     }
   }
@@ -70,27 +68,28 @@ class SheetWithHistory(sheet:Sheet, ss:StringWithHistory) extends StateWithHisto
   }
 }
 
-class SheetsInWallWithHistory(sheetsInWall:SheetsInWall) extends StateWithHistory with SheetsInWallLike {
 
-  def wallId = sheetsInWall.wallId
-  def sheets = sheetsInWall.sheets
+class WallWithSheetsWithHistory(val wall:Wall, sheets:Map[Long, SheetWithHistory]) extends StateWithHistory with WallWithSheetsLike {
+  def sheetsInWall:SheetsInWall = {
+    val newSheets = sheets.map { case (id, sheet) =>
+      (id, sheet.asInstanceOf[SheetWithHistory].sheet)
+    }
 
-  def applyChange(change:Change):(StateWithHistory, Change) = {
-    // trivial changes. No history
-    (new SheetsInWallWithHistory(sheetsInWall.applyAction(change.action)), change)
+    SheetsInWall(wall.id, newSheets)
   }
-}
 
-class WallWithHistory(wall:Wall) extends StateWithHistory with WallLike {
-  def id: Long = wall.id
-  def stateId:Long = wall.stateId
-  def x: Double = wall.x
-  def y: Double = wall.y
-  def scale: Double = wall.scale
-  def title: String = wall.title
 
   def applyChange(change:Change):(StateWithHistory, Change) = {
-    // trivial changes. No history
-    (new WallWithHistory(wall.applyAction(change.action)), change)
+    change.action match {
+      case a:SheetAlterAction =>
+        val sheet = sheets.get(a.sheetId).get.asInstanceOf[SheetWithHistory]
+        val (newSheet, newChange) = sheet.applyChange(change)
+        val newSheets = sheets + (a.sheetId -> newSheet.asInstanceOf[SheetWithHistory]) // replace
+        (new WallWithSheetsWithHistory(wall, newSheets), newChange)
+      case a:WallAlterAction =>
+        (new WallWithSheetsWithHistory(wall.applyAction(a), sheets), change)
+      case _ =>
+        (this, change)
+    }
   }
 }

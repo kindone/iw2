@@ -15,7 +15,8 @@ class Repository(baseState:State) {
     changes = changes :+ change
     val (newSnapshot, _) = states.last.applyChange(change)
     states = states :+ newSnapshot
-    assert(changes.length + 1 == states.length)
+
+    checkSanity()
   }
 
   // replace changes
@@ -47,7 +48,7 @@ class Repository(baseState:State) {
     //changes = baseChanges ++ newChanges ++ targetChanges
     changes = newStream2._2
 
-    assert(changes.length + 1 == states.length)
+    checkSanity()
   }
 
   def getChanges(baseChange:Change) = {
@@ -56,6 +57,13 @@ class Repository(baseState:State) {
 
   def getLatestState():StateWithHistory = {
     states.last
+  }
+
+  def baseLogId = {
+    if(changes.isEmpty)
+      0L
+    else
+      changes.last.baseLogId + 1
   }
 
   def getBaseState(baseChange:Change):StateWithHistory = {
@@ -76,12 +84,23 @@ class Repository(baseState:State) {
     states.take(index+1)
   }
 
+  private def checkSanity() = {
+    assert(changes.length + 1 == states.length)
+    changes.foldLeft(0) { (i, change) =>
+      assert(i == change.baseLogId)
+      i+1
+    }
+  }
+
   private def checkSanity(changes:Seq[Change]) = {
-//    changes.foreach(checkSanity(_))
+    changes.foldLeft(0) { (i, change) =>
+      assert(i == change.baseLogId)
+      i+1
+    }
   }
 
   private def checkSanity(change:Change) = {
-//    assert(changes.find(_.hash == change.hash).isDefined)
+    assert(baseLogId == change.baseLogId)
   }
 
 }
