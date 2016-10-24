@@ -28,14 +28,14 @@ class Socket(baseUrl: String) extends WebSocketEventDispatcher {
   val wsFuture = wsPromise.future
 
   val ws = new dom.WebSocket("ws://" + baseUrl + "/ws")
-    ws.onmessage = (evt: MessageEvent) => receive(evt.data.toString)
-    ws.onopen = (evt: Event) => {
-      wsPromise success ws
-      dispatchSocketOpenEvent()
-    }
-    ws.onclose = (evt: Event) => {
-      dispatchSocketCloseEvent()
-    }
+  ws.onmessage = (evt: MessageEvent) => receive(evt.data.toString)
+  ws.onopen = (evt: Event) => {
+    wsPromise success ws
+    dispatchSocketOpenEvent()
+  }
+  ws.onclose = (evt: Event) => {
+    dispatchSocketCloseEvent()
+  }
 
   // request/response id to distinguish concurrent requests
   private var maxReqId: Long = 0

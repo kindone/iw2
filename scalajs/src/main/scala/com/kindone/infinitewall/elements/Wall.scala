@@ -10,9 +10,9 @@ import org.scalajs.jquery._
 import scala.scalajs.js
 import scalatags.JsDom.all._
 
-class Wall(model: WallModel) extends Element with WallEventDispatcher {
+class Wall(initial: WallModel) extends Element with WallEventDispatcher {
 
-  val id = model.id
+  val id = initial.id
 
   private var stateId = 0L
   private var scale = 1.0
@@ -23,6 +23,16 @@ class Wall(model: WallModel) extends Element with WallEventDispatcher {
   private var rotate = 0.0 //45.0
   private var downX: Int = 0
   private var downY: Int = 0
+
+  private def width = jQuery(element).width()
+  private def height = jQuery(element).height()
+
+  private def recalculateTranslation(totalX: Double, totalY: Double) = {
+    panX = (totalX + (scale - 1.0) * width / 2) / scale
+    panY = (totalY + (scale - 1.0) * height / 2) / scale
+    shiftX = totalX - panX * scale
+    shiftY = totalY - panY * scale
+  }
 
   val element = {
     val containerDiv = div(cls := "wall")(
@@ -53,21 +63,11 @@ class Wall(model: WallModel) extends Element with WallEventDispatcher {
 
   def center = (panX, panY)
 
-  private def width = jQuery(element).width()
-  private def height = jQuery(element).height()
-
-  private def recalculateTranslation(totalX: Double, totalY: Double) = {
-    panX = (totalX + (scale - 1.0) * width / 2) / scale
-    panY = (totalY + (scale - 1.0) * height / 2) / scale
-    shiftX = totalX - panX * scale
-    shiftY = totalY - panY * scale
-  }
-
   def setup(): Unit = {
 
-    stateId = model.stateId
-    scale = model.scale
-    recalculateTranslation(model.x, model.y)
+    stateId = initial.stateId
+    scale = initial.scale
+    recalculateTranslation(initial.x, initial.y)
 
     val layer = jQuery(element).find(".layer")
 
@@ -115,15 +115,16 @@ class Wall(model: WallModel) extends Element with WallEventDispatcher {
       false
     }
 
-    jQuery(element).on("mousedown", (evt: JQueryEventObject) => {
+    val downHandler: js.Function1[JQueryEventObject, js.Any] = (evt: JQueryEventObject) => {
       downX = evt.pageX
       downY = evt.pageY
 
       println("mousedown - pan")
       jQuery("body").on("mousemove", moveHandler)
       jQuery("body").on("mouseup", upHandler)
-    })
+    }
 
+    jQuery(element).on("mousedown", downHandler)
     jQuery(dom.window).on("mousewheel", wheelHandler)
   }
 
