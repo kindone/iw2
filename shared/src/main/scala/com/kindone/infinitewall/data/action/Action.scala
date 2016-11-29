@@ -27,8 +27,9 @@ case class DeleteWallAction(wallId:Long) extends WallAlterAction
 case class GetWallAction(wallId:Long) extends WallAction with ReadonlyAction
 case class ListWallAction() extends WallAction with ReadonlyAction
 
-case class SubscribeWallEventAction(wallId:Long) extends WallReadonlyAction
-case class SubscribeSheetEventAction(sheetId:Long) extends SheetReadonlyAction
+trait SubscribeEventAction extends ReadonlyAction
+case class SubscribeWallEventAction(wallId:Long) extends WallReadonlyAction with SubscribeEventAction
+case class SubscribeSheetEventAction(sheetId:Long) extends SheetReadonlyAction with SubscribeEventAction
 
 case class ChangePanAction(wallId: Long, x: Double, y:Double) extends WallAlterAction
 case class ChangeZoomAction(wallId: Long, scale:Double) extends WallAlterAction
@@ -39,6 +40,12 @@ case class ListSheetAction(wallId:Long) extends WallReadonlyAction
 case class GetSheetAction(sheetId:Long) extends SheetReadonlyAction
 
 case class CreateSheetAction(wallId:Long, sheet:Sheet) extends WallAlterAction
+{
+  def copy(id:Long):CreateSheetAction = {
+    val newSheet = sheet.copy(id = id)
+    CreateSheetAction(wallId, newSheet)
+  }
+}
 case class DeleteSheetAction(wallId:Long, sheetId:Long) extends WallAlterAction
 
 case class MoveSheetAction(sheetId:Long, x: Double, y:Double) extends SheetAlterAction

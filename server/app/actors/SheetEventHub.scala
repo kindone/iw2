@@ -5,19 +5,19 @@ import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.versioncontrol.Change
 import com.kindone.infinitewall.data.ws.Response
-import models.SheetManager
+import models.{ModelManager, SheetManager}
 import play.api.Logger
 import upickle.default._
 
 /**
  * Created by kindone on 2016. 4. 17..
  */
-object SheetEventHubActor {
-  def props() = Props(new SheetEventHubActor())
+object SheetEventHub {
+  def props() = Props(new SheetEventHub())
 }
 
-class SheetEventHubActor extends Actor {
-  lazy val sheetManager = new SheetManager
+class SheetEventHub extends Actor {
+  lazy val modelManager = new ModelManager
 
   def response[T: Writer](reqId: Long, logId: Long, msg: T) = {
     write(Response(reqId, logId, write[T](msg)))
@@ -28,7 +28,7 @@ class SheetEventHubActor extends Actor {
   def sendToSheetEventActor(sheetId: Long, out: ActorRef, msg: Any) = {
     // create event actor if not running
     if (!openSheets.contains(sheetId)) {
-      val actor = context.actorOf(SheetEventActor.props(), name = "sheetEventActor_" + sheetId)
+      val actor = context.actorOf(SheetEventProcessor.props(), name = "sheetEventActor_" + sheetId)
       openSheets = openSheets + (sheetId -> actor)
       Logger.info("created sheet event actor of id: " + sheetId)
     }
@@ -43,18 +43,17 @@ class SheetEventHubActor extends Actor {
   }
 
   def receive = {
-    case userChange @ UserGeneratedChange(out, userId, msgId, Change(action: SheetAction, _, _)) =>
+    case change @ ChangeOnWebSocket(WebSocketContext(out, userId, msgId), Change(action: SheetAction, _, _)) =>
       action match {
         case action @ SubscribeSheetEventAction(sheetId) =>
           sendToSheetEventActor(sheetId, out, AddEventListener(out))
-        //out ! response(msgId, true)
 
         // read-only shortcut
         case GetSheetAction(id) =>
-          out ! response(msgId, 0, sheetManager.find(id)(userId).get)
+          out ! response(msgId, 0, modelManager.findSheet(id)(userId).get)
 
         case action: SheetAlterAction =>
-          sendToSheetEventActor(action.sheetId, out, userChange)
+          sendToSheetEventActor(action.sheetId, out, change)
 
         case _ =>
           Logger.error("Unsupported action type to Sheet Actor received")

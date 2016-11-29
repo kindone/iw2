@@ -1,7 +1,7 @@
 package com.kindone.infinitewall.data.ws
 
 import com.kindone.infinitewall.data.action.{ReadonlyAction, Action}
-import com.kindone.infinitewall.data.versioncontrol.{Read, Change}
+import com.kindone.infinitewall.data.versioncontrol.{ Read, Change}
 
 /**
  * Created by kindone on 2016. 4. 23..

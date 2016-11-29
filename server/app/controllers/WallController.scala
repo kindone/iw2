@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.{ Singleton, Inject }
 
-import actors.{ SheetEventHubActor, WallEventHubActor, WebSocketActor }
+import actors.{ SheetEventHub, WallEventHub$, WebSocketInboundChannel$ }
 import akka.actor._
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.{ Sheet, Wall }
@@ -27,8 +27,8 @@ class WallController @Inject() (system: ActorSystem) extends Controller {
 
   lazy val wallManager = new WallManager
 
-  lazy val wallActor = system.actorOf(WallEventHubActor.props(), name = "wallEventHubActor")
-  lazy val sheetActor = system.actorOf(SheetEventHubActor.props(), name = "sheetEventHubActor")
+  lazy val wallActor = system.actorOf(WallEventHub.props(), name = "wallEventHubActor")
+  lazy val sheetActor = system.actorOf(SheetEventHub.props(), name = "sheetEventHubActor")
 
   def index = UserAction {
     Ok(views.html.wall.index("Your new application is ready."))
@@ -113,7 +113,7 @@ class WallController @Inject() (system: ActorSystem) extends Controller {
   def websocket = WebSocket.tryAcceptWithActor[String, String] { request =>
     Future.successful(request.session.get(LOGGED_IN_AS) match {
       case None         => Left(Forbidden)
-      case Some(userId) => Right(WebSocketActor.props(wallActor, sheetActor, userId.toLong))
+      case Some(userId) => Right(WebSocketInboundChannel.props(wallActor, sheetActor, userId.toLong))
     })
   }
 }

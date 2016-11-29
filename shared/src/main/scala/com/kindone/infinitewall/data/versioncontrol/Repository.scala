@@ -6,8 +6,8 @@ import com.kindone.infinitewall.data.State
  * Created by kindone on 2016. 10. 2..
  */
 class Repository(baseState:State) {
-  var states:Vector[StateWithHistory] = Vector(StateWithHistory.create(baseState))
-  var changes:Vector[Change] = Vector()
+  private var states:Vector[StateWithHistory] = Vector(StateWithHistory.create(baseState))
+  private var changes:Vector[Change] = Vector()
 
   def append(change:Change):Unit = {
     checkSanity(change)
@@ -20,7 +20,7 @@ class Repository(baseState:State) {
   }
 
   // replace changes
-  def rebase(newChanges:Seq[Change]) = {
+  def rebase(newChanges:Seq[Change]):Unit = {
     checkSanity(newChanges)
 
     val targetChanges = getChanges(newChanges.head)
@@ -55,28 +55,33 @@ class Repository(baseState:State) {
     changes.dropWhile(_.baseLogId != baseChange.baseLogId)
   }
 
-  def getLatestState():StateWithHistory = {
-    states.last
+  def clearChanges() = {
+    states = Vector(states.last)
+    changes = Vector()
   }
 
   def baseLogId = {
     if(changes.isEmpty)
-      0L
+      states.last.stateId
     else
       changes.last.baseLogId + 1
   }
 
-  def getBaseState(baseChange:Change):StateWithHistory = {
+  private def getLatestState():StateWithHistory = {
+    states.last
+  }
+
+  private def getBaseState(baseChange:Change):StateWithHistory = {
     val index = changes.indexWhere(_.baseLogId == baseChange.baseLogId)
     assert(index >= 0)
     states(index)
   }
 
-  def getBaseChanges(baseChange:Change):Vector[Change] = {
+  private def getBaseChanges(baseChange:Change):Vector[Change] = {
     changes.takeWhile(_.baseLogId != baseChange.baseLogId)
   }
 
-  def getBaseStates(baseChange:Change):Vector[StateWithHistory] = {
+  private def getBaseStates(baseChange:Change):Vector[StateWithHistory] = {
     val index = changes.indexWhere(_.baseLogId == baseChange.baseLogId)
     // s0-(c0)-s1-(c1)-s2- ... -
     // c1 -> [s0, s1]

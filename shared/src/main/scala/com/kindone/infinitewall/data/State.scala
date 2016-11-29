@@ -9,6 +9,7 @@ import com.kindone.infinitewall.data.versioncontrol.util.{StringWithHistory, Tex
 
 sealed abstract class State {
   def oid:String
+  def stateId:Long
   def applyAction(action:Action):State
 }
 
@@ -76,6 +77,8 @@ case class SheetsInWall(wallId: Long, sheets:Map[Long, Sheet]) extends State
 {
   val oid = "sheetsInWall_" + wallId
 
+  def stateId = 0L //FIXME
+
   def applyAction(action:Action):SheetsInWall = {
     action match {
       case action:WallAlterAction =>
@@ -123,6 +126,8 @@ case class Wall(id: Long, stateId:Long, x: Double, y: Double, scale: Double, tit
 case class WallWithSheets(wall:Wall, sheetsInWall:SheetsInWall) extends State
 {
   val oid = "wws_" + wall.id
+
+  def stateId:Long = wall.stateId
 
   def applyAction(action:Action):WallWithSheets = {
     action match {

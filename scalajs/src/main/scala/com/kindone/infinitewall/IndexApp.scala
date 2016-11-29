@@ -30,8 +30,7 @@ class IndexApp(val useLocalStorage: Boolean = true, val useWS: Boolean = false) 
   def walls(onComplete: js.Function1[js.Array[js.Dictionary[Any]], Unit]): Unit = {
     import js.JSConverters._
 
-    val wallManager = persistence.wallManager
-    val wallsFuture = wallManager.getWalls().map { walls =>
+    val wallsFuture = persistence.getWalls().map { walls =>
       walls.map { wall =>
         JSON.parse(write(wall)).asInstanceOf[js.Dictionary[Any]]
       }.toJSArray
@@ -44,8 +43,7 @@ class IndexApp(val useLocalStorage: Boolean = true, val useWS: Boolean = false) 
 
   @JSExport
   def createWall(title: String, onComplete: js.Function1[js.Dictionary[Any], Unit]): Unit = {
-    val wallManager = persistence.wallManager
-    val wallFuture = wallManager.create(title)
+    val wallFuture = persistence.createWall(title)
     wallFuture.foreach { wall =>
       val result = JSON.parse(write(wall)).asInstanceOf[js.Dictionary[Any]]
       onComplete.apply(result)
@@ -54,8 +52,7 @@ class IndexApp(val useLocalStorage: Boolean = true, val useWS: Boolean = false) 
 
   @JSExport
   def deleteWall(id: Int, onComplete: js.Function1[Boolean, Unit]): Unit = {
-    val wallManager = persistence.wallManager
-    wallManager.delete(id).map { status =>
+    persistence.deleteWall(id).map { status =>
       onComplete.apply(status)
     }
   }

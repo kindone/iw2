@@ -11,6 +11,8 @@ import anorm._
  * Created by kindone on 2016. 6. 26..
  */
 case class SheetLog(sheetId: Long, logId: Long, actionType: Int, action: Option[String])
+case class LogCreationResult(logId:Long, success:Boolean)
+case class LogCreationResultWithId(logId:Long, success:Boolean, id:Long)
 
 class SheetLogManager {
   def find(sheetId: Long)(implicit userId: Long) = DB.withConnection { implicit c =>
@@ -26,7 +28,7 @@ class SheetLogManager {
     }.list
   }
 
-  def create(sheetLog: SheetLog)(implicit userId: Long): Tuple2[Long, Boolean] = {
+  def create(sheetLog: SheetLog)(implicit userId: Long): LogCreationResult = {
     // returns latest log id and success/failure
 
     DB.withTransaction { implicit c =>
@@ -41,9 +43,9 @@ class SheetLogManager {
            VALUES(${sheetLog.sheetId}, ${maxId}+1, ${sheetLog.actionType}, ${sheetLog.action})
         """.executeInsert()
 
-        (maxId + 1, true)
+        LogCreationResult(maxId + 1, true)
       } else
-        (maxId, false)
+        LogCreationResult(maxId, false)
     }
     //    Logger.info(find(sheetLog.sheetId).toString)
   }

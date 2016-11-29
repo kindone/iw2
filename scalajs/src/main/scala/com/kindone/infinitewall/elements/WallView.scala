@@ -29,7 +29,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
   def setup() = {
 
     val wallModelFuture = {
-      for (requestedWall <- persistence.wallManager.get(id)) yield {
+      for (requestedWall <- persistence.getWall(id)) yield {
         if (!requestedWall.isEmpty) {
           requestedWall.get
         } else {
@@ -37,9 +37,6 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         }
       }
     }
-
-    val wallManager = persistence.wallManager
-    val sheetManager = persistence.sheetManager
 
     for (wallModel <- wallModelFuture) {
 
@@ -75,12 +72,12 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         // activate events
         sheet.addOnDimensionChangeListener(new EventListener[SheetDimensionChangeEvent] {
           def apply(evt: SheetDimensionChangeEvent) = {
-            sheetManager.setDimension(sheet.id, evt.x, evt.y, evt.w, evt.h)
+            persistence.setSheetDimension(sheet.id, evt.x, evt.y, evt.w, evt.h)
           }
         })
         sheet.addOnContentChangeListener(new EventListener[SheetContentChangeEvent] {
           def apply(evt: SheetContentChangeEvent) = {
-            sheetManager.setText(sheet.id, evt.content)
+            persistence.setSheetText(sheet.id, evt.content)
           }
         })
         sheet.addOnSheetCloseListener(new EventListener[SheetCloseEvent] {
@@ -96,7 +93,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
           overlay.on("mousedown", editorClose)
         })
 
-        persistence.sheetManager.addOnUpdateEventHandler(sheet.id, new EventListener[PersistenceUpdateEvent] {
+        persistence.addOnSheetUpdateEventHandler(sheet.id, new EventListener[PersistenceUpdateEvent] {
           def apply(evt: PersistenceUpdateEvent) = {
             println("sheet persistence event:" + evt.toString)
             evt.change.action match {
@@ -109,14 +106,14 @@ class WallView(id: Long, persistence: Persistence) extends Element {
             }
           }
         })
-        persistence.sheetManager.subscribe(sheet.id)
+        persistence.subscribeSheet(sheet.id)
       }
 
       // load and create sheets
       for (
-        sheets <- wallManager.getSheets(wallModel.id);
+        sheets <- persistence.getSheetsInWall(wallModel.id);
         sheetId <- sheets;
-        sheet <- sheetManager.get(sheetId)
+        sheet <- persistence.getSheet(sheetId)
       ) {
         createSheet(sheet)
       }
@@ -124,13 +121,13 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       // activate sheet lifecycle events
       wall.addOnSheetRemovedListener(new EventListener[SheetRemovedEvent] {
         def apply(evt: SheetRemovedEvent) = {
-          wallManager.deleteSheet(wall.id, evt.sheetId)
+          persistence.deleteSheetInWall(wall.id, evt.sheetId)
         }
       })
 
       wall.addOnViewChangedListener(new EventListener[ViewChangeEvent] {
         def apply(evt: ViewChangeEvent) = {
-          wallManager.setView(wall.id, evt.x, evt.y, evt.scale)
+          persistence.setWallView(wall.id, evt.x, evt.y, evt.scale)
         }
       })
 
@@ -138,7 +135,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       controlPad.setOnAddButtonClickListener({ () =>
         // create random sheet model first and realize
         println(wall.center)
-        for (sheetModel <- wallManager.createSheet(wall.id, js.Math.random() * 800, js.Math.random() * 600, 100, 100, ""))
+        for (sheetModel <- persistence.createSheetInWall(wall.id, js.Math.random() * 800, js.Math.random() * 600, 100, 100, ""))
           createSheet(sheetModel)
       })
 
@@ -147,7 +144,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       })
 
       // add wall persistence update event
-      persistence.wallManager.addOnUpdateEventHandler(wall.id, new EventListener[PersistenceUpdateEvent] {
+      persistence.addOnWallUpdateEventHandler(wall.id, new EventListener[PersistenceUpdateEvent] {
         def apply(evt: PersistenceUpdateEvent) = {
           println("wall persistence event:" + evt.toString)
           evt.change.action match {
@@ -160,8 +157,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         }
       })
 
-      persistence.wallManager.subscribe(wall.id)
-
+      persistence.subscribeWall(wall.id)
     }
 
   }

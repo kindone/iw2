@@ -7,11 +7,12 @@ import com.kindone.util.Hasher
  * Created by kindone on 2016. 7. 24..
  */
 // json content to hash.
-sealed trait VersionedAction {
+
+
+trait VersionedAction {
   def action:Action
   def baseLogId:Long
 }
-
 
 case class Change(action:Action, baseLogId:Long, branch:Branch) extends VersionedAction
 case class Read(action:ReadonlyAction, baseLogId:Long) extends VersionedAction// none means latest

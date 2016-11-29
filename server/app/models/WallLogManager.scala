@@ -25,7 +25,7 @@ class WallLogManager {
     }.list
   }
 
-  def create(wallLog: WallLog)(implicit userId: Long): Tuple2[Long, Boolean] = {
+  def create(wallLog: WallLog)(implicit userId: Long):LogCreationResult = {
     // returns id
 
     DB.withTransaction { implicit c =>
@@ -40,9 +40,9 @@ class WallLogManager {
            VALUES(${wallLog.wallId}, ${maxId}+1, ${wallLog.actionType}, ${wallLog.action})
         """.executeInsert()
 
-        (maxId + 1, true)
+        LogCreationResult(maxId + 1, true)
       } else
-        (maxId, false)
+        LogCreationResult(maxId, false)
     }
     //    Logger.info(find(wallLog.wallId).toString)
   }

@@ -37,7 +37,8 @@ lazy val server = (project in file("server")).settings(
     "org.webjars" % "react" % "0.14.7",
     "org.flywaydb" %% "flyway-play" % "2.2.1",
     "org.webjars" % "cryptojs" % "3.1.2",
-    "org.mindrot" % "jbcrypt" % "0.3m"
+    "org.mindrot" % "jbcrypt" % "0.3m",
+    "io.monix" %% "monix" % "2.1.0"
 )
  ).enablePlugins(PlayScala).
   aggregate(clients.map(projectToRef): _*).
@@ -53,6 +54,7 @@ lazy val scalajs = (project in file("scalajs")).settings(
     "com.lihaoyi" %%% "scalarx" % "0.3.1",
     "be.doeraene" %%% "scalajs-jquery" % "0.9.0",
     "com.lihaoyi" %%% "upickle" % "0.3.8",
+    "io.monix" %%% "monix" % "2.1.0",
     "io.monix" %%% "minitest" % "0.22" % "test"
   ),
   jsDependencies ++= Seq(
@@ -84,6 +86,21 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
       "com.kindone" %% "crosslib" % "0.1-SNAPSHOT"
     )
   )
+
+
+lazy val sandbox = (project in file("sandbox")).settings(
+  scalaVersion := scalaV,
+  resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+  libraryDependencies ++= Seq(
+    specs2 % Test,
+    "com.typesafe.akka" %% "akka-testkit" % "2.4.8" %   "test",
+    "com.lihaoyi" %% "upickle" % "0.3.8",
+    "org.mindrot" % "jbcrypt" % "0.3m",
+    "io.monix" %% "monix" % "2.1.0",
+    "io.monix" %% "minitest" % "0.22" % "test"
+  ),
+  testFrameworks += new TestFramework("minitest.runner.Framework")
+)
 
 lazy val crosslib = project.in(file("crosslib"))
 

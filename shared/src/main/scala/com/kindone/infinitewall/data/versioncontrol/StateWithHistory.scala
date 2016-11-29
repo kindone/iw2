@@ -9,6 +9,8 @@ import upickle.default._
 
 sealed trait StateWithHistory
 {
+  type BaseType
+  def stateId:Long
   def applyChange(change:Change):(StateWithHistory, Change)
 }
 
@@ -29,15 +31,11 @@ object StateWithHistory {
   def create(sheet:Sheet):SheetWithHistory =
     new SheetWithHistory(sheet)
 
-  def create(wall:WallWithSheets):StateWithHistory = {
-    val sheets = wall.sheetsInWall.sheets.map { case (id, sheet) =>
-      (id, create(sheet))
-    }
-    new WallWithSheetsWithHistory(wall.wall, sheets)
-  }
 }
 
 class SheetWithHistory(val sheet:Sheet, ss:StringWithHistory) extends StateWithHistory with SheetLike{
+
+  type BaseType = Sheet
 
   def this(sheet:Sheet) {
     this(sheet, new StringWithHistory(sheet.text))
@@ -69,25 +67,20 @@ class SheetWithHistory(val sheet:Sheet, ss:StringWithHistory) extends StateWithH
 }
 
 
-class WallWithSheetsWithHistory(val wall:Wall, sheets:Map[Long, SheetWithHistory]) extends StateWithHistory with WallWithSheetsLike {
-  def sheetsInWall:SheetsInWall = {
-    val newSheets = sheets.map { case (id, sheet) =>
-      (id, sheet.asInstanceOf[SheetWithHistory].sheet)
-    }
+class WallWithHistory(val wall:Wall) extends StateWithHistory with WallLike {
+  type BaseType = Wall
 
-    SheetsInWall(wall.id, newSheets)
-  }
-
+  def id: Long = wall.id
+  def stateId:Long = wall.stateId
+  def x: Double = wall.x
+  def y: Double = wall.y
+  def scale: Double = wall.scale
+  def title: String = wall.title
 
   def applyChange(change:Change):(StateWithHistory, Change) = {
     change.action match {
-      case a:SheetAlterAction =>
-        val sheet = sheets.get(a.sheetId).get.asInstanceOf[SheetWithHistory]
-        val (newSheet, newChange) = sheet.applyChange(change)
-        val newSheets = sheets + (a.sheetId -> newSheet.asInstanceOf[SheetWithHistory]) // replace
-        (new WallWithSheetsWithHistory(wall, newSheets), newChange)
       case a:WallAlterAction =>
-        (new WallWithSheetsWithHistory(wall.applyAction(a), sheets), change)
+        (new WallWithHistory(wall.applyAction(a)), change)
       case _ =>
         (this, change)
     }

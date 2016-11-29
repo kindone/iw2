@@ -1,39 +1,26 @@
 package com.kindone.infinitewall.versioncontrol
 
 import com.kindone.infinitewall.data.action.{ _ }
-import com.kindone.infinitewall.data.versioncontrol.{ Branch, Read, Change }
+import com.kindone.infinitewall.data.versioncontrol.{ Repository, Branch, Read, Change }
 import com.kindone.infinitewall.facades.CryptoJS
 import upickle.default._
 
 /**
  * Created by kindone on 2016. 7. 27..
  */
-class VersionControl {
+class VersionControl extends Synchronizer with History {
 
-  lazy val branch: Branch = new Branch(Branch.genHash)
+  val branch: Branch = new Branch(Branch.genHash)
 
-  def createRead(action: ReadonlyAction, baseLogId: Long = 0) = {
-    Read(action, baseLogId)
+  def append(change: Change): Unit = {
+
   }
 
-  def createChange(action: WriteAction, baseLogId: Long = 0) = {
-    val serializedString = write(action)
-    val hash = (new CryptoJS).SHA1(serializedString)
-    //    val typeString: String = action match {
-    //      case _: ChangeSheetContentAction   => "changeSheetContent"
-    //      case _: ChangePanAction            => "changePan"
-    //      case _: ChangeZoomAction           => "changeZoom"
-    //      case _: ChangeViewAction           => "changeView"
-    //      case _: ChangeTitleAction          => "changeTitle"
-    //      case _: CreateSheetAction          => "createSheet"
-    //      case _: DeleteSheetAction          => "deleteSheet"
-    //      case _: MoveSheetAction            => "moveSheet"
-    //      case _: ResizeSheetAction          => "resizeSheet"
-    //      case _: ChangeSheetDimensionAction => "changeSheetDimension"
-    //      case _                             => "unknown"
-    //    }
+  def rebase(changes: Seq[Change]): Unit = {
 
-    Change(action, baseLogId, branch)
   }
 
+  def getSeq(): Seq[Change] = {
+    Seq()
+  }
 }
