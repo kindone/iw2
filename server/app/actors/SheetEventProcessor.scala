@@ -19,7 +19,7 @@ object SheetEventProcessor {
 
 class SheetEventProcessor extends EventProcessor {
 
-  def applyChange(change:ChangeOnWebSocket):Unit = {
+  def applyChange(change: ChangeOnWebSocket): Unit = {
     change match {
       case ChangeOnWebSocket(WebSocketContext(outChannel, userId, reqId), change @ Change(alterAction: SheetAlterAction, baseLogId, _)) =>
         val actionResult: LogCreationResult =

@@ -5,7 +5,7 @@ import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.versioncontrol.Change
 import com.kindone.infinitewall.data.ws.Response
-import models.{ModelManager, SheetManager}
+import models.{ ModelManager, SheetManager }
 import play.api.Logger
 import upickle.default._
 

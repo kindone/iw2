@@ -1,99 +1,85 @@
 package com.kindone.infinitewall.persistence.wsstorage.sockets
 
-import com.kindone.infinitewall.persistence.wsstorage.events.{ MessageReceiveEventEventDispatcher, SocketOpenCloseEventDispatcher }
-import org.scalajs.dom
-import org.scalajs.dom.raw.{ Event, MessageEvent }
+import com.kindone.infinitewall.events.EventListener
+import com.kindone.infinitewall.persistence.wsstorage.events._
 import upickle.default._
-
+import org.scalajs.dom
 import scala.scalajs.js.JavaScriptException
 import scala.scalajs.js.timers._
 
 /**
  * Created by kindone on 2016. 4. 17..
  */
-class PersistentWebSocket(baseUrl: String) extends SocketOpenCloseEventDispatcher
-    with MessageReceiveEventEventDispatcher {
+object PersistentWebSocket {
+  val BACKOFF_BASE_MS = 500
+}
 
-  private var socket: Option[dom.WebSocket] = connect(baseUrl)
-  private var isConnected = false
+class PersistentWebSocket(baseUrl: String) extends PersistentSocket {
+
+  private var socket: Option[Socket] = connect(baseUrl)
   private var backOff = 0
 
-  private val onMessage = (evt: MessageEvent) => {
-    dom.console.info("WebSocket onMessage event called: " + evt.toString)
-    dispatchReceiveEvent(evt.data.toString)
+  def send(str: String): Unit = {
+    socket.foreach(_.send(str))
   }
 
-  private val onOpen = (evt: Event) => {
-    dom.console.info("WebSocket onOpen event called: " + evt.toString)
-    isConnected = true
-    backOff = 0
-    dispatchSocketOpenEvent()
+  def onReceive(e: MessageReceiveEvent) = {
+    dispatchReceiveEvent(e.str)
   }
 
-  private val onClose = (evt: Event) => {
-    dom.console.info("WebSocket onClose event called: " + evt.toString)
-    isConnected = false
-    dispatchSocketCloseEvent()
+  private def connect(baseUrl: String): Option[WebSocket] = {
+    dom.console.info(s"Trying WebSocket reconnection(${backOff}) ... ")
 
-    reconnect()
-  }
-
-  private val onError = (evt: Event) => {
-    println("Error occurred in WebSocket: " + evt.toString)
-  }
-
-  private def connect(baseUrl: String): Option[dom.WebSocket] = {
     try {
-      val ws = new dom.WebSocket("ws://" + baseUrl + "/ws")
-      ws.onmessage = onMessage
-      ws.onopen = onOpen
-      ws.onclose = onClose
-      ws.onerror = onError
+      val ws = new WebSocket(baseUrl)
+      ws.addOnReceiveListener(onReceive _)
+      ws.addOnSocketOpenListener({ e: SocketOpenCloseEvent =>
+        resetBackOff()
+      })
+
+      ws.addOnSocketCloseListener({ e: SocketOpenCloseEvent =>
+        reconnect()
+        increaseBackOff()
+      })
+
+      dom.console.info("WebSocket connected")
       Some(ws)
     } catch {
       case err: JavaScriptException =>
         dom.console.error("Error occurred in creating WebSocket object: " + err.toString())
-        backOff += 1
+        increaseBackOff()
         reconnect()
+        increaseBackOff()
         None
     }
   }
 
-  private def close(): Unit = {
-    if (isConnected) {
-      for (s <- socket) {
-        dom.console.info("Closing existing WebSocket")
-        s.close()
-        s.onmessage = null
-        s.onopen = null
-        s.onclose = null
-        s.onerror = null
-      }
-    }
-  }
-
   private def reconnect(): Unit = {
-    close()
-
-    dom.console.info(s"Trying WebSocket reconnection(${backOff}) ... ")
+    socket.foreach(_.close())
+    socket = None
 
     runWithBackOff {
       socket = connect(baseUrl)
     }
+  }
+
+  private def runWithBackOff(block: => Unit): Unit = {
+    if (backOff == 0) {
+      block
+    } else {
+      setTimeout(Math.pow(2.0, backOff) * PersistentWebSocket.BACKOFF_BASE_MS) {
+        block
+      }
+    }
+  }
+
+  private def increaseBackOff(): Unit = {
     if (backOff < 5)
       backOff += 1
   }
 
-  private def runWithBackOff(block: => Unit): Unit = {
-    if (backOff > 0) {
-      setTimeout(Math.pow(2.0, backOff) * 500) {
-        block
-      }
-    } else
-      block
+  private def resetBackOff(): Unit = {
+    backOff = 0
   }
 
-  def send[T: Reader](str: String): Unit = {
-    socket.foreach(_.send(str))
-  }
 }

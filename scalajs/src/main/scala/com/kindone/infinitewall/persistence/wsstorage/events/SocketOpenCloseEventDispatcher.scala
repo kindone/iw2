@@ -31,5 +31,9 @@ trait SocketOpenCloseEventDispatcher {
 
   def dispatchSocketCloseEvent() =
     dispatcher.dispatchEvent(SOCKET_CLOSE, new SocketOpenCloseEvent)
+
+  def removeAllOnSocketOpenCloseListener(): Unit = {
+    dispatcher.clear()
+  }
 }
 

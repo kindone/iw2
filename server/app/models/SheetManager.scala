@@ -64,6 +64,14 @@ class SheetManager {
       }
     }
 
+  def updateText(id: Long, content: String, from: Int, numDeleted: Int)(implicit userId: Long) = {
+    sheetOfUser(id, userId).foreach { _ =>
+      DB.withConnection { implicit c =>
+        SQL"update sheets set content = substr(content FROM 0 FOR ${from}) + $content + substr(content FROM ${from + numDeleted}}) where id = $id".executeUpdate()
+      }
+    }
+  }
+
   private def sheetOfUser(sheetId: Long, userId: Long): Option[Long] = DB.withConnection { implicit c =>
     SQL"""select sheets_in_wall.wall_id from sheets_in_wall,walls_of_user
         where sheets_in_wall.sheet_id = $sheetId

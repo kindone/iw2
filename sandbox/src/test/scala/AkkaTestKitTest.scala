@@ -1,5 +1,5 @@
 import minitest.SimpleTestSuite
-import akka.testkit.{TestActorRef}
+import akka.testkit.{ TestActorRef }
 /**
  * Created by kindone on 2016. 11. 28..
  */

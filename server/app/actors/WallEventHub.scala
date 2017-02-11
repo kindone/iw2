@@ -44,8 +44,8 @@ class WallEventHub extends EventProcessor {
 
   // life cycle management: create actor -> do action (+delete) poisonpill
 
-  def receive = {
-    case change:ChangeOnWebSocket =>
+  override def receive = {
+    case change: ChangeOnWebSocket =>
       applyChange(change)
     case ConnectionClosed(out, _, walls) =>
       Logger.info("connection closed by: " + out.toString)
@@ -53,10 +53,11 @@ class WallEventHub extends EventProcessor {
         sendToOpenEventActor(wallId, RemoveEventListener(out))
       }
     case a @ _ =>
+      super.receive(a)
       Logger.error("Unsupported message type to Wall Actor received" + a.toString)
   }
 
-  def applyChange(change:ChangeOnWebSocket):Unit = {
+  def applyChange(change: ChangeOnWebSocket): Unit = {
     change match {
       case userChange @ ChangeOnWebSocket(WebSocketContext(out, userId, reqId), Change(action: WallAction, baseLogId, _)) =>
 

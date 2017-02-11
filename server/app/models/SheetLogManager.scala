@@ -11,8 +11,8 @@ import anorm._
  * Created by kindone on 2016. 6. 26..
  */
 case class SheetLog(sheetId: Long, logId: Long, actionType: Int, action: Option[String])
-case class LogCreationResult(logId:Long, success:Boolean)
-case class LogCreationResultWithId(logId:Long, success:Boolean, id:Long)
+case class LogCreationResult(logId: Long, success: Boolean)
+case class LogCreationResultWithId(logId: Long, success: Boolean, id: Long)
 
 class SheetLogManager {
   def find(sheetId: Long)(implicit userId: Long) = DB.withConnection { implicit c =>

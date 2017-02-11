@@ -2,7 +2,7 @@ package shared.test
 
 import com.kindone.infinitewall.data.Sheet
 import com.kindone.infinitewall.data.action.{Action, ChangeSheetContentAction}
-import com.kindone.infinitewall.data.versioncontrol.{SheetWithHistory, Repository, Branch, Change}
+import com.kindone.infinitewall.data.versioncontrol._
 import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, StringWithHistory}
 import minitest._
 
@@ -11,16 +11,13 @@ object ChangeTest extends SimpleTestSuite {
 
   }
 
-  test("reposistory") {
+  test("change stream") {
     val br1 = Branch.create()
     val br2 = Branch.create()
 
-//    println(br1.hash)
-//    println(br2.hash)
-
     val base = "Hello world"
     val baseState = Sheet(id=0, 0, 0, 0, 0, 0, "Hello world")
-    val repository:Repository = new Repository(baseState)
+    val changeStream:ChangeStream = new ChangeStream(baseState)
 
     val ac1 = ChangeSheetContentAction(sheetId=0, "Hi!", 0, 5)  // replace Hello
     val ac2 = ChangeSheetContentAction(sheetId=0, "land", 6, 5) // replace world
@@ -28,22 +25,18 @@ object ChangeTest extends SimpleTestSuite {
     val ch1 = Change(ac1, 0, br1)
     val ch2 = Change(ac2, 0, br2)
 
-    repository.append(ch1)
-    assertEquals(repository.getLatestState.asInstanceOf[SheetWithHistory].text, "Hi! world")
-    repository.rebase(Seq(ch2))
-    println(repository.getLatestState.asInstanceOf[SheetWithHistory].text)
+    changeStream.append(ch1)
+    assertEquals(changeStream.getLatestState.asInstanceOf[SheetWithHistory].text, "Hi! world")
+    changeStream.rebase(Seq(ch2))
+    println(changeStream.getLatestState.asInstanceOf[SheetWithHistory].text)
 
-    assertEquals(repository.getLatestState.asInstanceOf[SheetWithHistory].text, "Hi! land")
+    assertEquals(changeStream.getLatestState.asInstanceOf[SheetWithHistory].text, "Hi! land")
   }
 
   test("change stream - multi-party") {
     val br1 = Branch.create()
     val br2 = Branch.create()
     val br3 = Branch.create()
-
-//    println(br1.hash)
-//    println(br2.hash)
-//    println(br3.hash)
 
     val base = "Hello world"
     val ac1 = ChangeSheetContentAction(0, "Hi!", 0, 5)  // replace Hello

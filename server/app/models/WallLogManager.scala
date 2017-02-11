@@ -25,7 +25,7 @@ class WallLogManager {
     }.list
   }
 
-  def create(wallLog: WallLog)(implicit userId: Long):LogCreationResult = {
+  def create(wallLog: WallLog)(implicit userId: Long): LogCreationResult = {
     // returns id
 
     DB.withTransaction { implicit c =>

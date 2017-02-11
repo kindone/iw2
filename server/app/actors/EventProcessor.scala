@@ -1,27 +1,26 @@
 package actors
 
-import actors.event.{RemoveEventListener, AddEventListener}
-import akka.actor.{Actor, ActorRef}
+import actors.event.{ RemoveEventListener, AddEventListener }
+import akka.actor.{ Actor, ActorRef }
 import com.kindone.infinitewall.data.versioncontrol.Change
-import com.kindone.infinitewall.data.ws.{Notification, Response}
-import models.{LogCreationResult, ModelManager}
+import com.kindone.infinitewall.data.ws.{ Notification, Response }
+import models.{ LogCreationResult, ModelManager }
 import play.api.Logger
-import upickle.Types.Writer
 import upickle.default._
 
 /**
  * Created by kindone on 2016. 12. 3..
  */
-trait EventProcessor extends Actor{
+trait EventProcessor extends Actor {
   lazy val modelManager = new ModelManager
   var listeners = Set[ActorRef]()
 
-  def addListener(listener:ActorRef) = {
+  def addListener(listener: ActorRef) = {
     Logger.info("listening actor:" + listener.toString())
     listeners = listeners + listener
   }
 
-  def removeListener(listener:ActorRef) = {
+  def removeListener(listener: ActorRef) = {
     Logger.info("unlistening actor:" + listener.toString())
     listeners = listeners - listener
   }
@@ -30,7 +29,7 @@ trait EventProcessor extends Actor{
     write(Response(reqId, logId, write[T](msg)))
   }
 
-  def response(reqId: Long, result:LogCreationResult): String = {
+  def response(reqId: Long, result: LogCreationResult): String = {
     response(reqId, result.logId, result.success)
   }
 
@@ -49,10 +48,10 @@ trait EventProcessor extends Actor{
       addListener(listener)
     case RemoveEventListener(listener) =>
       removeListener(listener)
-    case change:ChangeOnWebSocket =>
+    case change: ChangeOnWebSocket =>
       applyChange(change)
     case _ =>
   }
 
-  def applyChange(change:ChangeOnWebSocket):Unit
+  def applyChange(change: ChangeOnWebSocket): Unit
 }

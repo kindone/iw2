@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.{ Singleton, Inject }
 
-import actors.{ SheetEventHub, WallEventHub$, WebSocketInboundChannel$ }
+import actors._
 import akka.actor._
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.{ Sheet, Wall }

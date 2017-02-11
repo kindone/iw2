@@ -6,7 +6,7 @@ import com.kindone.infinitewall.events.{ EventListener, EventDispatcher }
  * Created by kindone on 2016. 5. 31..
  */
 
-class MessageReceiveEvent(str: String) extends WebSocketEvent
+case class MessageReceiveEvent(str: String) extends WebSocketEvent
 
 trait MessageReceiveEventEventDispatcher {
   private val dispatcher: EventDispatcher[MessageReceiveEvent] = new EventDispatcher
@@ -21,6 +21,10 @@ trait MessageReceiveEventEventDispatcher {
 
   def dispatchReceiveEvent(str: String) =
     dispatcher.dispatchEvent(RECEIVE, new MessageReceiveEvent(str))
+
+  def removeAllOnReceiveListener(): Unit = {
+    dispatcher.clear()
+  }
 
 }
 

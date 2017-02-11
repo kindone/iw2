@@ -58,7 +58,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       element.append(editor.element)
       editor.setup()
 
-      lazy val editorClose: js.Function1[JQueryEventObject, js.Any] = (evt: JQueryEventObject) => {
+      lazy val editorClose: Function1[JQueryEventObject, Unit] = { evt: JQueryEventObject =>
         editor.close()
         overlay.hide()
         overlay.off("mousedown", editorClose)
@@ -70,20 +70,16 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         wall.appendSheet(sheet)
 
         // activate events
-        sheet.addOnDimensionChangeListener(new EventListener[SheetDimensionChangeEvent] {
-          def apply(evt: SheetDimensionChangeEvent) = {
-            persistence.setSheetDimension(sheet.id, evt.x, evt.y, evt.w, evt.h)
-          }
+        sheet.addOnDimensionChangeListener({ evt: SheetDimensionChangeEvent =>
+          persistence.setSheetDimension(sheet.id, evt.x, evt.y, evt.w, evt.h)
         })
-        sheet.addOnContentChangeListener(new EventListener[SheetContentChangeEvent] {
-          def apply(evt: SheetContentChangeEvent) = {
-            persistence.setSheetText(sheet.id, evt.content)
-          }
+
+        sheet.addOnContentChangeListener({ evt: SheetContentChangeEvent =>
+          persistence.setSheetText(sheet.id, evt.content)
         })
-        sheet.addOnSheetCloseListener(new EventListener[SheetCloseEvent] {
-          def apply(evt: SheetCloseEvent) = {
-            wall.removeSheet(evt.sheet)
-          }
+
+        sheet.addOnSheetCloseListener({ evt: SheetCloseEvent =>
+          wall.removeSheet(evt.sheet)
         })
 
         sheet.setOnDoubleClickListener((sheet: Sheet) => {
@@ -93,17 +89,15 @@ class WallView(id: Long, persistence: Persistence) extends Element {
           overlay.on("mousedown", editorClose)
         })
 
-        persistence.addOnSheetUpdateEventHandler(sheet.id, new EventListener[PersistenceUpdateEvent] {
-          def apply(evt: PersistenceUpdateEvent) = {
-            println("sheet persistence event:" + evt.toString)
-            evt.change.action match {
-              // TODO
-              case MoveSheetAction(id, x, y) =>
-              case ResizeSheetAction(id, width, height) =>
-              case ChangeSheetDimensionAction(id, x, y, width, height) =>
-              case ChangeSheetContentAction(id, content, pos, length) =>
-              case _ =>
-            }
+        persistence.addOnSheetUpdateEventHandler(sheet.id, { evt: PersistenceUpdateEvent =>
+          println("sheet persistence event:" + evt.toString)
+          evt.change.action match {
+            // TODO
+            case MoveSheetAction(id, x, y) =>
+            case ResizeSheetAction(id, width, height) =>
+            case ChangeSheetDimensionAction(id, x, y, width, height) =>
+            case ChangeSheetContentAction(id, content, pos, length) =>
+            case _ =>
           }
         })
         persistence.subscribeSheet(sheet.id)
@@ -119,16 +113,12 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       }
 
       // activate sheet lifecycle events
-      wall.addOnSheetRemovedListener(new EventListener[SheetRemovedEvent] {
-        def apply(evt: SheetRemovedEvent) = {
-          persistence.deleteSheetInWall(wall.id, evt.sheetId)
-        }
+      wall.addOnSheetRemovedListener({ evt: SheetRemovedEvent =>
+        persistence.deleteSheetInWall(wall.id, evt.sheetId)
       })
 
-      wall.addOnViewChangedListener(new EventListener[ViewChangeEvent] {
-        def apply(evt: ViewChangeEvent) = {
-          persistence.setWallView(wall.id, evt.x, evt.y, evt.scale)
-        }
+      wall.addOnViewChangedListener({ evt: ViewChangeEvent =>
+        persistence.setWallView(wall.id, evt.x, evt.y, evt.scale)
       })
 
       // activate controlpad events
@@ -144,16 +134,14 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       })
 
       // add wall persistence update event
-      persistence.addOnWallUpdateEventHandler(wall.id, new EventListener[PersistenceUpdateEvent] {
-        def apply(evt: PersistenceUpdateEvent) = {
-          println("wall persistence event:" + evt.toString)
-          evt.change.action match {
-            //TODO
-            case ChangeTitleAction(_, _) =>
-            case CreateSheetAction(_, _) =>
-            case DeleteSheetAction(_, _) =>
-            case _                       =>
-          }
+      persistence.addOnWallUpdateEventHandler(wall.id, { evt: PersistenceUpdateEvent =>
+        println("wall persistence event:" + evt.toString)
+        evt.change.action match {
+          //TODO
+          case ChangeTitleAction(_, _) =>
+          case CreateSheetAction(_, _) =>
+          case DeleteSheetAction(_, _) =>
+          case _                       =>
         }
       })
 

@@ -6,4 +6,4 @@ import com.kindone.infinitewall.events.{ EventDispatcher, EventListener }
  * Created by kindone on 2016. 5. 30..
  */
 class SocketEventDispatcher extends SocketOpenCloseEventDispatcher
-  with WallNotificationEventDispatcher with SheetNotificationEventDispatcher
+  with MessageReceiveEventEventDispatcher with SocketErrorEventDispatcher

@@ -3,7 +3,7 @@ package actors
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.versioncontrol.Change
-import com.kindone.infinitewall.data.ws.{BulkChangeRequest, ChangeRequest}
+import com.kindone.infinitewall.data.ws.{ ChangeRequest }
 import play.api.Logger
 import upickle.default._
 
@@ -13,7 +13,7 @@ import scala.util.Try
  * Created by kindone on 2016. 4. 17..
  */
 
-case class WebSocketContext(outChannel:ActorRef, userId:Long, reqId:Long)
+case class WebSocketContext(outChannel: ActorRef, userId: Long, reqId: Long)
 
 case class ChangeOnWebSocket(context: WebSocketContext, change: Change)
 case class ConnectionClosed(outActor: ActorRef, subscribingWalls: Set[Long], subscribingSheets: Set[Long])
@@ -45,7 +45,7 @@ class WebSocketInboundChannel(wallActor: ActorRef, sheetActor: ActorRef, outboun
     subscribingWalls = Set()
   }
 
-  def processRequest(req:ChangeRequest):Unit = {
+  def processRequest(req: ChangeRequest): Unit = {
     req match {
       case ChangeRequest(reqId, change @ Change(action: SubscribeWallEventAction, _, _)) =>
         subscribeWall(action.wallId)

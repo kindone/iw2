@@ -18,21 +18,21 @@ object WallEventProcessor {
 }
 
 class WallEventProcessor extends EventProcessor {
-  def applyChange(change:ChangeOnWebSocket):Unit = {
+  def applyChange(change: ChangeOnWebSocket): Unit = {
     change match {
       case ChangeOnWebSocket(WebSocketContext(outChannel, userId, reqId), change @ Change(alterAction: WallAlterAction, baseLogId, _)) =>
 
-          alterAction match {
-            case createAction @ CreateSheetAction(wallId, sheet) =>
-              val actionResult = modelManager.createSheetInWall(baseLogId, createAction)(userId)
-              outChannel ! response(reqId, actionResult.logId, actionResult.id)
-              if (actionResult.success) {
-                val newChange = change.copy(action = createAction.copy(actionResult.id))
-                broadcast(actionResult.logId, newChange)
-              }
-            case nonCreateAction @ _ =>
-              val actionResult: LogCreationResult =
-                nonCreateAction match {
+        alterAction match {
+          case createAction @ CreateSheetAction(wallId, sheet) =>
+            val actionResult = modelManager.createSheetInWall(baseLogId, createAction)(userId)
+            outChannel ! response(reqId, actionResult.logId, actionResult.id)
+            if (actionResult.success) {
+              val newChange = change.copy(action = createAction.copy(actionResult.id))
+              broadcast(actionResult.logId, newChange)
+            }
+          case nonCreateAction @ _ =>
+            val actionResult: LogCreationResult =
+              nonCreateAction match {
                 case action @ ChangePanAction(wallId, x, y) =>
                   modelManager.setWallPan(baseLogId, action)(userId)
                 case action @ ChangeZoomAction(wallId, scale) =>
@@ -47,10 +47,10 @@ class WallEventProcessor extends EventProcessor {
                   Logger.warn("This message type is not supported")
                   throw new RuntimeException("Unexpected sheet alter action")
               }
-              outChannel ! response(reqId, actionResult)
-              if (actionResult.success)
-                broadcast(actionResult.logId, change)
-          }
+            outChannel ! response(reqId, actionResult)
+            if (actionResult.success)
+              broadcast(actionResult.logId, change)
+        }
     }
   }
 

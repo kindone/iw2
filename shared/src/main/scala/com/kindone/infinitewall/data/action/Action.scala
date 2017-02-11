@@ -27,7 +27,7 @@ case class DeleteWallAction(wallId:Long) extends WallAlterAction
 case class GetWallAction(wallId:Long) extends WallAction with ReadonlyAction
 case class ListWallAction() extends WallAction with ReadonlyAction
 
-trait SubscribeEventAction extends ReadonlyAction
+sealed trait SubscribeEventAction extends ReadonlyAction
 case class SubscribeWallEventAction(wallId:Long) extends WallReadonlyAction with SubscribeEventAction
 case class SubscribeSheetEventAction(sheetId:Long) extends SheetReadonlyAction with SubscribeEventAction
 

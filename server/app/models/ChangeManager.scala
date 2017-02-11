@@ -10,5 +10,4 @@ class ChangeManager {
   lazy val sheetManager = new SheetManager
   lazy val sheetLogManager = new SheetLogManager
 
-
 }

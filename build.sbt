@@ -49,21 +49,25 @@ lazy val scalajs = (project in file("scalajs")).settings(
   persistLauncher := true,
   persistLauncher in Test := false,
   libraryDependencies ++= Seq(
-    "org.scala-js" %%% "scalajs-dom" % "0.9.0",
-    "com.lihaoyi" %%% "scalatags" % "0.5.5",
+    "org.scala-js" %%% "scalajs-dom" % "0.9.1",
+    "com.lihaoyi" %%% "scalatags" % "0.6.0",
     "com.lihaoyi" %%% "scalarx" % "0.3.1",
-    "be.doeraene" %%% "scalajs-jquery" % "0.9.0",
+    "be.doeraene" %%% "scalajs-jquery" % "0.9.1",
     "com.lihaoyi" %%% "upickle" % "0.3.8",
-    "io.monix" %%% "monix" % "2.1.0",
-    "io.monix" %%% "minitest" % "0.22" % "test"
+    "io.monix" %%% "monix" % "2.2.1",
+    "com.kindone" %%% "crosslib" % "0.1-SNAPSHOT",
+    "io.monix" %%% "minitest" % "0.27" % "test",
+    "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
   ),
   jsDependencies ++= Seq(
-    "org.webjars" % "bootstrap" % "3.3.6" / "bootstrap.min.js",
-    "org.webjars" % "jquery" % "2.2.4" / "jquery.min.js",
-    "org.webjars" % "showdown" % "0.3.1" / "compressed/showdown.js",
-    "org.webjars" % "jquery-mousewheel" % "3.1.12" / "jquery.mousewheel.js" dependsOn "jquery.min.js",
-    "org.webjars" % "velocity" % "1.1.0" / "velocity.min.js" dependsOn "jquery.min.js"
-  )
+    RuntimeDOM,
+    "org.webjars" % "jquery" % "1.11.1" / "1.11.1/jquery.min.js",
+    "org.webjars" % "bootstrap" % "3.3.6" / "bootstrap.min.js" dependsOn "1.11.1/jquery.min.js",
+    "org.webjars" % "showdown" % "0.3.1" / "compressed/showdown.js"
+//    "org.webjars" % "jquery-mousewheel" % "3.1.12" / "jquery.mousewheel.js" dependsOn "jquery.min.js",
+//    "org.webjars" % "velocity" % "1.1.0" / "velocity.min.js" dependsOn "jquery.min.js"
+  ),
+  testFrameworks += new TestFramework("utest.runner.Framework")
 ).enablePlugins(ScalaJSPlugin, ScalaJSPlay).
   dependsOn(sharedJs)
 
@@ -71,9 +75,12 @@ val sharedJvmSettings = List(
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "upickle" % "0.3.8",
     "com.kindone" %% "crosslib" % "0.1-SNAPSHOT",
-    "io.monix" %% "minitest" % "0.24" % "test"
+    "io.monix" %% "minitest" % "0.24" % "test",
+    "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
   ),
-  testFrameworks += new TestFramework("minitest.runner.Framework")
+  testFrameworks ++= Seq(
+    new TestFramework("minitest.runner.Framework"),
+    new TestFramework("utest.runner.Framework"))
 )
 
 lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
@@ -93,10 +100,11 @@ lazy val sandbox = (project in file("sandbox")).settings(
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
   libraryDependencies ++= Seq(
     specs2 % Test,
-    "com.typesafe.akka" %% "akka-testkit" % "2.4.8" %   "test",
     "com.lihaoyi" %% "upickle" % "0.3.8",
     "org.mindrot" % "jbcrypt" % "0.3m",
     "io.monix" %% "monix" % "2.1.0",
+    "com.typesafe.akka" %% "akka-testkit" % "2.4.8" %   "test",
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % "test",
     "io.monix" %% "minitest" % "0.22" % "test"
   ),
   testFrameworks += new TestFramework("minitest.runner.Framework")
@@ -111,6 +119,8 @@ lazy val sharedJs = shared.js
 
 // loads the jvm project at sbt startup
 onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
+
+
 //
 //seq(flywaySettings: _*)
 //
@@ -128,3 +138,11 @@ routesGenerator := InjectedRoutesGenerator
 
 
 fork in run := true
+
+libraryDependencies in scalajs ++= Seq(
+  "com.lihaoyi" % "utest_2.11" % "latest.integration"
+)
+
+//libraryDependencies in scalajs ++= Seq(
+//  "org.scalatest" % "scalatest_2.11" % "latest.integration" % "test"
+//)
