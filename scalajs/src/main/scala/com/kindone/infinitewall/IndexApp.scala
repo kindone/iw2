@@ -21,7 +21,7 @@ class IndexApp(val useLocalStorage: Boolean = true, val useWS: Boolean = false) 
     if (useLocalStorage)
       new LocalPersistence()
     else if (useWS)
-      new WebSocketPersistence("")
+      new BrowserModule("").websocketPersistence
     else
       new HttpPersistence("")
   }

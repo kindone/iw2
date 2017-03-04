@@ -26,7 +26,7 @@ class WallApp(val useLocalStorage: Boolean = true, val useWS: Boolean = false) {
     if (useLocalStorage)
       new LocalPersistence()
     else if (useWS)
-      new WebSocketPersistence("localhost:9000")
+      new BrowserModule("localhost:9000").websocketPersistence
     else
       new HttpPersistence("")
   }

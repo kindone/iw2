@@ -16,6 +16,7 @@ trait Socket extends SocketEventDispatcher {
 
 trait PersistentSocket extends MessageReceiveEventEventDispatcher {
   def send(str: String): Unit
+  def isAlive: Boolean
 }
 
 trait MailboxSocket extends MessageReceiveEventEventDispatcher {

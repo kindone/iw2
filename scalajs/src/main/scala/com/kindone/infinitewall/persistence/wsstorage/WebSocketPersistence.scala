@@ -13,8 +13,7 @@ import scala.concurrent.Future
 /**
  * Created by kindone on 2016. 4. 17..
  */
-class WebSocketPersistence(baseUrl: String) extends Persistence {
-  private val socket: MailboxSocket = new MailboxWebSocket(baseUrl)
+class WebSocketPersistence(socket: MailboxWebSocket) extends Persistence {
   private val branch: Branch = Branch.create()
   private val processor = new MessageProcessor(branch, socket)
 

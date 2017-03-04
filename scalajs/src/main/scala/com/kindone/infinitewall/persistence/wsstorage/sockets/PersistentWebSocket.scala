@@ -1,85 +1,103 @@
 package com.kindone.infinitewall.persistence.wsstorage.sockets
 
+import java.util.UUID
+
 import com.kindone.infinitewall.events.EventListener
+import com.kindone.infinitewall.persistence.wsstorage.WebSocketFactory
 import com.kindone.infinitewall.persistence.wsstorage.events._
+import com.kindone.infinitewall.util.Timer
+import org.scalajs.dom.raw.Event
 import upickle.default._
 import org.scalajs.dom
+import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
-import scala.scalajs.js.timers._
+import scala.scalajs.js.timers.SetTimeoutHandle
 
 /**
  * Created by kindone on 2016. 4. 17..
  */
 object PersistentWebSocket {
+  val CONNECTION_TIMEOUT_MS = 25000
   val BACKOFF_BASE_MS = 500
 }
 
-class PersistentWebSocket(baseUrl: String) extends PersistentSocket {
+class PersistentWebSocket(baseUrl: String, wsFactory: WebSocketFactory, timer: Timer)
+    extends PersistentSocket with StateContext {
 
-  private var socket: Option[Socket] = connect(baseUrl)
-  private var backOff = 0
+  private var socket: Option[Socket] = None
+  private var openTimeoutUUID: Option[UUID] = None
+  private var retryTimeoutUUID: Option[UUID] = None
+  private var socketState: PersistentWebSocketState = new Initial(this)
+
+  socketState.tryConnect()
 
   def send(str: String): Unit = {
     socket.foreach(_.send(str))
   }
 
-  def onReceive(e: MessageReceiveEvent) = {
+  def isAlive: Boolean = socket.isDefined
+
+  private def onReceive(e: MessageReceiveEvent) = {
     dispatchReceiveEvent(e.str)
   }
 
-  private def connect(baseUrl: String): Option[WebSocket] = {
-    dom.console.info(s"Trying WebSocket reconnection(${backOff}) ... ")
-
+  def connect(): Unit = {
     try {
-      val ws = new WebSocket(baseUrl)
+      val ws = wsFactory.create(baseUrl)
       ws.addOnReceiveListener(onReceive _)
       ws.addOnSocketOpenListener({ e: SocketOpenCloseEvent =>
-        resetBackOff()
+        dom.console.info("onOpen called")
+        socketState.succeed()
       })
 
       ws.addOnSocketCloseListener({ e: SocketOpenCloseEvent =>
-        reconnect()
-        increaseBackOff()
+        socketState.closed()
       })
 
-      dom.console.info("WebSocket connected")
-      Some(ws)
+      dom.console.info("WebSocket opening: " + ws.toString + ":" + ws.ws.toString + ":" + ws.numSocketOpenEventListeners)
+      socket = Some(ws)
+      scheduleOpenTimeout()
+
     } catch {
       case err: JavaScriptException =>
-        dom.console.error("Error occurred in creating WebSocket object: " + err.toString())
-        increaseBackOff()
-        reconnect()
-        increaseBackOff()
-        None
+        dom.console.info("Exception occurred in creating WebSocket object: " + err.toString())
+        socketState.fail()
     }
   }
 
-  private def reconnect(): Unit = {
-    socket.foreach(_.close())
-    socket = None
+  def scheduleOpenTimeout(): Unit = {
+    openTimeoutUUID = Some(timer.setTimeout(PersistentWebSocket.CONNECTION_TIMEOUT_MS) {
+      socketState.timeout()
+    })
+  }
 
-    runWithBackOff {
-      socket = connect(baseUrl)
+  def cancelOpenTimeout(): Unit = {
+    dom.console.info("WebSocket canceled open timeout")
+    openTimeoutUUID.foreach(uuid => timer.clearTimeout(uuid))
+    openTimeoutUUID = None
+  }
+
+  override def scheduleReconnect(backOff: Int): Unit = {
+    val saturatedBackOff = if (backOff < 10) backOff else 10
+    val timeMs = (Math.pow(2.0, saturatedBackOff - 1) * PersistentWebSocket.BACKOFF_BASE_MS).toLong
+    retryTimeoutUUID = Some(timer.setTimeout(timeMs) {
+      connect()
+    })
+  }
+
+  override def changeState(newState: PersistentWebSocketState): Unit = {
+    socketState = newState
+  }
+
+  override def cancelReconnect(): Unit = {
+    retryTimeoutUUID.foreach(uuid => timer.clearTimeout(uuid))
+    retryTimeoutUUID = None
+  }
+
+  def open() = {
+    socket.foreach { ws =>
+      dom.console.info("WebSocket forced open event: " + ws.toString + ":" + ws.asInstanceOf[WebSocket].ws.toString + ":" + ws.numSocketOpenEventListeners)
+      ws.asInstanceOf[WebSocket].ws.onopen(js.Dynamic.literal().asInstanceOf[Event])
     }
   }
-
-  private def runWithBackOff(block: => Unit): Unit = {
-    if (backOff == 0) {
-      block
-    } else {
-      setTimeout(Math.pow(2.0, backOff) * PersistentWebSocket.BACKOFF_BASE_MS) {
-        block
-      }
-    }
-  }
-
-  private def increaseBackOff(): Unit = {
-    if (backOff < 5)
-      backOff += 1
-  }
-
-  private def resetBackOff(): Unit = {
-    backOff = 0
-  }
-
 }

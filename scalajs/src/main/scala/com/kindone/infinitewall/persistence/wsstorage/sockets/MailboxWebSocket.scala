@@ -17,9 +17,8 @@ import scala.scalajs.js.timers.SetTimeoutHandle
  *
  *
  */
-class MailboxWebSocket(baseUrl: String)
+class MailboxWebSocket(persistentSocket: PersistentSocket)
     extends MailboxSocket {
-  private val persistentSocket: PersistentSocket = new PersistentWebSocket(baseUrl)
   persistentSocket.addOnReceiveListener(receive _)
 
   private var timeoutHandle: Option[SetTimeoutHandle] = None

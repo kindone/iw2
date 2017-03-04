@@ -35,5 +35,9 @@ trait SocketOpenCloseEventDispatcher {
   def removeAllOnSocketOpenCloseListener(): Unit = {
     dispatcher.clear()
   }
+
+  def numSocketOpenEventListeners = dispatcher.numEventListeners(SOCKET_OPEN)
+  def numSocketCloseEventListeners = dispatcher.numEventListeners(SOCKET_CLOSE)
+
 }
 

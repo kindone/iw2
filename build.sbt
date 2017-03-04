@@ -54,8 +54,11 @@ lazy val scalajs = (project in file("scalajs")).settings(
     "com.lihaoyi" %%% "scalarx" % "0.3.1",
     "be.doeraene" %%% "scalajs-jquery" % "0.9.1",
     "com.lihaoyi" %%% "upickle" % "0.3.8",
+    "com.softwaremill.macwire" %% "macros" % "2.3.0",
     "io.monix" %%% "monix" % "2.2.1",
     "com.kindone" %%% "crosslib" % "0.1-SNAPSHOT",
+    "org.scalatest" %%% "scalatest" % "3.0.1" % "test",
+    "org.scalamock" %%% "scalamock-scalatest-support" % "3.5.0" % "test",
     "io.monix" %%% "minitest" % "0.27" % "test",
     "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
   ),
@@ -75,6 +78,8 @@ val sharedJvmSettings = List(
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "upickle" % "0.3.8",
     "com.kindone" %% "crosslib" % "0.1-SNAPSHOT",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % "test",
     "io.monix" %% "minitest" % "0.24" % "test",
     "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
   ),
@@ -90,7 +95,11 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
   jsSettings(
     libraryDependencies ++= Seq(
       "com.lihaoyi" %%% "upickle" % "0.3.8",
-      "com.kindone" %% "crosslib" % "0.1-SNAPSHOT"
+      "com.kindone" %%% "crosslib" % "0.1-SNAPSHOT",
+      "org.scalatest" %%% "scalatest" % "3.0.1" % "test",
+      "org.scalamock" %%% "scalamock-scalatest-support" % "3.5.0" % "test",
+      "io.monix" %%% "minitest" % "0.27" % "test",
+      "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
     )
   )
 
@@ -103,11 +112,18 @@ lazy val sandbox = (project in file("sandbox")).settings(
     "com.lihaoyi" %% "upickle" % "0.3.8",
     "org.mindrot" % "jbcrypt" % "0.3m",
     "io.monix" %% "monix" % "2.1.0",
+    "com.softwaremill.macwire" %% "macros" % "2.2.0",
+    "com.lihaoyi" %%% "utest" % "0.4.5" % "test",
+    "com.lihaoyi" % "utest_2.11" % "latest.integration",
     "com.typesafe.akka" %% "akka-testkit" % "2.4.8" %   "test",
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.4.2" % "test",
     "io.monix" %% "minitest" % "0.22" % "test"
   ),
-  testFrameworks += new TestFramework("minitest.runner.Framework")
+  testFrameworks ++= Seq(
+    new TestFramework("minitest.runner.Framework"),
+    new TestFramework("utest.runner.Framework")
+  )
 )
 
 lazy val crosslib = project.in(file("crosslib"))
@@ -146,3 +162,9 @@ libraryDependencies in scalajs ++= Seq(
 //libraryDependencies in scalajs ++= Seq(
 //  "org.scalatest" % "scalatest_2.11" % "latest.integration" % "test"
 //)
+//
+//libraryDependencies in shared ++= Seq(
+//  "org.scalatest" % "scalatest_2.11" % "latest.integration" % "test"
+//)
+
+
