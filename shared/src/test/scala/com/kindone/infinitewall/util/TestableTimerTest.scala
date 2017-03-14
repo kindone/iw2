@@ -6,9 +6,9 @@ import org.scalatest._
 /**
  * Created by kindone on 2017. 2. 19..
  */
-class MockTimerTest extends FlatSpec with Matchers{
+class TestableTimerTest extends FlatSpec with Matchers{
   "MockTimer" should "work as expected" in {
-    val timer = new MockTimer
+    val timer = new TestableTimer
 
     var (fired1, fired2, fired3, fired4) = (false, false, false, false)
 
@@ -45,7 +45,7 @@ class MockTimerTest extends FlatSpec with Matchers{
 
 
   "MockTimer" should "cancel as expected" in {
-    val timer = new MockTimer
+    val timer = new TestableTimer
 
     var (fired1, fired2, fired3, fired4) = (false, false, false, false)
 

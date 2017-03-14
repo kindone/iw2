@@ -1,37 +1,47 @@
 package com.kindone.infinitewall.persistence.wsstorage.sockets
 
+import java.util.UUID
+
 import com.kindone.infinitewall.data.action.Action
 import com.kindone.infinitewall.data.versioncontrol.{ Change, Read }
 import com.kindone.infinitewall.data.ws._
 import com.kindone.infinitewall.events.EventListener
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.wsstorage.events.{ MessageReceiveEvent, SocketEventDispatcher, SocketOpenCloseEvent }
+import com.kindone.infinitewall.util.Timer
 import upickle.default._
 
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.timers.SetTimeoutHandle
 
 /**
  * Created by kindone on 2016. 10. 24..
  *
  *
  */
-class MailboxWebSocket(persistentSocket: PersistentSocket)
+
+object MailboxWebSocket {
+  val RETRY_TIMEOUT = 1000
+}
+
+class MailboxWebSocket(persistentSocket: PersistentSocket, timer: Timer)
     extends MailboxSocket {
+  import MailboxWebSocket._
+
   persistentSocket.addOnReceiveListener(receive _)
 
-  private var timeoutHandle: Option[SetTimeoutHandle] = None
+  private var timeoutHandle: Option[UUID] = None
   private var mailBox: List[String] = List()
 
   private def restartTimer() = {
-    timeoutHandle = Some(js.timers.setTimeout(1000) {
+
+    timeoutHandle = Some(timer.setTimeout(RETRY_TIMEOUT) {
       sendMailBox()
     })
   }
 
   private def stopTimer() = {
-    timeoutHandle.foreach(js.timers.clearTimeout(_))
+    timeoutHandle.foreach(timer.clearTimeout(_))
     timeoutHandle = None
   }
 

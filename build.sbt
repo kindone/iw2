@@ -67,6 +67,7 @@ lazy val scalajs = (project in file("scalajs")).settings(
     "org.webjars" % "jquery" % "1.11.1" / "1.11.1/jquery.min.js",
     "org.webjars" % "bootstrap" % "3.3.6" / "bootstrap.min.js" dependsOn "1.11.1/jquery.min.js",
     "org.webjars" % "showdown" % "0.3.1" / "compressed/showdown.js"
+//    "org.webjars" % "cryptojs" % "3.1.2" / "component/",
 //    "org.webjars" % "jquery-mousewheel" % "3.1.12" / "jquery.mousewheel.js" dependsOn "jquery.min.js",
 //    "org.webjars" % "velocity" % "1.1.0" / "velocity.min.js" dependsOn "jquery.min.js"
   ),

@@ -15,7 +15,7 @@ trait Timer {
 
 case class TimerEntry(task: () => Unit, timestampMs:Long)
 
-class MockTimer extends Timer{
+class TestableTimer extends Timer{
   var scheduledEntries:Map[UUID, TimerEntry] = Map()
   var currentTimestampMs: Long = 0
 

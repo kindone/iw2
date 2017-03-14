@@ -1,6 +1,6 @@
 import minitest._
 
-object MySimpleSuite extends SimpleTestSuite {
+object MiniTestExample extends SimpleTestSuite {
   test("should be") {
     assertEquals(2, 1 + 1)
   }

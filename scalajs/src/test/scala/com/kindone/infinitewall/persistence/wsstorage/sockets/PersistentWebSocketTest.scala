@@ -1,7 +1,7 @@
 package com.kindone.infinitewall.persistence.wsstorage.sockets
 
 import com.kindone.infinitewall.persistence.wsstorage.WebSocketFactory
-import com.kindone.infinitewall.util.MockTimer
+import com.kindone.infinitewall.util.TestableTimer
 import org.scalajs.dom.raw.{ CloseEvent, MessageEvent, ErrorEvent, Event }
 import org.scalatest.FlatSpec
 import org.scalatest._
@@ -37,7 +37,7 @@ class PersistentWebSocketTest extends FlatSpec with org.scalamock.scalatest.Mock
     val ws = factory.ws
     (factory.create _).expects(*).throws(new JavaScriptException("synthetic error message"))
 
-    val timer = new MockTimer
+    val timer = new TestableTimer
     val pws = new PersistentWebSocket("", factory, timer)
   }
 
@@ -46,7 +46,7 @@ class PersistentWebSocketTest extends FlatSpec with org.scalamock.scalatest.Mock
 
     (factory.create _).expects(*).throws(new JavaScriptException("synthetic error message"))
 
-    val timer = new MockTimer
+    val timer = new TestableTimer
     val pws = new PersistentWebSocket("", factory, timer)
 
     timer.advance(PersistentWebSocket.BACKOFF_BASE_MS - 1)
@@ -69,7 +69,7 @@ class PersistentWebSocketTest extends FlatSpec with org.scalamock.scalatest.Mock
     }
 
     // there should be one timer for retry (fail 1)
-    val timer = new MockTimer
+    val timer = new TestableTimer
     val ws = factory.ws
     Given("a new instance")
     val pws = new PersistentWebSocket("", factory, timer)

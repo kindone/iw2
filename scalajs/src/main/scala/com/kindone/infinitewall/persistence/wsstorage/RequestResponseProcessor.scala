@@ -16,6 +16,8 @@ class RequestResponseProcessor {
   private var requestIdGenerator = new SimpleIdGenerator
   private var pendingRecords = Map[Long, Record[_]]()
 
+  def size = pendingRecords.size
+
   def getNextRequestId() = requestIdGenerator.getNextId()
 
   def getResponseFuture[T: Reader](reqId: Long): Future[T] = {
