@@ -26,8 +26,10 @@ lazy val server = (project in file("server")).settings(
     evolutions,
     specs2 % Test,
     "com.typesafe.akka" %% "akka-testkit" % "2.3.13" % "test", // update version accordingly
-    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-    "org.scalamock" %%% "scalamock-scalatest-support" % "3.5.0" % "test",
+//    "org.scalatest" %% "scalatest" % "3.0.1" % "test", --> 3.0.1 is for scalajs support
+    "org.scalatest" %% "scalatest" % "2.2.1" % "test",
+    "org.scalatestplus" %% "play" % "1.4.0-M3" % "test",
+    "org.scalamock" %%% "scalamock-scalatest-support" % "3.2" % "test",
     "com.typesafe.play" %% "anorm" % "2.5.0",
     "com.vmunier" %% "play-scalajs-scripts" % "0.3.0",
     "com.typesafe.slick" %% "slick" % "3.0.2",
@@ -54,7 +56,7 @@ lazy val scalajs = (project in file("scalajs")).settings(
   libraryDependencies ++= Seq(
     "org.scala-js" %%% "scalajs-dom" % "0.9.1",
     "com.lihaoyi" %%% "scalatags" % "0.6.0",
-    "com.lihaoyi" %%% "scalarx" % "0.3.1",
+    "com.lihaoyi" %%% "scalarx" % "0.3.2",
     "be.doeraene" %%% "scalajs-jquery" % "0.9.1",
     "com.lihaoyi" %%% "upickle" % "0.3.8",
     "com.softwaremill.macwire" %% "macros" % "2.3.0",
