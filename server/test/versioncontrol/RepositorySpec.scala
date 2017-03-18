@@ -1,7 +1,7 @@
 package versioncontrol
 
 import com.kindone.infinitewall.data.Sheet
-import com.kindone.infinitewall.data.versioncontrol.{ GroupedSnapshot, SingleSnapshot, Repository }
+//import com.kindone.infinitewall.data.versioncontrol.{ GroupedSnapshot, SingleSnapshot, Repository }
 import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -20,15 +20,15 @@ class RepositorySpec extends Specification {
     }
   }
 
-  "The Repository" should {
-    "" in {
-      val repository = new Repository
-      val sheet = Sheet(0, 0, 0, 0, 0, 0, "")
-      val sheetSnapshot = SingleSnapshot("hash1", sheet)
-      val initialSnapshot = GroupedSnapshot("hash2", List(sheetSnapshot))
-      repository.initialize(initialSnapshot)
-      repository.findChange("hash1")
-      "Hello world" must have size (11)
-    }
-  }
+  //  "The Repository" should {
+  //    "" in {
+  //      val repository = new Repository
+  //      val sheet = Sheet(0, 0, 0, 0, 0, 0, "")
+  //      val sheetSnapshot = SingleSnapshot("hash1", sheet)
+  //      val initialSnapshot = GroupedSnapshot("hash2", List(sheetSnapshot))
+  //      repository.initialize(initialSnapshot)
+  //      repository.findChange("hash1")
+  //      "Hello world" must have size (11)
+  //    }
+  //  }
 }

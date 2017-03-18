@@ -25,6 +25,9 @@ lazy val server = (project in file("server")).settings(
     ws,
     evolutions,
     specs2 % Test,
+    "com.typesafe.akka" %% "akka-testkit" % "2.3.13" % "test", // update version accordingly
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    "org.scalamock" %%% "scalamock-scalatest-support" % "3.5.0" % "test",
     "com.typesafe.play" %% "anorm" % "2.5.0",
     "com.vmunier" %% "play-scalajs-scripts" % "0.3.0",
     "com.typesafe.slick" %% "slick" % "3.0.2",
