@@ -1,7 +1,7 @@
 package actors
 
-import com.kindone.infinitewall.data.action.{MoveSheetAction, SheetAction}
-import com.kindone.infinitewall.data.versioncontrol.{Branch, Change}
+import com.kindone.infinitewall.data.action.{ MoveSheetAction, SheetAction }
+import com.kindone.infinitewall.data.versioncontrol.{ Branch, Change }
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{ WordSpecLike, Matchers, FunSuite }
 import akka.testkit.{ TestActors, DefaultTimeout, ImplicitSender, TestKit }

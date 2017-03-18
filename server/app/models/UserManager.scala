@@ -24,6 +24,8 @@ class UserManager {
       }.singleOpt()
     }
 
+  def hashPassword(passwordRaw: String) = BCrypt.hashpw(passwordRaw, BCrypt.gensalt)
+
   def find(email: String, passwordRaw: String) =
     DB.withConnection { implicit c =>
       SQL"select id,password_hashed from users where email=$email".map {
@@ -47,10 +49,16 @@ class UserManager {
     idOpt.get
   }
 
-  def delete(id: Long) =
-    DB.withConnection { implicit c =>
-      SQL"delete from users where id = $id".executeUpdate()
-    } == 1
+  def delete(id: Long) = {
+    // admin
+    if (id == 0L) {
+      false
+    } else {
+      DB.withConnection { implicit c =>
+        SQL"delete from users where id = $id".executeUpdate()
+      } == 1
+    }
+  }
 
   def changePassword(id: Long, oldPassword: String, newPassword: String) =
     DB.withTransaction { implicit c =>
@@ -59,7 +67,7 @@ class UserManager {
       }.single
 
       if (BCrypt.checkpw(oldPassword, passwordHashed)) {
-        val newPasswordHashed = BCrypt.hashpw(newPassword, BCrypt.gensalt)
+        val newPasswordHashed = hashPassword(newPassword)
         SQL"update users set password_hashed = $newPasswordHashed where id = $id".executeUpdate()
         true
       } else false
