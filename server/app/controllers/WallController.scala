@@ -54,7 +54,7 @@ class WallController @Inject() (system: ActorSystem) extends Controller {
   def create() = UserAction { implicit request =>
     implicit val userId = request.userId
     val wall = read[Wall](bodyText)
-    val wallId = wallManager.create(wall)
+    val wallId = wallManager.create(wall).get
     Ok(write[Wall](wall.copy(id = wallId))).as(JSON_TYPE)
   }
 
@@ -100,7 +100,7 @@ class WallController @Inject() (system: ActorSystem) extends Controller {
   def createSheet(id: Long) = UserAction { implicit request =>
     implicit val userId = request.userId
     val sheet = read[Sheet](bodyText)
-    val sheetId = wallManager.createSheet(id, sheet)
+    val sheetId = wallManager.createSheet(id, sheet).get
     Ok(write[Sheet](sheet.copy(id = sheetId))).as(JSON_TYPE)
   }
 

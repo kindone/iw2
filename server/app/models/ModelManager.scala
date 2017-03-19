@@ -72,7 +72,7 @@ class ModelManager {
   def findWall(id: Long)(implicit userId: Long): Option[Wall] = wallManager.find(id)(userId)
 
   def createWall(baseLogId: Long, action: CreateWallAction)(implicit userId: Long): LogCreationResultWithId = withTransaction {
-    val newWallId = wallManager.create(Wall(0, 0, action.x, action.y, action.scale, action.title))(userId)
+    val newWallId = wallManager.create(Wall(0, 0, action.x, action.y, action.scale, action.title))(userId).get
     val result = logManager.createWallLog(WallLog(newWallId, baseLogId, CREATE_WALL, Some(write(action))))(userId)
     LogCreationResultWithId(result.logId, result.success, newWallId)
   }
@@ -115,7 +115,7 @@ class ModelManager {
   def getSheetIdsInWall(id: Long)(implicit userId: Long): Set[Long] = wallManager.getSheetIds(id)(userId)
 
   def createSheetInWall(baseLogId: Long, action: CreateSheetAction)(implicit userId: Long): LogCreationResultWithId = withTransaction {
-    val newSheetId = wallManager.createSheet(action.wallId, action.sheet)(userId)
+    val newSheetId = wallManager.createSheet(action.wallId, action.sheet)(userId).get
     val newAction = CreateSheetAction(action.wallId, action.sheet.copy(id = newSheetId))
     val result = logManager.createWallLog(WallLog(action.wallId, baseLogId, CREATE_SHEET, Some(write(newAction))))(userId)
     LogCreationResultWithId(result.logId, result.success, newSheetId)

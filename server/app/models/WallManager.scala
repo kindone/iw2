@@ -33,59 +33,57 @@ class WallManager {
          """.as(wallParser.*)
     }
 
-  def find(id: Long)(implicit userId: Long) =
-    wallOfUser(id, userId).map { wallId =>
+  def find(id: Long)(implicit userId: Long): Option[Wall] =
+    wallOfUser(id, userId).flatMap { wallId =>
       DB.withConnection { implicit c =>
         SQL"select id,state_id,x,y,scale,title from walls where id = $wallId".as(wallParser.singleOpt)
       }
-    }.get
-
-  def create(wall: Wall)(implicit userId: Long): Long = {
-    // returns id
-    val wallId: Long = DB.withTransaction { implicit c =>
-      val wallIdOpt: Option[Long] = SQL"insert into walls(state_id, x, y, scale, title) values(0, ${wall.x}, ${wall.y}, ${wall.scale}, ${wall.title})".executeInsert()
-      SQL"insert into walls_of_user(wall_id, user_id) values(${wallIdOpt.get}, $userId)".executeInsert()
-      wallIdOpt.get
     }
-    wallId
-  }
 
-  def delete(id: Long)(implicit userId: Long) =
-    wallOfUser(id, userId).foreach { _ =>
+  def create(wall: Wall)(implicit userId: Long): Option[Long] =
+    // returns id
+    DB.withTransaction { implicit c =>
+      val wallIdOpt: Option[Long] = SQL"insert into walls(state_id, x, y, scale, title) values(0, ${wall.x}, ${wall.y}, ${wall.scale}, ${wall.title})".executeInsert()
+      wallIdOpt.foreach { wallId => SQL"insert into walls_of_user(wall_id, user_id) values(${wallId}, $userId)".executeInsert() }
+      wallIdOpt
+    }
+
+  def delete(id: Long)(implicit userId: Long): Boolean =
+    wallOfUser(id, userId).map { _ =>
       DB.withConnection { implicit c =>
         SQL"delete from walls where id = $id".executeUpdate()
-      }
-    }
+      } == 1
+    }.getOrElse(false)
 
-  def setPan(id: Long, x: Double, y: Double)(implicit userId: Long) =
-    wallOfUser(id, userId).foreach { _ =>
+  def setPan(id: Long, x: Double, y: Double)(implicit userId: Long): Boolean =
+    wallOfUser(id, userId).map { _ =>
       DB.withConnection { implicit c =>
         SQL"update walls set x = $x, y = $y where id = $id".executeUpdate()
-      }
-    }
+      } == 1
+    }.getOrElse(false)
 
-  def setZoom(id: Long, scale: Double)(implicit userId: Long): Unit =
-    wallOfUser(id, userId).foreach { _ =>
+  def setZoom(id: Long, scale: Double)(implicit userId: Long): Boolean =
+    wallOfUser(id, userId).map { _ =>
       DB.withConnection { implicit c =>
         SQL"update walls set scale = $scale where id = $id".executeUpdate()
-      }
-    }
+      } == 1
+    }.getOrElse(false)
 
-  def setView(id: Long, x: Double, y: Double, scale: Double)(implicit userId: Long) =
-    wallOfUser(id, userId).foreach { _ =>
+  def setView(id: Long, x: Double, y: Double, scale: Double)(implicit userId: Long): Boolean =
+    wallOfUser(id, userId).map { _ =>
       DB.withConnection { implicit c =>
         SQL"update walls set x = $x, y = $y, scale = $scale where id = $id".executeUpdate()
-      }
-    }
+      } == 1
+    }.getOrElse(false)
 
-  def setTitle(id: Long, title: String)(implicit userId: Long) =
-    wallOfUser(id, userId).foreach { _ =>
+  def setTitle(id: Long, title: String)(implicit userId: Long): Boolean =
+    wallOfUser(id, userId).map { _ =>
       DB.withConnection { implicit c =>
         SQL"update walls set title=$title where id = $id".executeUpdate()
-      }
-    }
+      } == 1
+    }.getOrElse(false)
 
-  def getSheets(id: Long)(implicit userId: Long) = DB.withConnection { implicit c =>
+  def getSheets(id: Long)(implicit userId: Long): List[Sheet] = DB.withConnection { implicit c =>
     wallOfUser(id, userId).map { wallId =>
       SQL"""select
             sheets.id, sheets.state_id, sheets.x, sheets.y,
@@ -93,34 +91,34 @@ class WallManager {
             from sheets INNER JOIN sheets_in_wall
             ON sheets.id = sheets_in_wall.sheet_id
             where sheets_in_wall.wall_id = $id""".as(sheetParser.*)
-    }.get
+    }.getOrElse(List())
   }
 
-  def getSheetIds(id: Long)(implicit userId: Long) = DB.withConnection { implicit c =>
+  def getSheetIds(id: Long)(implicit userId: Long): Set[Long] = DB.withConnection { implicit c =>
     wallOfUser(id, userId).map { wallId =>
       SQL"""select
             sheets.id
             from sheets INNER JOIN sheets_in_wall
             ON sheets.id = sheets_in_wall.sheet_id
             where sheets_in_wall.wall_id = $id""".as(idParser.*).toSet
-    }.get
+    }.getOrElse(Set())
   }
 
-  def createSheet(id: Long, sheet: Sheet)(implicit userId: Long) = DB.withTransaction { implicit c =>
+  def createSheet(id: Long, sheet: Sheet)(implicit userId: Long): Option[Long] = DB.withTransaction { implicit c =>
     wallOfUser(id, userId).flatMap { wallId =>
       val sheetId: Option[Long] = SQL"""insert into sheets(state_id, x, y, width, height, content)
         values(0, ${sheet.x}, ${sheet.y}, ${sheet.width}, ${sheet.height}, ${sheet.text})""".executeInsert()
       SQL"insert into sheets_in_wall(wall_id, sheet_id) values($id, ${sheetId.get})".executeInsert()
       sheetId
-    }.get
+    }
   }
 
-  def deleteSheet(id: Long, sheetId: Long)(implicit userId: Long) = DB.withTransaction { implicit c =>
-    // must owned by user
-    wallOfUser(id, userId).foreach { wallId =>
-      SQL"delete from sheets where id = $sheetId".executeUpdate()
-      SQL"delete from sheets_in_wall where wall_id = $wallId and sheet_id = $sheetId".executeUpdate()
-    }
+  def deleteSheet(id: Long, sheetId: Long)(implicit userId: Long): Boolean = DB.withTransaction { implicit c =>
+    // must be owned by user
+    wallOfUser(id, userId).map { wallId =>
+      (SQL"delete from sheets where id = $sheetId".executeUpdate() == 1) &&
+        (SQL"delete from sheets_in_wall where wall_id = $wallId and sheet_id = $sheetId".executeUpdate() == 1)
+    }.getOrElse(false)
   }
 
   private def wallOfUser(wallId: Long, userId: Long): Option[Long] = DB.withConnection { implicit c =>
