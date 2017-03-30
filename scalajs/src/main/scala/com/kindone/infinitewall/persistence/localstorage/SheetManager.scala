@@ -2,6 +2,7 @@ package com.kindone.infinitewall.persistence.localstorage
 
 import com.kindone.infinitewall.data.Sheet
 import com.kindone.infinitewall.persistence.api.{ SheetManager => SheetManagerAPI }
+import org.scalajs.dom
 
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -20,13 +21,13 @@ class SheetManager(localStorage: LocalStorage) extends SheetManagerAPI {
     val id = objectManager.nextId()
     val sheet = new Sheet(id, 0, x, y, width, height, text)
     objectManager.save(id, sheet)
-    println("sheet created")
+    dom.console.info("sheet created")
     sheet
   }
 
   def delete(id: Long) = Future {
     objectManager.delete(id)
-    println("sheet deleted")
+    dom.console.info("sheet deleted")
     true
   }
 

@@ -93,7 +93,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         })
 
         persistence.addOnSheetUpdateEventHandler(sheet.id, { evt: PersistenceUpdateEvent =>
-          println("sheet persistence event:" + evt.toString)
+          dom.console.info("sheet persistence event:" + evt.toString)
           evt.change.action match {
             // TODO
             case MoveSheetAction(id, x, y) =>
@@ -127,7 +127,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       // activate controlpad events
       controlPad.setOnAddButtonClickListener({ () =>
         // create random sheet model first and realize
-        println(wall.center)
+        //dom.console.info("creating random sheet:" + wall.center)
         for (sheetModel <- persistence.createSheetInWall(wall.id, js.Math.random() * 800, js.Math.random() * 600, 100, 100, ""))
           createSheet(sheetModel)
       })
@@ -138,7 +138,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
 
       // add wall persistence update event
       persistence.addOnWallUpdateEventHandler(wall.id, { evt: PersistenceUpdateEvent =>
-        println("wall persistence event:" + evt.toString)
+        dom.console.info("wall persistence event:" + evt.toString)
         evt.change.action match {
           //TODO
           case ChangeTitleAction(_, _) =>

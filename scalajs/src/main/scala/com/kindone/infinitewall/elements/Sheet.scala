@@ -121,7 +121,7 @@ class Sheet(model: SheetModel, converter: ShowdownConverter) extends Element wit
 
       jQuery("body").on("mousemove", moveHandler)
       jQuery("body").on("mouseup", endMoveHandler)
-      println("mousedown - move")
+      dom.console.info("mousedown - move")
       false
     })
 

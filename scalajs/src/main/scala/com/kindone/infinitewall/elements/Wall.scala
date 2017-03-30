@@ -101,7 +101,7 @@ class Wall(initial: WallModel) extends Element with WallEventDispatcher {
     }
 
     val wheelHandler: js.Function1[JQueryEventObject, Boolean] = (evt: JQueryEventObject) => {
-      printf("%d %d %d\n", evt.deltaX, evt.deltaY, evt.deltaFactor)
+      dom.console.info(s"${evt.deltaX}, ${evt.deltaY}, ${evt.deltaFactor}")
       val prevScale = scale
       if (evt.deltaY > 0)
         scale = scale * (1.01)
@@ -120,7 +120,7 @@ class Wall(initial: WallModel) extends Element with WallEventDispatcher {
       downX = evt.pageX
       downY = evt.pageY
 
-      println("mousedown - pan")
+      dom.console.info("mousedown - pan")
       jQuery("body").on("mousemove", moveHandler)
       jQuery("body").on("mouseup", upHandler)
     }

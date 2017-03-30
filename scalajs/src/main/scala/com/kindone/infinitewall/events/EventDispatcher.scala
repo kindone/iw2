@@ -1,5 +1,7 @@
 package com.kindone.infinitewall.events
 
+import org.scalajs.dom
+
 /**
  * Created by kindone on 2016. 2. 21..
  */
@@ -8,19 +10,19 @@ class EventDispatcher[T <: Event] {
 
   def addEventListener(key: String, listener: EventListener[T]) = {
     eventListeners :+= (key, listener)
-    println("added event:" + this.toString + "," + key)
+    dom.console.info("added event:" + this.toString + "," + key)
   }
 
   def removeEventListener(key: String, listener: EventListener[T]) = {
     eventListeners = eventListeners.dropWhile(_ == (key, listener))
-    println("removed event:" + eventListeners.size)
+    dom.console.info("removed event:" + eventListeners.size)
   }
 
   def dispatchEvent(key: String, evt: T) = {
     if (!eventListeners.isEmpty)
-      println("dispatching event: " + this.toString + "," + eventListeners(0).toString())
+      dom.console.info("dispatching event: " + this.toString + "," + eventListeners(0).toString())
     else
-      println("dispatching event: " + this.toString + ", nothing")
+      dom.console.info("dispatching event: " + this.toString + ", nothing")
     for (listener <- eventListeners) {
       if (listener._1 == key) {
         listener._2.apply(evt)
