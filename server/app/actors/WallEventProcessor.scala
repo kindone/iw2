@@ -51,6 +51,7 @@ class WallEventProcessor extends EventProcessor {
             if (actionResult.success)
               broadcast(actionResult.logId, change)
         }
+
     }
   }
 

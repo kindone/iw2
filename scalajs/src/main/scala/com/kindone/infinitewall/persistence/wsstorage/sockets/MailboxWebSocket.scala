@@ -34,7 +34,6 @@ class MailboxWebSocket(persistentSocket: PersistentSocket, timer: Timer)
   private var mailBox: List[String] = List()
 
   private def restartTimer() = {
-
     timeoutHandle = Some(timer.setTimeout(RETRY_TIMEOUT) {
       sendMailBox()
     })
@@ -46,14 +45,19 @@ class MailboxWebSocket(persistentSocket: PersistentSocket, timer: Timer)
   }
 
   private def sendMailBox(): Unit = {
-    for (msg <- mailBox)
-      persistentSocket.send(msg)
+    if (persistentSocket.isOpen) {
+      for (msg <- mailBox)
+        persistentSocket.send(msg)
+    }
     restartTimer()
   }
 
   def setMailbox(messages: List[String]): Unit = {
     mailBox = messages
-    sendMailBox()
+    if (mailBox.isEmpty)
+      stopTimer()
+    else if (timeoutHandle.isEmpty)
+      sendMailBox()
   }
 
   def clearMailbox(): Unit = {

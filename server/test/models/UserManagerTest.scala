@@ -19,10 +19,12 @@ class UserManagerTest extends PlaySpec with MustMatchers with OneAppPerSuite {
 
     "properly find admin user" in {
       userManager.find(0).isDefined must be(true)
+      userManager.find("admin@infinitewall.com", "wallwall").isDefined must be(true)
     }
 
     "properly create a user" in {
       val id = userManager.create(User(0, username, hashedPassword))
+      //      println("password hashed:" + hashedPassword)
       id must be(1L)
     }
 

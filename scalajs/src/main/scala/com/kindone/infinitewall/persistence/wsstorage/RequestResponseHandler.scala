@@ -8,7 +8,7 @@ import scala.concurrent.{ Future, Promise }
 /**
  * Created by kindone on 2016. 12. 11..
  */
-class RequestResponseProcessor {
+class RequestResponseHandler {
 
   type OnReceive = (String, Promise[_]) => Unit
   private case class Record[T](reqId: Long, promise: Promise[T], onReceive: OnReceive)

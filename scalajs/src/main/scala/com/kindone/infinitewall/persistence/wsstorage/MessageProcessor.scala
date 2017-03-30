@@ -18,7 +18,7 @@ import scala.concurrent.{ Promise, Future }
 class MessageProcessor(branch: Branch, socket: MailboxSocket) {
   private var messages: Map[Long, Action] = Map()
   private var baseLogId = 0L
-  private val requestProcessor = new RequestResponseProcessor
+  private val requestHandler = new RequestResponseHandler
   private var sheetNotificationListeners: List[EventListener[PersistenceUpdateEvent]] = List()
   private var wallNotificationListeners: List[EventListener[PersistenceUpdateEvent]] = List()
 
@@ -26,11 +26,13 @@ class MessageProcessor(branch: Branch, socket: MailboxSocket) {
     onReceive(e.str)
   })
 
-  def send[T: Reader](action: Action): Future[T] = {
-    val reqId = requestProcessor.getNextRequestId()
+  def size = messages.size
+
+  def send[T: Reader](action: Action, baseLogId: Long = 0): Future[T] = {
+    val reqId = requestHandler.getNextRequestId()
     messages = messages + (reqId -> action)
-    updateMailbox()
-    requestProcessor.getResponseFuture[T](reqId)
+    updateMailbox(baseLogId)
+    requestHandler.getResponseFuture[T](reqId)
   }
 
   def addOnSheetNotificationListener(sheetId: Long, handler: EventListener[PersistenceUpdateEvent]): Unit = {
@@ -41,11 +43,12 @@ class MessageProcessor(branch: Branch, socket: MailboxSocket) {
     wallNotificationListeners :+= handler
   }
 
-  private def updateMailbox() = {
+  private def updateMailbox(baseLogId: Long) = {
     // convert to network friendly string
     val convertedMessages: List[String] =
       for (message <- messages.toList) yield {
         val (reqId, action) = message
+        this.baseLogId = baseLogId
         write(ChangeRequest(reqId, Change(action, baseLogId, branch)))
       }
 
@@ -57,7 +60,9 @@ class MessageProcessor(branch: Branch, socket: MailboxSocket) {
     val parsedMessage = read[ServerToClientMessage](msg)
     parsedMessage match {
       case Response(reqId, logId, message) =>
-        requestProcessor.processResponse(reqId, message)
+        requestHandler.processResponse(reqId, message)
+        messages -= reqId
+        updateMailbox(this.baseLogId)
       case Notification(logId, change) =>
         change.action match {
           case _: WallAction =>

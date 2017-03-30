@@ -12,17 +12,17 @@ import scala.concurrent.Future
 trait Persistence {
 
   /* sheet */
-  def getSheet(sheetId: Long): Future[Sheet]
+  def getSheet(sheetId: Long)(implicit stateId: Long): Future[Sheet]
 
-  def moveSheet(sheetId: Long, x: Double, y: Double): Future[Boolean]
+  def moveSheet(sheetId: Long, x: Double, y: Double)(implicit stateId: Long): Future[Boolean]
 
-  def resizeSheet(sheetId: Long, width: Double, height: Double): Future[Boolean]
+  def resizeSheet(sheetId: Long, width: Double, height: Double)(implicit stateId: Long): Future[Boolean]
 
-  def setSheetDimension(sheetId: Long, x: Double, y: Double, width: Double, height: Double): Future[Boolean]
+  def setSheetDimension(sheetId: Long, x: Double, y: Double, width: Double, height: Double)(implicit stateId: Long): Future[Boolean]
 
-  def setSheetText(sheetId: Long, text: String): Future[Boolean]
+  def setSheetText(sheetId: Long, text: String)(implicit stateId: Long): Future[Boolean]
 
-  def subscribeSheet(sheetId: Long): Future[Boolean]
+  def subscribeSheet(sheetId: Long)(implicit stateId: Long): Future[Boolean]
   def addOnSheetUpdateEventHandler(sheetId: Long, handler: EventListener[PersistenceUpdateEvent]): Unit
 
   /* wall */
@@ -34,21 +34,21 @@ trait Persistence {
 
   def getWalls(): Future[Seq[Wall]]
 
-  def panWall(wallId: Long, x: Double, y: Double): Future[Boolean]
+  def panWall(wallId: Long, x: Double, y: Double)(implicit stateId: Long): Future[Boolean]
 
-  def zoomWall(wallId: Long, scale: Double): Future[Boolean]
+  def zoomWall(wallId: Long, scale: Double)(implicit stateId: Long): Future[Boolean]
 
-  def setWallView(wallId: Long, x: Double, y: Double, scale: Double): Future[Boolean]
+  def setWallView(wallId: Long, x: Double, y: Double, scale: Double)(implicit stateId: Long): Future[Boolean]
 
-  def setWallTitle(wallId: Long, title: String): Future[Boolean]
+  def setWallTitle(wallId: Long, title: String)(implicit stateId: Long): Future[Boolean]
 
-  def getSheetsInWall(wallId: Long): Future[Set[Long]]
+  def getSheetsInWall(wallId: Long)(implicit stateId: Long): Future[Set[Long]]
 
-  def createSheetInWall(wallId: Long, x: Double, y: Double, width: Double, height: Double, text: String): Future[Sheet]
+  def createSheetInWall(wallId: Long, x: Double, y: Double, width: Double, height: Double, text: String)(implicit stateId: Long): Future[Sheet]
 
-  def deleteSheetInWall(wallId: Long, sheetId: Long): Future[Boolean]
+  def deleteSheetInWall(wallId: Long, sheetId: Long)(implicit stateId: Long): Future[Boolean]
 
-  def subscribeWall(wallId: Long): Future[Boolean]
+  def subscribeWall(wallId: Long)(implicit stateId: Long): Future[Boolean]
 
   def addOnWallUpdateEventHandler(wallId: Long, handler: EventListener[PersistenceUpdateEvent]): Unit
 

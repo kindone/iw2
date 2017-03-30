@@ -14,22 +14,6 @@ import scala.scalajs.js
 
 class WebSocketTest extends FlatSpec with MockFactory with Matchers {
 
-  class MockWebSocketInterface {
-
-    def send(str: String): Unit = {
-      sendCalled = true
-    }
-
-    def close(code: Int, reason: String): Unit = {}
-
-    var onopen: js.Function1[Event, _] = null
-    var onerror: js.Function1[ErrorEvent, _] = null
-    var onmessage: js.Function1[MessageEvent, _] = null
-    var onclose: js.Function1[CloseEvent, _] = null
-
-    var sendCalled: Boolean = false
-  }
-
   "WebSocket" should "respond to events" in {
 
     val wsi = new MockWebSocketInterface()

@@ -55,13 +55,19 @@ class MessageProcessorTest extends FunSuite with org.scalamock.scalatest.MockFac
         theHandler(MessageReceiveEvent(str))
       }
 
-      (mockSocket.dispatchReceiveEvent _).expects(*) onCall { (str: String) =>
-        theHandler(MessageReceiveEvent(str))
-      }
+      (mockSocket.setMailbox _).expects(*)
 
       (mockSocket.dispatchReceiveEvent _).expects(*) onCall { (str: String) =>
         theHandler(MessageReceiveEvent(str))
       }
+
+      (mockSocket.setMailbox _).expects(*)
+
+      (mockSocket.dispatchReceiveEvent _).expects(*) onCall { (str: String) =>
+        theHandler(MessageReceiveEvent(str))
+      }
+
+      (mockSocket.setMailbox _).expects(*)
     }
 
     val processor = new MessageProcessor(branch, mockSocket)
@@ -75,9 +81,13 @@ class MessageProcessorTest extends FunSuite with org.scalamock.scalatest.MockFac
     val response2 = Response(2L /*reqId*/ , 0 /*logid*/ , "false")
     val response3 = Response(3L /*reqId*/ , 0 /*logid*/ , "5")
 
+    processor.size should be(3)
     mockSocket.dispatchReceiveEvent(write(response1))
+    processor.size should be(2)
     mockSocket.dispatchReceiveEvent(write(response2))
+    processor.size should be(1)
     mockSocket.dispatchReceiveEvent(write(response3))
+    processor.size should be(0)
 
     responseFuture1.foreach(value =>
       value should be(true)

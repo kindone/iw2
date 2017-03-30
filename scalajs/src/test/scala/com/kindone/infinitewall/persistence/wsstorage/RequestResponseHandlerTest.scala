@@ -8,13 +8,13 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 /**
  * Created by kindone on 2017. 3. 5..
  */
-class RequestResponseProcessorTest extends FunSuite with MockFactory with Matchers {
+class RequestResponseHandlerTest extends FunSuite with MockFactory with Matchers {
 
   import scala.concurrent._
   import scala.concurrent.duration._
 
   test("testBasics") {
-    val processor = new RequestResponseProcessor
+    val processor = new RequestResponseHandler
 
     val reqId1 = processor.getNextRequestId()
     val future1 = processor.getResponseFuture[Boolean](reqId1)

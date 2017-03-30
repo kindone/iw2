@@ -64,7 +64,7 @@ class WebSocketInboundChannel(wallActor: ActorRef, sheetActor: ActorRef, outboun
 
   def receive = {
     case str: String =>
-      Logger.debug("ws event: " + str)
+      Logger.debug("WebSocket raw message came: " + str)
       val reqTry = Try { read[ChangeRequest](str) }
 
       for (req <- reqTry) {

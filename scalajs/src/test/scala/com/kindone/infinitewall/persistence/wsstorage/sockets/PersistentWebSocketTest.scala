@@ -8,12 +8,14 @@ import org.scalatest._
 
 import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
+import scala.scalajs.js.annotation.ScalaJSDefined
 
 /**
  * Created by kindone on 2017. 2. 18..
  */
 
-class MockWebSocketInterface {
+@ScalaJSDefined
+class MockWebSocketInterface extends js.Object {
   def send(str: String): Unit = {
     sendCalled = true
   }

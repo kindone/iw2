@@ -13,6 +13,6 @@ trait WebSocketFactory {
 
 class DomWebSocketFactory extends WebSocketFactory {
   def create(url: String) = {
-    new WebSocket(new raw.WebSocket(url, ""))
+    new WebSocket(new raw.WebSocket(url))
   }
 }

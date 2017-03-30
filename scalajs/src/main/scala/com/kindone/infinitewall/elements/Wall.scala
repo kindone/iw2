@@ -13,8 +13,9 @@ import scalatags.JsDom.all._
 class Wall(initial: WallModel) extends Element with WallEventDispatcher {
 
   val id = initial.id
+  def stateId = _stateId
 
-  private var stateId = 0L
+  private var _stateId = 0L
   private var scale = 1.0
   private var panX = 0.0
   private var panY = 0.0
@@ -65,7 +66,7 @@ class Wall(initial: WallModel) extends Element with WallEventDispatcher {
 
   def setup(): Unit = {
 
-    stateId = initial.stateId
+    _stateId = initial.stateId
     scale = initial.scale
     recalculateTranslation(initial.x, initial.y)
 

@@ -59,12 +59,12 @@ class WallEventHub extends EventProcessor {
 
   def applyChange(change: ChangeOnWebSocket): Unit = {
     change match {
-      case userChange @ ChangeOnWebSocket(WebSocketContext(out, userId, reqId), Change(action: WallAction, baseLogId, _)) =>
+      case userChange @ ChangeOnWebSocket(context @ WebSocketContext(out, userId, reqId), Change(action: WallAction, baseLogId, _)) =>
 
         action match {
 
           case action @ SubscribeWallEventAction(wallId) =>
-            sendToWallEventActor(wallId, out, AddEventListener(out))
+            sendToWallEventActor(wallId, out, AddEventListener(out, context))
 
           case a @ CreateWallAction(title, x, y, scale) =>
             val result = modelManager.createWall(0, a)(userId)

@@ -9,6 +9,7 @@ import com.kindone.infinitewall.persistence.api.Persistence
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import org.scalajs.jquery._
 import scala.scalajs.js
+import org.scalajs.dom
 import scalatags.JsDom.all._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
@@ -27,6 +28,8 @@ class WallView(id: Long, persistence: Persistence) extends Element {
   }
 
   def setup() = {
+
+    implicit val mockStateId: Long = 0L
 
     val wallModelFuture = {
       for (requestedWall <- persistence.getWall(id)) yield {
@@ -145,7 +148,10 @@ class WallView(id: Long, persistence: Persistence) extends Element {
         }
       })
 
-      persistence.subscribeWall(wall.id)
+      persistence.subscribeWall(wall.id)(wallModel.stateId).foreach { result =>
+        dom.console.info("now subscribing wall: " + wall.id)
+      }
+
     }
 
   }

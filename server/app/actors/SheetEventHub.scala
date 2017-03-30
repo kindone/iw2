@@ -43,10 +43,10 @@ class SheetEventHub extends Actor {
   }
 
   def receive = {
-    case change @ ChangeOnWebSocket(WebSocketContext(out, userId, msgId), Change(action: SheetAction, _, _)) =>
+    case change @ ChangeOnWebSocket(context @ WebSocketContext(out, userId, msgId), Change(action: SheetAction, _, _)) =>
       action match {
         case action @ SubscribeSheetEventAction(sheetId) =>
-          sendToSheetEventActor(sheetId, out, AddEventListener(out))
+          sendToSheetEventActor(sheetId, out, AddEventListener(out, context))
 
         // read-only shortcut
         case GetSheetAction(id) =>

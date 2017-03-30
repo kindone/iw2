@@ -1,5 +1,6 @@
 package actors.event
 
+import actors.WebSocketContext
 import akka.actor.ActorRef
 
 /**
@@ -7,7 +8,7 @@ import akka.actor.ActorRef
  */
 sealed trait Event
 
-case class AddEventListener(actorRef: ActorRef)
+case class AddEventListener(actorRef: ActorRef, context: WebSocketContext)
 case class RemoveEventListener(actorRef: ActorRef)
 
 case class SheetEvent() extends Event

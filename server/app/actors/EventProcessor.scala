@@ -44,8 +44,9 @@ trait EventProcessor extends Actor {
   }
 
   def receive = {
-    case AddEventListener(listener) =>
+    case AddEventListener(listener, context) =>
       addListener(listener)
+      listener ! response(context.reqId, 0, true)
     case RemoveEventListener(listener) =>
       removeListener(listener)
     case change: ChangeOnWebSocket =>

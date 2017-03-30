@@ -37,6 +37,8 @@ class PersistentWebSocket(baseUrl: String, wsFactory: WebSocketFactory, timer: T
 
   def isAlive: Boolean = socket.isDefined
 
+  def isOpen: Boolean = socketState.isInstanceOf[Connected]
+
   private def onReceive(e: MessageReceiveEvent) = {
     dispatchReceiveEvent(e.str)
   }
@@ -97,7 +99,7 @@ class PersistentWebSocket(baseUrl: String, wsFactory: WebSocketFactory, timer: T
   def open() = {
     socket.foreach { ws =>
       dom.console.info("WebSocket forced open event: " + ws.toString + ":" + ws.asInstanceOf[WebSocket].ws.toString + ":" + ws.numSocketOpenEventListeners)
-      ws.asInstanceOf[WebSocket].ws.onopen(js.Dynamic.literal().asInstanceOf[Event])
+      ws.asInstanceOf[WebSocket].ws.asInstanceOf[js.Dynamic].onopen(js.Dynamic.literal().asInstanceOf[Event])
     }
   }
 }

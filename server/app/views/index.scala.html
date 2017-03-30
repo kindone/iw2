@@ -99,11 +99,11 @@
                     method: 'POST',
                     contentType: 'text/plain', // FIXME
                     data: $('#form-login').serializeFormJSON(),
-                    complete: function(xhr, status) {
+                    success: function(xhr, status) {
                         window.location.href = "/wall.html"
                     },
                     error: function(xhr, status) {
-                        // TODO
+                        alert('error')
                     }
                 })
                 return false;
