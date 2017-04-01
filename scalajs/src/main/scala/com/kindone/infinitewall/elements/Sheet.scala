@@ -1,7 +1,7 @@
 package com.kindone.infinitewall.elements
 
 import com.kindone.infinitewall.elements.events.{ SheetEventDispatcher, SheetDimensionChangeEvent, SheetContentChangeEvent, SheetCloseEvent }
-import com.kindone.infinitewall.events._
+import com.kindone.infinitewall.event._
 import com.kindone.infinitewall.facades.ShowdownConverter
 import com.kindone.infinitewall.data.{ Sheet => SheetModel }
 import org.scalajs.dom

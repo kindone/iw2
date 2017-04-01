@@ -4,7 +4,7 @@ import actors.event.{ RemoveEventListener, AddEventListener }
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.versioncontrol.Change
-import com.kindone.infinitewall.data.ws.Response
+import com.kindone.infinitewall.data.communication.Response
 import models.{ ModelManager, SheetManager }
 import play.api.Logger
 import upickle.default._

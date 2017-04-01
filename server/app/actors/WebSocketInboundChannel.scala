@@ -3,7 +3,7 @@ package actors
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.versioncontrol.Change
-import com.kindone.infinitewall.data.ws.{ ChangeRequest }
+import com.kindone.infinitewall.data.communication.{ ChangeRequest }
 import play.api.Logger
 import upickle.default._
 

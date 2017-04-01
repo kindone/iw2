@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.persistence.wsstorage.socket
 
-import com.kindone.infinitewall.events.EventListener
+import com.kindone.infinitewall.event.EventListener
 import com.kindone.infinitewall.persistence.wsstorage.events.{ MessageReceiveEvent, SocketErrorEvent, SocketOpenCloseEvent }
 import org.scalajs.dom.raw.{ CloseEvent, MessageEvent, ErrorEvent, Event }
 import org.scalatest._

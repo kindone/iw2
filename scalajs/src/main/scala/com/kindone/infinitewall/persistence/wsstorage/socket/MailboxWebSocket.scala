@@ -4,8 +4,8 @@ import java.util.UUID
 
 import com.kindone.infinitewall.data.action.Action
 import com.kindone.infinitewall.data.versioncontrol.{ Change, Read }
-import com.kindone.infinitewall.data.ws._
-import com.kindone.infinitewall.events.EventListener
+import com.kindone.infinitewall.data.communication._
+import com.kindone.infinitewall.event.EventListener
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.wsstorage.events.{ MessageReceiveEvent, SocketEventDispatcher, SocketOpenCloseEvent }
 import com.kindone.infinitewall.util.Timer

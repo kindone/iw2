@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.data.ws
+package com.kindone.infinitewall.data.communication
 
 import com.kindone.infinitewall.data.action.{ReadonlyAction, Action}
 import com.kindone.infinitewall.data.versioncontrol.{ Read, Change}

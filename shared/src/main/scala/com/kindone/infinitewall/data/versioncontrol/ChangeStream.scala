@@ -6,7 +6,7 @@ import com.kindone.infinitewall.data.State
  * Created by kindone on 2016. 12. 10..
  */
 
-case class PartialChangeStream(states:Vector[StateWithHistory], changes:Vector[Change], baseLogId:Long)
+case class PartialChangeStream(states:Seq[StateWithHistory], changes:Seq[Change], baseLogId:Long)
 {
   def applyChanges(changes:Seq[Change]):PartialChangeStream = {
     changes.foldLeft(this) { (stream, change) =>
@@ -19,8 +19,8 @@ case class PartialChangeStream(states:Vector[StateWithHistory], changes:Vector[C
 }
 
 class ChangeStream(baseState:State) {
-  private var states:Vector[StateWithHistory] = Vector(StateWithHistory.create(baseState))
-  private var changes:Vector[Change] = Vector()
+  private var states:Seq[StateWithHistory] = Vector(StateWithHistory.create(baseState))
+  private var changes:Seq[Change] = Vector()
 
   def append(change:Change) = {
     changes = changes :+ change

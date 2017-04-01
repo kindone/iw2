@@ -1,7 +1,7 @@
 package com.kindone.infinitewall
 
 import com.kindone.infinitewall.elements._
-import com.kindone.infinitewall.events._
+import com.kindone.infinitewall.event._
 import com.kindone.infinitewall.facades.ShowdownConverter
 import com.kindone.infinitewall.persistence.api.Persistence
 import com.kindone.infinitewall.persistence.localstorage.{ LocalPersistence, LocalStorage }

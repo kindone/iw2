@@ -3,7 +3,7 @@ package com.kindone.infinitewall.elements
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.{ Wall => WallModel, Sheet => SheetModel }
 import com.kindone.infinitewall.elements.events._
-import com.kindone.infinitewall.events._
+import com.kindone.infinitewall.event._
 import com.kindone.infinitewall.facades.ShowdownConverter
 import com.kindone.infinitewall.persistence.api.Persistence
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent

@@ -2,8 +2,8 @@ package com.kindone.infinitewall.persistence.wsstorage
 
 import com.kindone.infinitewall.data.action.{ SheetAction, WallAction, Action }
 import com.kindone.infinitewall.data.versioncontrol.{ Branch, Change }
-import com.kindone.infinitewall.data.ws.{ Notification, Response, ServerToClientMessage, ChangeRequest }
-import com.kindone.infinitewall.events._
+import com.kindone.infinitewall.data.communication.{ Notification, Response, ServerToClientMessage, ChangeRequest }
+import com.kindone.infinitewall.event._
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.wsstorage.events.MessageReceiveEvent
 import com.kindone.infinitewall.persistence.wsstorage.socket.{ MailboxWebSocket, MailboxSocket }

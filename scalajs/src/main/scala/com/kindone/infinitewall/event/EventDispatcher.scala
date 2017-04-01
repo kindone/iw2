@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.events
+package com.kindone.infinitewall.event
 
 import org.scalajs.dom
 

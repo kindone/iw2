@@ -3,7 +3,7 @@ package actors
 import actors.event.{ RemoveEventListener, AddEventListener }
 import akka.actor.{ Actor, ActorRef }
 import com.kindone.infinitewall.data.versioncontrol.Change
-import com.kindone.infinitewall.data.ws.{ Notification, Response }
+import com.kindone.infinitewall.data.communication.{ Notification, Response }
 import models.{ LogCreationResult, ModelManager }
 import play.api.Logger
 import upickle.default._

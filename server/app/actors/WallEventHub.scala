@@ -3,7 +3,7 @@ package actors
 import actors.event.{ AddEventListener, RemoveEventListener }
 import akka.actor.{ Actor, Props, ActorRef }
 import com.kindone.infinitewall.data.versioncontrol.Change
-import com.kindone.infinitewall.data.ws.Response
+import com.kindone.infinitewall.data.communication.Response
 import com.kindone.infinitewall.data.Wall
 import com.kindone.infinitewall.data.action._
 import models.{ WallLog, WallLogManager, WallManager }

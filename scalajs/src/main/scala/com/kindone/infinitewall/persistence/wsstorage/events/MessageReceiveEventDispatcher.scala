@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.persistence.wsstorage.events
 
-import com.kindone.infinitewall.events.{ EventListener, EventDispatcher }
+import com.kindone.infinitewall.event.{ EventListener, EventDispatcher }
 
 /**
  * Created by kindone on 2016. 5. 31..

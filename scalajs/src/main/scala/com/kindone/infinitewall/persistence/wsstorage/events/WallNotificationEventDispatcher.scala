@@ -1,7 +1,7 @@
 package com.kindone.infinitewall.persistence.wsstorage.events
 
 import com.kindone.infinitewall.data.action.Action
-import com.kindone.infinitewall.events.{ EventListener, EventDispatcher }
+import com.kindone.infinitewall.event.{ EventListener, EventDispatcher }
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 
 /**
