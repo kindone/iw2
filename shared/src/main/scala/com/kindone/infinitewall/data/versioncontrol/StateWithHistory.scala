@@ -1,11 +1,36 @@
 package com.kindone.infinitewall.data.versioncontrol
 
 import com.kindone.infinitewall.data.action.{WallAlterAction, SheetAlterAction, ChangeSheetContentAction}
+import com.kindone.infinitewall.data.state._
 import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, StringWithHistory}
 import com.kindone.infinitewall.data._
 import com.kindone.util.Hasher
 import upickle.default._
 
+
+trait SheetLike {
+  def id:Long
+  def stateId:Long
+  def x:Double
+  def y:Double
+  def width:Double
+  def height:Double
+  def text:String
+}
+
+trait WallLike {
+  def id: Long
+  def stateId:Long
+  def x: Double
+  def y: Double
+  def scale: Double
+  def title: String
+}
+
+trait WallWithSheetsLike {
+  def wall:Wall
+  def sheetsInWall:SheetsInWall
+}
 
 sealed trait StateWithHistory
 {
@@ -19,17 +44,18 @@ object StateWithHistory {
     anonymous match {
       case sheet:Sheet =>
         create(sheet)
-      case sheetsInWall:SheetsInWall =>
-        create(sheetsInWall)
       case wall:Wall =>
         create(wall)
-      case wall:WallWithSheets =>
-        create(wall)
+      case wws:WallWithSheets =>
+        create(wws)
     }
   }
 
   def create(sheet:Sheet):SheetWithHistory =
     new SheetWithHistory(sheet)
+
+  def create(wall:Wall):WallWithHistory =
+    new WallWithHistory(wall)
 
 }
 

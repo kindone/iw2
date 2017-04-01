@@ -1,7 +1,8 @@
 package models
 
 import com.kindone.infinitewall.data.action._
-import com.kindone.infinitewall.data.{ Sheet, Wall }
+import com.kindone.infinitewall.data.Wall
+import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import upickle.default._
 import play.api.db.DB
 import play.api.Play.current

@@ -1,6 +1,6 @@
 package controllers
 
-import com.kindone.infinitewall.data.Sheet
+import com.kindone.infinitewall.data.state.Sheet
 import models.SheetManager
 import models.WallManager
 import play.api._

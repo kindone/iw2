@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.data.versioncontrol
 
-import com.kindone.infinitewall.data.State
+import com.kindone.infinitewall.data.state.State
 
 /**
  * Created by kindone on 2016. 10. 2..

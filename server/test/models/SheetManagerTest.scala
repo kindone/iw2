@@ -1,6 +1,7 @@
 package models
 
-import com.kindone.infinitewall.data.{ Sheet, Wall }
+import com.kindone.infinitewall.data.Wall
+import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.{ OneAppPerSuite, PlaySpec }
 

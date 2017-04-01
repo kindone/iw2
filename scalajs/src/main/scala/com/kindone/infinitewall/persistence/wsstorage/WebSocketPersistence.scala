@@ -1,8 +1,9 @@
 package com.kindone.infinitewall.persistence.wsstorage
 
 import com.kindone.infinitewall.data.action._
+import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import com.kindone.infinitewall.data.versioncontrol.Branch
-import com.kindone.infinitewall.data.{ Wall, Sheet }
+import com.kindone.infinitewall.data.Wall
 import com.kindone.infinitewall.event.EventListener
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.api.{ SimplePersistence, Persistence }

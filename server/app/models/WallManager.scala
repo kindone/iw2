@@ -1,7 +1,8 @@
 package models
 
+import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import play.api.Play.current
-import com.kindone.infinitewall.data.{ Sheet, Wall }
+import com.kindone.infinitewall.data.Wall
 import anorm._
 import play.api.db.DB
 

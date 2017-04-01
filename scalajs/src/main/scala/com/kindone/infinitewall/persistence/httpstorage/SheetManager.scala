@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.persistence.httpstorage
 
-import com.kindone.infinitewall.data.Sheet
+import com.kindone.infinitewall.data.state.Sheet
 import com.kindone.infinitewall.persistence.api.{ SheetManager => SheetManagerAPI }
 import org.scalajs.dom
 import dom.ext.Ajax

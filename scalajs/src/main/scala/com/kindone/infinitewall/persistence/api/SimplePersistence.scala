@@ -1,6 +1,7 @@
 package com.kindone.infinitewall.persistence.api
 
-import com.kindone.infinitewall.data.{ Wall, Sheet }
+import com.kindone.infinitewall.data.Wall
+import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import com.kindone.infinitewall.event.EventListener
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 

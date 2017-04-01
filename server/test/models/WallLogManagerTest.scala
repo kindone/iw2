@@ -1,7 +1,7 @@
 package models
 
-import com.kindone.infinitewall.data.Wall
 import com.kindone.infinitewall.data.action.ChangePanAction
+import com.kindone.infinitewall.data.state.Wall
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.{ OneAppPerSuite, PlaySpec }
 import upickle.default._

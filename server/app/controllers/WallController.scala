@@ -5,7 +5,8 @@ import javax.inject.{ Singleton, Inject }
 import actors._
 import akka.actor._
 import com.kindone.infinitewall.data.action._
-import com.kindone.infinitewall.data.{ Sheet, Wall }
+import com.kindone.infinitewall.data.Wall
+import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import models.WallManager
 import play.api._
 import play.api.libs.json.JsValue

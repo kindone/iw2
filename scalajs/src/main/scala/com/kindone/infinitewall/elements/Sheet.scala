@@ -3,14 +3,13 @@ package com.kindone.infinitewall.elements
 import com.kindone.infinitewall.elements.events.{ SheetEventDispatcher, SheetDimensionChangeEvent, SheetContentChangeEvent, SheetCloseEvent }
 import com.kindone.infinitewall.event._
 import com.kindone.infinitewall.facades.ShowdownConverter
-import com.kindone.infinitewall.data.{ Sheet => SheetModel }
 import org.scalajs.dom
 import org.scalajs.jquery._
 
 import scala.scalajs.js
 import scalatags.JsDom.all._
 
-class Sheet(model: SheetModel, converter: ShowdownConverter) extends Element with SheetEventDispatcher {
+class Sheet(model: Sheet, converter: ShowdownConverter) extends Element with SheetEventDispatcher {
 
   val id = model.id
 

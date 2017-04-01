@@ -1,10 +1,10 @@
 package models
 
 import anorm.SqlParser._
+import com.kindone.infinitewall.data.state.Wall
 import play.api.Logger
 import play.api.Play.current
 import anorm.Row
-import com.kindone.infinitewall.data.Wall
 import play.api.db.DB
 import anorm._
 

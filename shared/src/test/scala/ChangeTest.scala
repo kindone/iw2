@@ -1,7 +1,7 @@
 package shared.test
 
-import com.kindone.infinitewall.data.Sheet
 import com.kindone.infinitewall.data.action.{Action, ChangeSheetContentAction}
+import com.kindone.infinitewall.data.state.Sheet
 import com.kindone.infinitewall.data.versioncontrol._
 import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, StringWithHistory}
 import minitest._

@@ -1,6 +1,7 @@
 package com.kindone.infinitewall.persistence.localstorage
 
-import com.kindone.infinitewall.data.{ Sheet, Wall }
+import com.kindone.infinitewall.data.Wall
+import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import upickle.default._
 
 import scala.concurrent.Future

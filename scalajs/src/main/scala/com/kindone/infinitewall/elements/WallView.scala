@@ -1,7 +1,6 @@
 package com.kindone.infinitewall.elements
 
 import com.kindone.infinitewall.data.action._
-import com.kindone.infinitewall.data.{ Wall => WallModel, Sheet => SheetModel }
 import com.kindone.infinitewall.elements.events._
 import com.kindone.infinitewall.event._
 import com.kindone.infinitewall.facades.ShowdownConverter
@@ -68,7 +67,7 @@ class WallView(id: Long, persistence: Persistence) extends Element {
       }
 
       // sheets
-      def createSheet(sheetModel: SheetModel) = {
+      def createSheet(sheetModel: Sheet) = {
         val sheet = new Sheet(sheetModel, showdownConverter)
         wall.appendSheet(sheet)
 

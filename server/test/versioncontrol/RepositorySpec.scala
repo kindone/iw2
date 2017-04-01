@@ -1,7 +1,8 @@
 package versioncontrol
 
-import com.kindone.infinitewall.data.Sheet
 //import com.kindone.infinitewall.data.versioncontrol.{ GroupedSnapshot, SingleSnapshot, Repository }
+
+import com.kindone.infinitewall.data.state.Sheet
 import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._

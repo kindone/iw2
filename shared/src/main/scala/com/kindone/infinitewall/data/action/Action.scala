@@ -1,6 +1,6 @@
 package com.kindone.infinitewall.data.action
 
-import com.kindone.infinitewall.data.Sheet
+import com.kindone.infinitewall.data.state.Sheet
 
 /**
  * Created by kindone on 2016. 4. 16..
