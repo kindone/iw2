@@ -6,7 +6,7 @@ import com.kindone.infinitewall.data.ws.{ Notification, Response, ServerToClient
 import com.kindone.infinitewall.events._
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.wsstorage.events.MessageReceiveEvent
-import com.kindone.infinitewall.persistence.wsstorage.sockets.{ MailboxWebSocket, MailboxSocket }
+import com.kindone.infinitewall.persistence.wsstorage.socket.{ MailboxWebSocket, MailboxSocket }
 import com.kindone.infinitewall.util.SimpleIdGenerator
 import upickle.default._
 

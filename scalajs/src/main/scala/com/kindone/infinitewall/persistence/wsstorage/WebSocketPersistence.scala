@@ -6,7 +6,7 @@ import com.kindone.infinitewall.data.{ Wall, Sheet }
 import com.kindone.infinitewall.events.EventListener
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.api.{ SimplePersistence, Persistence }
-import com.kindone.infinitewall.persistence.wsstorage.sockets.{ MailboxSocket, MailboxWebSocket }
+import com.kindone.infinitewall.persistence.wsstorage.socket.{ MailboxSocket, MailboxWebSocket }
 
 import scala.concurrent.Future
 

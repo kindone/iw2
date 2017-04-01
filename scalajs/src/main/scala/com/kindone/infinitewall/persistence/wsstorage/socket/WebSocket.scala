@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.persistence.wsstorage.sockets
+package com.kindone.infinitewall.persistence.wsstorage.socket
 
 import org.scalajs.dom
 import org.scalajs.dom.raw.{ ErrorEvent, Event, MessageEvent }

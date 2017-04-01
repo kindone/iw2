@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.persistence.wsstorage.sockets
+package com.kindone.infinitewall.persistence.wsstorage.socket
 
 import java.util.UUID
 

@@ -1,10 +1,10 @@
-package com.kindone.infinitewall.persistence.wsstorage.sockets
+package com.kindone.infinitewall.persistence.wsstorage.socket
 
 import java.util.UUID
 
 import com.kindone.infinitewall.events.EventListener
-import com.kindone.infinitewall.persistence.wsstorage.WebSocketFactory
 import com.kindone.infinitewall.persistence.wsstorage.events._
+import com.kindone.infinitewall.persistence.wsstorage.socket.WebSocketFactory
 import com.kindone.infinitewall.util.Timer
 import org.scalajs.dom.raw.Event
 import upickle.default._

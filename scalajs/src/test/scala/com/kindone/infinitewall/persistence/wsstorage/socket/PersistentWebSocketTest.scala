@@ -1,6 +1,6 @@
-package com.kindone.infinitewall.persistence.wsstorage.sockets
+package com.kindone.infinitewall.persistence.wsstorage.socket
 
-import com.kindone.infinitewall.persistence.wsstorage.WebSocketFactory
+import com.kindone.infinitewall.persistence.wsstorage.socket.WebSocketFactory
 import com.kindone.infinitewall.util.TestableTimer
 import org.scalajs.dom.raw.{ CloseEvent, MessageEvent, ErrorEvent, Event }
 import org.scalatest.FlatSpec

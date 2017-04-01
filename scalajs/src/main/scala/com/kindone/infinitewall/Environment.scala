@@ -1,8 +1,8 @@
 package com.kindone.infinitewall
 
 import com.kindone.infinitewall.facades.DomTimer
-import com.kindone.infinitewall.persistence.wsstorage.{ WebSocketPersistence, DomWebSocketFactory }
-import com.kindone.infinitewall.persistence.wsstorage.sockets.{ PersistentSocket, WebSocket, PersistentWebSocket, MailboxWebSocket }
+import com.kindone.infinitewall.persistence.wsstorage.WebSocketPersistence
+import com.kindone.infinitewall.persistence.wsstorage.socket._
 
 import scala.scalajs.js
 

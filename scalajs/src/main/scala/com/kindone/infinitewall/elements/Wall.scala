@@ -100,6 +100,7 @@ class Wall(initial: WallModel) extends Element with WallEventDispatcher {
       element
     }
 
+    // FIXME: wheel library
     val wheelHandler: js.Function1[JQueryEventObject, Boolean] = (evt: JQueryEventObject) => {
       dom.console.info(s"${evt.deltaX}, ${evt.deltaY}, ${evt.deltaFactor}")
       val prevScale = scale

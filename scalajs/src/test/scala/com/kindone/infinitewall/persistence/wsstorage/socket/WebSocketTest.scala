@@ -1,4 +1,4 @@
-package com.kindone.infinitewall.persistence.wsstorage.sockets
+package com.kindone.infinitewall.persistence.wsstorage.socket
 
 import com.kindone.infinitewall.events.EventListener
 import com.kindone.infinitewall.persistence.wsstorage.events.{ MessageReceiveEvent, SocketErrorEvent, SocketOpenCloseEvent }

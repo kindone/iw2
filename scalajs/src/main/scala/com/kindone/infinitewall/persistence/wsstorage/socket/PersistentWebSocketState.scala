@@ -1,5 +1,6 @@
-package com.kindone.infinitewall.persistence.wsstorage.sockets
+package com.kindone.infinitewall.persistence.wsstorage.socket
 
+import org.scalajs.dom
 /**
  * Created by kindone on 2017. 2. 22..
  */
@@ -32,6 +33,11 @@ trait PersistentWebSocketState {
   def changeState(newState: PersistentWebSocketState): Unit = {
     context.changeState(newState)
   }
+
+  def unexpected = {
+    dom.console.warn("unexpected state change requested")
+  }
+
 }
 
 class Initial(val context: StateContext) extends PersistentWebSocketState {
@@ -40,19 +46,19 @@ class Initial(val context: StateContext) extends PersistentWebSocketState {
     context.connect()
   }
 
-  def closed(): Unit = {}
+  def closed(): Unit = unexpected
 
-  def fail(): Unit = {}
+  def fail(): Unit = unexpected
 
-  def timeout(): Unit = {}
+  def timeout(): Unit = unexpected
 
-  def succeed(): Unit = {}
+  def succeed(): Unit = unexpected
 }
 
 class Connecting(val context: StateContext) extends PersistentWebSocketState {
-  def tryConnect(): Unit = {}
+  def tryConnect(): Unit = unexpected
 
-  def closed(): Unit = {}
+  def closed(): Unit = unexpected
 
   def fail(): Unit = {
     changeState(new ConnectionRetrying(context, 1))
@@ -77,19 +83,19 @@ class ConnectionClosed(val context: StateContext) extends PersistentWebSocketSta
     context.connect()
   }
 
-  def closed(): Unit = {}
+  def closed(): Unit = unexpected
 
-  def fail(): Unit = {}
+  def fail(): Unit = unexpected
 
-  def timeout(): Unit = {}
+  def timeout(): Unit = unexpected
 
-  def succeed(): Unit = {}
+  def succeed(): Unit = unexpected
 }
 
 class ConnectionRetrying(val context: StateContext, numRetry: Int) extends PersistentWebSocketState {
-  def tryConnect(): Unit = {}
+  def tryConnect(): Unit = unexpected
 
-  def closed(): Unit = {}
+  def closed(): Unit = unexpected
 
   def fail(): Unit = {
     changeState(new ConnectionRetrying(context, numRetry + 1))
@@ -109,15 +115,15 @@ class ConnectionRetrying(val context: StateContext, numRetry: Int) extends Persi
 }
 
 class Connected(val context: StateContext) extends PersistentWebSocketState {
-  def tryConnect(): Unit = {}
+  def tryConnect(): Unit = unexpected
 
   def closed(): Unit = {
     changeState(new ConnectionClosed(context))
   }
 
-  def fail(): Unit = {}
+  def fail(): Unit = unexpected
 
-  def timeout(): Unit = {}
+  def timeout(): Unit = unexpected
 
-  def succeed(): Unit = {}
+  def succeed(): Unit = unexpected
 }

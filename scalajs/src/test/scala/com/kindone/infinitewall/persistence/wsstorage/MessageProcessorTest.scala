@@ -6,7 +6,7 @@ import com.kindone.infinitewall.data.ws.{ Response, Notification }
 import com.kindone.infinitewall.events.EventListener
 import com.kindone.infinitewall.persistence.api.events.PersistenceUpdateEvent
 import com.kindone.infinitewall.persistence.wsstorage.events.MessageReceiveEvent
-import com.kindone.infinitewall.persistence.wsstorage.sockets.{ MailboxSocket, PersistentWebSocket }
+import com.kindone.infinitewall.persistence.wsstorage.socket.{ MailboxSocket, PersistentWebSocket }
 import org.scalatest.{ Matchers, FunSuite }
 import upickle.default._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

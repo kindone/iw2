@@ -1,6 +1,5 @@
-package com.kindone.infinitewall.persistence.wsstorage
+package com.kindone.infinitewall.persistence.wsstorage.socket
 
-import com.kindone.infinitewall.persistence.wsstorage.sockets.WebSocket
 import org.scalajs.dom.raw
 
 /**
