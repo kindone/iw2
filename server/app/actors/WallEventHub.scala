@@ -59,7 +59,7 @@ class WallEventHub extends EventProcessor {
 
   def applyChange(change: ChangeOnWebSocket): Unit = {
     change match {
-      case userChange @ ChangeOnWebSocket(context @ WebSocketContext(out, userId, reqId), Change(action: WallAction, baseLogId, _)) =>
+      case userChange @ ChangeOnWebSocket(context @ WebSocketContext(out, userId, reqId), Change(action: WallAction, stateId, _)) =>
 
         action match {
 
@@ -71,7 +71,7 @@ class WallEventHub extends EventProcessor {
             out ! response(reqId, result.logId, Wall(result.id, 0, x, y, scale, title))
 
           case a @ DeleteWallAction(wallId) =>
-            val result = modelManager.deleteWall(baseLogId, a)(userId)
+            val result = modelManager.deleteWall(stateId, a)(userId)
             out ! response(reqId, result)
           case ListWallAction() =>
             out ! response(reqId, 0, modelManager.findAllWalls()(userId))

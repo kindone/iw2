@@ -1,6 +1,5 @@
 package models
 
-import com.kindone.infinitewall.data.Wall
 import com.kindone.infinitewall.data.action._
 import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import org.scalatest.MustMatchers

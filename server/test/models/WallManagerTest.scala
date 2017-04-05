@@ -2,7 +2,6 @@ package models
 
 import java.util.NoSuchElementException
 
-import com.kindone.infinitewall.data.Wall
 import com.kindone.infinitewall.data.state.{Wall, Sheet}
 import org.scalatest._
 import org.scalatestplus.play._

@@ -17,7 +17,7 @@ import scala.concurrent.{ Promise, Future }
  */
 class MessageProcessor(branch: Branch, socket: MailboxSocket) {
   private var messages: Map[Long, Action] = Map()
-  private var baseLogId = 0L
+  private var stateId = 0L
   private val requestHandler = new RequestResponseHandler
   private var sheetNotificationListeners: List[EventListener[PersistenceUpdateEvent]] = List()
   private var wallNotificationListeners: List[EventListener[PersistenceUpdateEvent]] = List()
@@ -28,10 +28,10 @@ class MessageProcessor(branch: Branch, socket: MailboxSocket) {
 
   def size = messages.size
 
-  def send[T: Reader](action: Action, baseLogId: Long = 0): Future[T] = {
+  def send[T: Reader](action: Action, stateId: Long = 0): Future[T] = {
     val reqId = requestHandler.getNextRequestId()
     messages = messages + (reqId -> action)
-    updateMailbox(baseLogId)
+    updateMailbox(stateId)
     requestHandler.getResponseFuture[T](reqId)
   }
 
@@ -43,13 +43,13 @@ class MessageProcessor(branch: Branch, socket: MailboxSocket) {
     wallNotificationListeners :+= handler
   }
 
-  private def updateMailbox(baseLogId: Long) = {
+  private def updateMailbox(stateId: Long) = {
     // convert to network friendly string
     val convertedMessages: List[String] =
       for (message <- messages.toList) yield {
         val (reqId, action) = message
-        this.baseLogId = baseLogId
-        write(ChangeRequest(reqId, Change(action, baseLogId, branch)))
+        this.stateId = stateId
+        write(ChangeRequest(reqId, Change(action, stateId, branch)))
       }
 
     socket.setMailbox(convertedMessages)
@@ -62,7 +62,7 @@ class MessageProcessor(branch: Branch, socket: MailboxSocket) {
       case Response(reqId, logId, message) =>
         requestHandler.processResponse(reqId, message)
         messages -= reqId
-        updateMailbox(this.baseLogId)
+        updateMailbox(this.stateId)
       case Notification(logId, change) =>
         change.action match {
           case _: WallAction =>

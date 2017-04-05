@@ -21,17 +21,17 @@ class SheetEventProcessor extends EventProcessor {
 
   def applyChange(change: ChangeOnWebSocket): Unit = {
     change match {
-      case ChangeOnWebSocket(WebSocketContext(outChannel, userId, reqId), change @ Change(alterAction: SheetAlterAction, baseLogId, _)) =>
+      case ChangeOnWebSocket(WebSocketContext(outChannel, userId, reqId), change @ Change(alterAction: SheetAlterAction, stateId, _)) =>
         val actionResult: LogCreationResult =
           alterAction match {
             case action @ MoveSheetAction(id, x, y) =>
-              modelManager.moveSheet(baseLogId, action)(userId)
+              modelManager.moveSheet(stateId, action)(userId)
             case action @ ResizeSheetAction(id, width, height) =>
-              modelManager.resizeSheet(baseLogId, action)(userId)
+              modelManager.resizeSheet(stateId, action)(userId)
             case action @ ChangeSheetDimensionAction(id, x, y, width, height) =>
-              modelManager.setSheetDimension(baseLogId, action)(userId)
+              modelManager.setSheetDimension(stateId, action)(userId)
             case action @ ChangeSheetContentAction(id, content, pos, length) =>
-              modelManager.setSheetText(baseLogId, action)(userId)
+              modelManager.setSheetText(stateId, action)(userId)
             case _ =>
               Logger.warn("This message type is not supported")
               throw new RuntimeException("Unexpected sheet alter action")

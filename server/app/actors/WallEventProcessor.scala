@@ -20,11 +20,11 @@ object WallEventProcessor {
 class WallEventProcessor extends EventProcessor {
   def applyChange(change: ChangeOnWebSocket): Unit = {
     change match {
-      case ChangeOnWebSocket(WebSocketContext(outChannel, userId, reqId), change @ Change(alterAction: WallAlterAction, baseLogId, _)) =>
+      case ChangeOnWebSocket(WebSocketContext(outChannel, userId, reqId), change @ Change(alterAction: WallAlterAction, stateId, _)) =>
 
         alterAction match {
           case createAction @ CreateSheetAction(wallId, sheet) =>
-            val actionResult = modelManager.createSheetInWall(baseLogId, createAction)(userId)
+            val actionResult = modelManager.createSheetInWall(stateId, createAction)(userId)
             outChannel ! response(reqId, actionResult.logId, actionResult.id)
             if (actionResult.success) {
               val newChange = change.copy(action = createAction.copy(actionResult.id))
@@ -34,15 +34,15 @@ class WallEventProcessor extends EventProcessor {
             val actionResult: LogCreationResult =
               nonCreateAction match {
                 case action @ ChangePanAction(wallId, x, y) =>
-                  modelManager.setWallPan(baseLogId, action)(userId)
+                  modelManager.setWallPan(stateId, action)(userId)
                 case action @ ChangeZoomAction(wallId, scale) =>
-                  modelManager.setWallZoom(baseLogId, action)(userId)
+                  modelManager.setWallZoom(stateId, action)(userId)
                 case action @ ChangeViewAction(wallId, x, y, scale) =>
-                  modelManager.setWallView(baseLogId, action)(userId)
+                  modelManager.setWallView(stateId, action)(userId)
                 case action @ ChangeTitleAction(wallId, title) =>
-                  modelManager.setWallTitle(baseLogId, action)(userId)
+                  modelManager.setWallTitle(stateId, action)(userId)
                 case action @ DeleteSheetAction(wallId, sheetId) =>
-                  modelManager.deleteSheetInWall(baseLogId, action)(userId)
+                  modelManager.deleteSheetInWall(stateId, action)(userId)
                 case _ =>
                   Logger.warn("This message type is not supported")
                   throw new RuntimeException("Unexpected sheet alter action")

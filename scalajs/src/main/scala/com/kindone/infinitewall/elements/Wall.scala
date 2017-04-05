@@ -3,13 +3,13 @@ package com.kindone.infinitewall.elements
 import com.kindone.infinitewall.elements.events.{ WallEventDispatcher, ViewChangeEvent, SheetRemovedEvent, SheetAppendedEvent }
 import com.kindone.infinitewall.event._
 import com.kindone.infinitewall.facades.JqWheel._
+import com.kindone.infinitewall.data.state.{ Wall => WallModel }
 import org.scalajs.dom
 import org.scalajs.jquery._
-
 import scala.scalajs.js
 import scalatags.JsDom.all._
 
-class Wall(initial: Wall) extends Element with WallEventDispatcher {
+class Wall(initial: WallModel) extends Element with WallEventDispatcher {
 
   val id = initial.id
   def stateId = _stateId

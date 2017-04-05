@@ -1,8 +1,7 @@
 package models
 
 import com.kindone.infinitewall.data.action._
-import com.kindone.infinitewall.data.Wall
-import com.kindone.infinitewall.data.state.{Wall, Sheet}
+import com.kindone.infinitewall.data.state.{ Wall, Sheet }
 import upickle.default._
 import play.api.db.DB
 import play.api.Play.current
@@ -40,29 +39,29 @@ class ModelManager {
 
   def deleteSheet(id: Long)(implicit userId: Long): Unit = sheetManager.delete(id)(userId)
 
-  def moveSheet(baseLogId: Long, action: MoveSheetAction)(implicit userId: Long): LogCreationResult = withTransaction[LogCreationResult] {
-    val result = logManager.createSheetLog(SheetLog(action.sheetId, baseLogId, MOVE_SHEET, Some(write(action))))(userId)
+  def moveSheet(stateId: Long, action: MoveSheetAction)(implicit userId: Long): LogCreationResult = withTransaction[LogCreationResult] {
+    val result = logManager.createSheetLog(SheetLog(action.sheetId, stateId, MOVE_SHEET, Some(write(action))))(userId)
     if (result.success)
       sheetManager.setPosition(action.sheetId, action.x, action.y)(userId)
     result
   }
 
-  def resizeSheet(baseLogId: Long, action: ResizeSheetAction)(implicit userId: Long): LogCreationResult = withTransaction {
-    val result = logManager.createSheetLog(SheetLog(action.sheetId, baseLogId, RESIZE_SHEET, Some(write(action))))(userId)
+  def resizeSheet(stateId: Long, action: ResizeSheetAction)(implicit userId: Long): LogCreationResult = withTransaction {
+    val result = logManager.createSheetLog(SheetLog(action.sheetId, stateId, RESIZE_SHEET, Some(write(action))))(userId)
     if (result.success)
       sheetManager.setSize(action.sheetId, action.width, action.height)(userId)
     result
   }
 
-  def setSheetDimension(baseLogId: Long, action: ChangeSheetDimensionAction)(implicit userId: Long): LogCreationResult = withTransaction {
-    val result = logManager.createSheetLog(SheetLog(action.sheetId, baseLogId, CHANGE_SHEET_DIMENSION, Some(write(action))))(userId)
+  def setSheetDimension(stateId: Long, action: ChangeSheetDimensionAction)(implicit userId: Long): LogCreationResult = withTransaction {
+    val result = logManager.createSheetLog(SheetLog(action.sheetId, stateId, CHANGE_SHEET_DIMENSION, Some(write(action))))(userId)
     if (result.success)
       sheetManager.setSize(action.sheetId, action.width, action.height)(userId)
     result
   }
 
-  def setSheetText(baseLogId: Long, action: ChangeSheetContentAction)(implicit userId: Long): LogCreationResult = withTransaction {
-    val result = logManager.createSheetLog(SheetLog(action.sheetId, baseLogId, CHANGE_SHEET_CONTENT, Some(write(action))))(userId)
+  def setSheetText(stateId: Long, action: ChangeSheetContentAction)(implicit userId: Long): LogCreationResult = withTransaction {
+    val result = logManager.createSheetLog(SheetLog(action.sheetId, stateId, CHANGE_SHEET_CONTENT, Some(write(action))))(userId)
     if (result.success)
       sheetManager.updateText(action.sheetId, action.content, action.from, action.numDeleted)(userId)
     result
@@ -72,40 +71,40 @@ class ModelManager {
 
   def findWall(id: Long)(implicit userId: Long): Option[Wall] = wallManager.find(id)(userId)
 
-  def createWall(baseLogId: Long, action: CreateWallAction)(implicit userId: Long): LogCreationResultWithId = withTransaction {
+  def createWall(stateId: Long, action: CreateWallAction)(implicit userId: Long): LogCreationResultWithId = withTransaction {
     val newWallId = wallManager.create(Wall(0, 0, action.x, action.y, action.scale, action.title))(userId).get
-    val result = logManager.createWallLog(WallLog(newWallId, baseLogId, CREATE_WALL, Some(write(action))))(userId)
+    val result = logManager.createWallLog(WallLog(newWallId, stateId, CREATE_WALL, Some(write(action))))(userId)
     LogCreationResultWithId(result.logId, result.success, newWallId)
   }
 
-  def deleteWall(baseLogId: Long, action: DeleteWallAction)(implicit userId: Long): LogCreationResult = withTransaction {
-    val result = logManager.createWallLog(WallLog(action.wallId, baseLogId, DELETE_WALL, Some(write(action))))(userId)
+  def deleteWall(stateId: Long, action: DeleteWallAction)(implicit userId: Long): LogCreationResult = withTransaction {
+    val result = logManager.createWallLog(WallLog(action.wallId, stateId, DELETE_WALL, Some(write(action))))(userId)
     wallManager.delete(action.wallId)(userId)
     result
   }
-  def setWallPan(baseLogId: Long, action: ChangePanAction)(implicit userId: Long): LogCreationResult = withTransaction {
-    val result = logManager.createWallLog(WallLog(action.wallId, baseLogId, CHANGE_WALL_PAN, Some(write(action))))(userId)
+  def setWallPan(stateId: Long, action: ChangePanAction)(implicit userId: Long): LogCreationResult = withTransaction {
+    val result = logManager.createWallLog(WallLog(action.wallId, stateId, CHANGE_WALL_PAN, Some(write(action))))(userId)
     if (result.success)
       wallManager.setPan(action.wallId, action.x, action.y)(userId)
     result
   }
 
-  def setWallZoom(baseLogId: Long, action: ChangeZoomAction)(implicit userId: Long): LogCreationResult = withTransaction {
-    val result = logManager.createWallLog(WallLog(action.wallId, baseLogId, CHANGE_WALL_ZOOM, Some(write(action))))(userId)
+  def setWallZoom(stateId: Long, action: ChangeZoomAction)(implicit userId: Long): LogCreationResult = withTransaction {
+    val result = logManager.createWallLog(WallLog(action.wallId, stateId, CHANGE_WALL_ZOOM, Some(write(action))))(userId)
     if (result.success)
       wallManager.setZoom(action.wallId, action.scale)(userId)
     result
   }
 
-  def setWallView(baseLogId: Long, action: ChangeViewAction)(implicit userId: Long): LogCreationResult = withTransaction {
-    val result = logManager.createWallLog(WallLog(action.wallId, baseLogId, CHANGE_WALL_VIEW, Some(write(action))))(userId)
+  def setWallView(stateId: Long, action: ChangeViewAction)(implicit userId: Long): LogCreationResult = withTransaction {
+    val result = logManager.createWallLog(WallLog(action.wallId, stateId, CHANGE_WALL_VIEW, Some(write(action))))(userId)
     if (result.success)
       wallManager.setView(action.wallId, action.x, action.y, action.scale)(userId)
     result
   }
 
-  def setWallTitle(baseLogId: Long, action: ChangeTitleAction)(implicit userId: Long): LogCreationResult = withTransaction {
-    val result = logManager.createWallLog(WallLog(action.wallId, baseLogId, CHANGE_WALL_TITLE, Some(write(action))))(userId)
+  def setWallTitle(stateId: Long, action: ChangeTitleAction)(implicit userId: Long): LogCreationResult = withTransaction {
+    val result = logManager.createWallLog(WallLog(action.wallId, stateId, CHANGE_WALL_TITLE, Some(write(action))))(userId)
     if (result.success)
       wallManager.setTitle(action.wallId, action.title)(userId)
     result
@@ -115,16 +114,16 @@ class ModelManager {
 
   def getSheetIdsInWall(id: Long)(implicit userId: Long): Set[Long] = wallManager.getSheetIds(id)(userId)
 
-  def createSheetInWall(baseLogId: Long, action: CreateSheetAction)(implicit userId: Long): LogCreationResultWithId = withTransaction {
+  def createSheetInWall(stateId: Long, action: CreateSheetAction)(implicit userId: Long): LogCreationResultWithId = withTransaction {
     val newSheetId = wallManager.createSheet(action.wallId, action.sheet)(userId).get
     val newAction = CreateSheetAction(action.wallId, action.sheet.copy(id = newSheetId))
-    val result = logManager.createWallLog(WallLog(action.wallId, baseLogId, CREATE_SHEET, Some(write(newAction))))(userId)
+    val result = logManager.createWallLog(WallLog(action.wallId, stateId, CREATE_SHEET, Some(write(newAction))))(userId)
     LogCreationResultWithId(result.logId, result.success, newSheetId)
   }
 
-  def deleteSheetInWall(baseLogId: Long, action: DeleteSheetAction)(implicit userId: Long): LogCreationResult = withTransaction {
+  def deleteSheetInWall(stateId: Long, action: DeleteSheetAction)(implicit userId: Long): LogCreationResult = withTransaction {
     wallManager.deleteSheet(action.wallId, action.sheetId)(userId)
-    logManager.createWallLog(WallLog(action.wallId, baseLogId, DELETE_SHEET, Some(write(action))))(userId)
+    logManager.createWallLog(WallLog(action.wallId, stateId, DELETE_SHEET, Some(write(action))))(userId)
   }
 
 }

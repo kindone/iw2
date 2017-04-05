@@ -6,14 +6,14 @@ import com.kindone.infinitewall.data.state.State
  * Created by kindone on 2016. 12. 10..
  */
 
-case class PartialChangeStream(states:Vector[StateWithHistory], changes:Vector[Change], baseLogId:Long)
+case class PartialChangeStream(states:Vector[StateWithHistory], changes:Vector[Change], stateId:Long)
 {
   def applyChanges(changes:Seq[Change]):PartialChangeStream = {
     changes.foldLeft(this) { (stream, change) =>
       val (newState, alteredChange) = stream.states.last.applyChange(change)
       PartialChangeStream(stream.states :+ newState,
-        stream.changes :+ alteredChange.copy(baseLogId = baseLogId),
-        stream.baseLogId +1)
+        stream.changes :+ alteredChange.copy(stateId = stateId),
+        stream.stateId +1)
     }
   }
 }
@@ -31,12 +31,12 @@ class ChangeStream(baseState:State) {
   // replace changes
   def rebase(newChanges:Seq[Change]):Unit = {
 
-    val baseLogId = newChanges.head.baseLogId
-    val (baseChanges, rebasedChanges) = splitChanges(baseLogId)
-    val baseStates = getBaseStates(baseLogId)
+    val stateId = newChanges.head.stateId
+    val (baseChanges, rebasedChanges) = splitChanges(stateId)
+    val baseStates = getBaseStates(stateId)
 
     // apply new changes first
-    val initialStream = PartialChangeStream(baseStates, baseChanges, baseLogId)
+    val initialStream = PartialChangeStream(baseStates, baseChanges, stateId)
     val newStream1 = initialStream.applyChanges(newChanges)
 
     // apply old changes on top of it
@@ -46,24 +46,24 @@ class ChangeStream(baseState:State) {
     changes = newStream2.changes
   }
 
-  def baseLogId = {
+  def stateId = {
     if(changes.isEmpty)
       states.last.stateId
     else
-      changes.last.baseLogId + 1
+      changes.last.stateId + 1
   }
 
   def getLatestState():StateWithHistory = {
     states.last
   }
 
-  private def splitChanges(baseLogId:Long):(Vector[Change], Vector[Change]) = {
-    val index = changes.indexWhere(_.baseLogId == baseLogId)
+  private def splitChanges(stateId:Long):(Vector[Change], Vector[Change]) = {
+    val index = changes.indexWhere(_.stateId == stateId)
     changes.splitAt(index)
   }
 
-  private def getBaseStates(baseLogId:Long):Vector[StateWithHistory] = {
-    val index = changes.indexWhere(_.baseLogId == baseLogId)
+  private def getBaseStates(stateId:Long):Vector[StateWithHistory] = {
+    val index = changes.indexWhere(_.stateId == stateId)
     // s0-(c0)-s1-(c1)-s2- ... -
     // c1 -> [s0, s1]
     assert(index >= 0)
@@ -73,14 +73,14 @@ class ChangeStream(baseState:State) {
   private def checkSanity() = {
     assert(changes.length + 1 == states.length)
     changes.foldLeft(0) { (i, change) =>
-      assert(i == change.baseLogId)
+      assert(i == change.stateId)
       i+1
     }
   }
 
   private def checkSanity(changes:Seq[Change]) = {
     changes.foldLeft(0) { (i, change) =>
-      assert(i == change.baseLogId)
+      assert(i == change.stateId)
       i+1
     }
   }

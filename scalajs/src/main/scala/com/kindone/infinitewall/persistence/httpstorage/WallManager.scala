@@ -1,7 +1,6 @@
 package com.kindone.infinitewall.persistence.httpstorage
 
-import com.kindone.infinitewall.data.Wall
-import com.kindone.infinitewall.data.state.{Wall, Sheet}
+import com.kindone.infinitewall.data.state.{ Wall, Sheet }
 import com.kindone.infinitewall.persistence.api.{ WallManager => WallManagerAPI }
 import org.scalajs.dom.ext.Ajax
 import upickle.default._

@@ -4,7 +4,6 @@ import com.kindone.infinitewall.data.state.Sheet
 import play.api.Play.current
 import anorm.Row
 import anorm.SqlParser.scalar
-import com.kindone.infinitewall.data.Wall
 import play.api.db.DB
 import anorm._
 

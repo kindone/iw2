@@ -11,9 +11,9 @@ import com.kindone.util.Hasher
 
 trait VersionedAction {
   def action:Action
-  def baseLogId:Long
+  def stateId:Long
 }
 
-case class Change(action:Action, baseLogId:Long, branch:Branch) extends VersionedAction
-case class Read(action:ReadonlyAction, baseLogId:Long) extends VersionedAction// none means latest
+case class Change(action:Action, stateId:Long, branch:Branch) extends VersionedAction
+case class Read(action:ReadonlyAction, stateId:Long) extends VersionedAction// none means latest
 
