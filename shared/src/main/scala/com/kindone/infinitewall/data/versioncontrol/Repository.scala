@@ -6,14 +6,14 @@ import com.kindone.infinitewall.data.state.State
  * Created by kindone on 2016. 10. 2..
  */
 class Repository(baseState:State) {
-  private val changeStream:ChangeStream = new ChangeStream(baseState)
+  private val history:History = new History(baseState)
 
   def append(change:Change):Unit = {
-    changeStream.append(change)
+    history.append(change)
   }
 
   def rebase(newChanges:Seq[Change]):Unit = {
-    changeStream.rebase(newChanges)
+    history.rebase(newChanges)
   }
 
 }

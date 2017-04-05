@@ -2,7 +2,7 @@ package com.kindone.infinitewall.data.versioncontrol
 
 import com.kindone.infinitewall.data.action.{WallAlterAction, SheetAlterAction, ChangeSheetContentAction}
 import com.kindone.infinitewall.data.state._
-import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, StringWithHistory}
+import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, JournaledString}
 import com.kindone.infinitewall.data._
 import com.kindone.util.Hasher
 import upickle.default._
@@ -32,39 +32,33 @@ trait WallWithSheetsLike {
   def sheetsInWall:SheetsInWall
 }
 
-sealed trait StateWithHistory
+sealed trait JournaledState
 {
   type BaseType
   def stateId:Long
-  def applyChange(change:Change):(StateWithHistory, Change)
+  def applyChange(change:Change):(JournaledState, Change)
 }
 
-object StateWithHistory {
-  def create(anonymous:State):StateWithHistory = {
+object JournaledState {
+  def create(anonymous:State):JournaledState = {
     anonymous match {
       case sheet:Sheet =>
-        create(sheet)
+        new JournaledSheet(sheet)
       case wall:Wall =>
-        create(wall)
+        new JournaledWall(wall)
       case wws:WallWithSheets =>
-        create(wws)
+        new JournaledWallWithSheets(wws)
     }
   }
-
-  def create(sheet:Sheet):SheetWithHistory =
-    new SheetWithHistory(sheet)
-
-  def create(wall:Wall):WallWithHistory =
-    new WallWithHistory(wall)
-
 }
 
-class SheetWithHistory(val sheet:Sheet, ss:StringWithHistory) extends StateWithHistory with SheetLike{
+class JournaledSheet(val sheet:Sheet, ss:JournaledString) extends JournaledState with SheetLike{
 
   type BaseType = Sheet
 
+  // initial state
   def this(sheet:Sheet) {
-    this(sheet, new StringWithHistory(sheet.text))
+    this(sheet, new JournaledString(sheet.text))
   }
 
   def id = sheet.id
@@ -75,14 +69,14 @@ class SheetWithHistory(val sheet:Sheet, ss:StringWithHistory) extends StateWithH
   def height = sheet.height
   def text = sheet.text
 
-  def applyChange(change:Change):(StateWithHistory, Change) = {
+  def applyChange(change:Change):(JournaledState, Change) = {
     change match {
       case Change(action:ChangeSheetContentAction,  _, _) =>
         val (newSs, op) = ss.applyTextOperation(new TextOperation(action.content, action.from, action.numDeleted), change.branch.hash)
-        val newSheetWithHistory = new SheetWithHistory(sheet.applyAction(change.action), newSs)
+        val newSheetWithHistory = new JournaledSheet(sheet.applyAction(change.action), newSs)
         (newSheetWithHistory, change.copy(action = action.copy(content = op.content, from = op.from, numDeleted = op.numDeleted)))
       case _ =>
-        val newSheetWithHistory = new SheetWithHistory(sheet.applyAction(change.action), ss)
+        val newSheetWithHistory = new JournaledSheet(sheet.applyAction(change.action), ss)
         (newSheetWithHistory, change)
     }
   }
@@ -93,7 +87,7 @@ class SheetWithHistory(val sheet:Sheet, ss:StringWithHistory) extends StateWithH
 }
 
 
-class WallWithHistory(val wall:Wall) extends StateWithHistory with WallLike {
+class JournaledWall(val wall:Wall) extends JournaledState with WallLike {
   type BaseType = Wall
 
   def id: Long = wall.id
@@ -103,12 +97,36 @@ class WallWithHistory(val wall:Wall) extends StateWithHistory with WallLike {
   def scale: Double = wall.scale
   def title: String = wall.title
 
-  def applyChange(change:Change):(StateWithHistory, Change) = {
+  def applyChange(change:Change):(JournaledState, Change) = {
     change.action match {
       case a:WallAlterAction =>
-        (new WallWithHistory(wall.applyAction(a)), change)
+        (new JournaledWall(wall.applyAction(a)), change)
       case _ =>
         (this, change)
     }
   }
+
+  override def toString = {
+    s"{id: $id, x: $x, y: $y, scale: $scale, title: '$title'}"
+  }
+}
+
+class JournaledWallWithSheets(val wws:WallWithSheets) extends JournaledState with WallWithSheetsLike {
+  type BaseType = WallWithSheets
+
+  def stateId: Long = wws.stateId
+
+  def wall: Wall = wws.wall
+
+  def sheetsInWall: SheetsInWall = wws.sheetsInWall
+
+  def applyChange(change: Change): (JournaledState, Change) = {
+    change.action match {
+      case a:WallAlterAction =>
+        (new JournaledWallWithSheets(WallWithSheets(wws.wall.applyAction(a), wws.sheetsInWall)), change)
+      case _ =>
+        (this, change)
+    }
+  }
+
 }

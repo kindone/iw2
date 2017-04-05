@@ -4,17 +4,17 @@ package com.kindone.infinitewall.data.versioncontrol.util
  * Created by kindone on 2016. 10. 2..
  */
 // immutable
-class StringWithHistory(list: List[CharWithHistory]) {
+class JournaledString(list: List[CharWithMod]) {
   // initialize
 
   def this(str: String) = {
     this(str.map { c =>
-      new CharWithHistory(c)
+      new CharWithMod(c)
     }.toList)
   }
 
   // @description: apply op operation and returns its transformed operation
-  def applyTextOperation(op: TextOperation, branchName: String): (StringWithHistory, TextOperation) = {
+  def applyTextOperation(op: TextOperation, branchName: String): (JournaledString, TextOperation) = {
     var i = 0
     var nVisible = 0
     var insertPos = 0
@@ -48,7 +48,7 @@ class StringWithHistory(list: List[CharWithHistory]) {
 
     // inserted part
     val inserted = op.content.map { c =>
-      new CharWithHistory(c, Set(branchName))
+      new CharWithMod(c, Set(branchName))
     }
 
     i = 0
@@ -61,7 +61,7 @@ class StringWithHistory(list: List[CharWithHistory]) {
 
     val finalList = list.take(insertPos) ++ inserted.toList ++ list.drop(insertPos)
     val alteredOp = TextOperation(op.content, alteredFrom, numDeleted)
-    (new StringWithHistory(finalList), alteredOp)
+    (new JournaledString(finalList), alteredOp)
   }
 
   // @description current state of string as text (deletion applied)

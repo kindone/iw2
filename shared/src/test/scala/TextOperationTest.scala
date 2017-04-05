@@ -1,18 +1,18 @@
 package shared.test
 
-import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, StringWithHistory}
+import com.kindone.infinitewall.data.versioncontrol.util.{TextOperation, JournaledString}
 import minitest._
 
 object TextOperationTest extends SimpleTestSuite {
   test("single branch") {
-    val ss = new StringWithHistory("abcdefg")
+    val ss = new JournaledString("abcdefg")
     val op1 = TextOperation("A", 1, 1)
     val (ss2,_) = ss.applyTextOperation(op1, "0")
     assertEquals(ss2.text, "aAcdefg")
   }
 
   test("double branches") {
-    val ss = new StringWithHistory("abcdefg")
+    val ss = new JournaledString("abcdefg")
     val op1 = TextOperation("A", 1, 1)
     val (ss2, _) = ss.applyTextOperation(op1, "0")
 
@@ -22,7 +22,7 @@ object TextOperationTest extends SimpleTestSuite {
   }
 
   test("double branches - crossed") {
-    val ss = new StringWithHistory("abcdefg")
+    val ss = new JournaledString("abcdefg")
     val opA1 = TextOperation("A", 1, 1) // replace 'b'
     val opA2 = TextOperation("A", 1, 1) // replace 'b'
     val opA3 = TextOperation("B", 2, 1) // replace 'c'
